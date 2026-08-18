@@ -3,6 +3,7 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { InitialLoader } from "@/components/site/InitialLoader";
 import { MarketStrip } from "@/components/site/MarketStrip";
+import { WelcomeModal } from "@/components/site/WelcomeModal";
 import { getNavCategories, getSettings } from "@/lib/queries";
 
 export default async function SiteLayout({ children }: LayoutProps<"/">) {
@@ -39,6 +40,7 @@ export default async function SiteLayout({ children }: LayoutProps<"/">) {
         copyright={settings?.copyright || "PrimeCrest Media Ltd."}
         categories={cats}
       />
+      <WelcomeModal />
     </InitialLoader>
   );
 }

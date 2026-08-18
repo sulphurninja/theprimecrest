@@ -2,6 +2,8 @@ import Link from "next/link";
 import { AdUnit } from "@/components/site/AdUnit";
 import { ArticleCard, type CardArticle } from "@/components/site/ArticleCard";
 import { NewsletterForm } from "@/components/site/NewsletterForm";
+import { FeaturedCarousel } from "@/components/site/FeaturedCarousel";
+import { Reveal } from "@/components/site/Reveal";
 import { getActiveAd, getHomePayload } from "@/lib/queries";
 import { buildMetadata } from "@/lib/seo";
 import { SITE } from "@/lib/constants";
@@ -60,13 +62,14 @@ export default async function HomePage() {
 
   const featured = payload.featured.filter(Boolean) as CardArticle[];
   const briefing = payload.briefing.filter(Boolean) as CardArticle[];
+  const lead = [payload.hero as CardArticle, ...featured.slice(0, 3)];
 
   return (
     <div className="mx-auto max-w-[1280px] px-5 lg:px-8">
-      {/* Lead well: hero story + latest rail */}
+      {/* Lead well: featured carousel + latest rail */}
       <section className="grid gap-10 py-10 lg:grid-cols-12 lg:gap-0">
         <div className="lg:col-span-8 lg:pr-10">
-          <ArticleCard article={payload.hero as CardArticle} variant="hero" />
+          <FeaturedCarousel articles={lead} />
         </div>
         <aside className="lg:col-span-4 lg:border-l lg:border-rule lg:pl-10">
           <h2 className="section-title mb-2 border-b-2 border-ink pb-3">The Latest</h2>
@@ -90,6 +93,7 @@ export default async function HomePage() {
 
       {/* The Briefing + sidebar */}
       <section className="border-t border-rule py-12">
+        <Reveal>
         <div className="grid gap-12 lg:grid-cols-12 lg:gap-0">
           <div className="lg:col-span-8 lg:pr-10">
             <SectionHeader title="The Briefing" />
@@ -116,12 +120,15 @@ export default async function HomePage() {
             ) : null}
           </aside>
         </div>
+        </Reveal>
       </section>
 
       {/* Cover story */}
       {payload.cover ? (
         <section className="border-t border-rule py-14">
-          <ArticleCard article={payload.cover as CardArticle} variant="cover" />
+          <Reveal>
+            <ArticleCard article={payload.cover as CardArticle} variant="cover" />
+          </Reveal>
         </section>
       ) : null}
 
@@ -134,8 +141,10 @@ export default async function HomePage() {
       {/* The Interview */}
       {payload.interview ? (
         <section className="border-t border-rule py-12">
-          <SectionHeader title="The Interview" />
-          <ArticleCard article={payload.interview as CardArticle} variant="standard" />
+          <Reveal>
+            <SectionHeader title="The Interview" />
+            <ArticleCard article={payload.interview as CardArticle} variant="standard" />
+          </Reveal>
         </section>
       ) : null}
 
@@ -144,12 +153,14 @@ export default async function HomePage() {
         .filter((rail) => rail.articles.length > 0)
         .map((rail) => (
           <section key={rail.category.slug} className="border-t border-rule py-12">
-            <SectionHeader title={rail.category.name} href={`/c/${rail.category.slug}`} />
-            <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
-              {rail.articles.slice(0, 4).map((article) => (
-                <ArticleCard key={article._id} article={article as CardArticle} variant="feature" />
-              ))}
-            </div>
+            <Reveal>
+              <SectionHeader title={rail.category.name} href={`/c/${rail.category.slug}`} />
+              <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
+                {rail.articles.slice(0, 4).map((article) => (
+                  <ArticleCard key={article._id} article={article as CardArticle} variant="feature" />
+                ))}
+              </div>
+            </Reveal>
           </section>
         ))}
 
