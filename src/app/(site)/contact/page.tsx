@@ -1,53 +1,62 @@
-import { InquireForm } from "@/components/site/InquireForm";
+import { getSettings } from "@/lib/queries";
 import { buildMetadata } from "@/lib/seo";
+import { ContactForm } from "@/components/site/ContactForm";
+
+export const revalidate = 3600;
 
 export const metadata = buildMetadata({
-  title: "Contact",
-  description: "Reach the PrimeCrest desk — editorial, corrections, partnerships, and press.",
+  title: "Contact Us",
+  description: "Get in touch with the PrimeCrest editorial team.",
   path: "/contact",
 });
 
-const DESKS = [
-  { name: "Editorial", email: "desk@primecrest.com", note: "Tips, pitches, corrections." },
-  { name: "Partnerships", email: "advertise@primecrest.com", note: "Advertising and sponsorship." },
-  { name: "Press", email: "press@primecrest.com", note: "Interviews and media requests." },
-];
+export default async function ContactPage() {
+  const settings = await getSettings().catch(() => null);
+  const contactEmail = settings?.contactEmail || "desk@primecrest.com";
+  const advertiseEmail = settings?.advertiseEmail || "advertise@primecrest.com";
 
-export default function ContactPage() {
   return (
-    <div className="mx-auto max-w-[1100px] px-5 lg:px-8">
-      <header className="border-b-2 border-ink py-16">
-        <p className="kicker">Contact</p>
-        <h1 className="headline mt-3 text-[2.6rem] sm:text-[3.4rem]">Write to the desk.</h1>
-        <p className="dek mt-5 max-w-2xl">
-          We read everything. Corrections are handled first, story tips are treated in
-          confidence, and serious pitches get a serious reply.
+    <div className="mx-auto max-w-[820px] px-5 py-16 lg:px-8">
+      <header className="border-b-2 border-ink pb-8">
+        <p className="kicker">Reach Us</p>
+        <h1 className="headline mt-2 text-[2.4rem] sm:text-[3rem]">Contact Us</h1>
+        <p className="dek mt-4">
+          Whether you have a tip, a correction, or simply want to say something — we read every
+          message.
         </p>
       </header>
 
-      <div className="grid gap-14 py-14 lg:grid-cols-5">
-        <div className="lg:col-span-2">
-          <div className="space-y-8">
-            {DESKS.map((desk) => (
-              <div key={desk.name} className="border-b border-rule pb-6 last:border-b-0">
-                <h2 className="font-sans text-[0.78rem] font-semibold uppercase tracking-[0.12em]">
-                  {desk.name}
-                </h2>
-                <a
-                  href={`mailto:${desk.email}`}
-                  className="headline mt-1.5 block text-[1.25rem] no-underline hover:text-accent"
-                >
-                  {desk.email}
-                </a>
-                <p className="mt-1 font-sans text-[0.85rem] text-muted">{desk.note}</p>
-              </div>
-            ))}
-          </div>
+      <div className="grid gap-10 py-12 sm:grid-cols-2">
+        <div>
+          <h2 className="section-title mb-3">Editorial</h2>
+          <p className="font-serif text-[0.95rem] leading-relaxed text-ink-soft">
+            For story tips, corrections, or press inquiries.
+          </p>
+          <a
+            href={`mailto:${contactEmail}`}
+            className="mt-3 inline-block font-sans text-[0.88rem] font-semibold text-accent no-underline hover:text-accent-hover"
+          >
+            {contactEmail}
+          </a>
         </div>
-        <div className="lg:col-span-3">
-          <InquireForm type="contact" />
+        <div>
+          <h2 className="section-title mb-3">Advertising</h2>
+          <p className="font-serif text-[0.95rem] leading-relaxed text-ink-soft">
+            Sponsorship, native features, and display placements.
+          </p>
+          <a
+            href={`mailto:${advertiseEmail}`}
+            className="mt-3 inline-block font-sans text-[0.88rem] font-semibold text-accent no-underline hover:text-accent-hover"
+          >
+            {advertiseEmail}
+          </a>
         </div>
       </div>
+
+      <section className="border-t border-rule pt-10">
+        <h2 className="section-title mb-6">Send us a message</h2>
+        <ContactForm />
+      </section>
     </div>
   );
 }

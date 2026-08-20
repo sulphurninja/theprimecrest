@@ -1,13 +1,14 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ExternalLink } from "lucide-react";
 import { AdUnit } from "@/components/site/AdUnit";
 import { ArticleBody } from "@/components/site/ArticleBody";
 import { ArticleCard, type CardArticle } from "@/components/site/ArticleCard";
 import { NewsletterForm } from "@/components/site/NewsletterForm";
 import { ReadingProgress } from "@/components/site/ReadingProgress";
 import { ShareBar } from "@/components/site/ShareBar";
-import { getActiveAd, getPublishedArticle, getRelatedArticles } from "@/lib/queries";
+import { getActiveAd, getPublishedArticle, getRelatedArticles, getSettings } from "@/lib/queries";
 import { buildMetadata, newsArticleJsonLd } from "@/lib/seo";
 import { formatDate, siteUrl } from "@/lib/utils";
 
@@ -44,11 +45,19 @@ export default async function StoryPage({ params }: Props) {
       ? String(article.category._id)
       : String(article.category);
 
-  const [related, sidebarAd, inlineAd] = await Promise.all([
+  const [related, sidebarAd, inlineAd, settings] = await Promise.all([
     getRelatedArticles(String(article._id), categoryId, 4).catch(() => []),
     article.allowAds ? getActiveAd("article-sidebar").catch(() => null) : null,
     article.allowAds ? getActiveAd("article-inline").catch(() => null) : null,
+    getSettings().catch(() => null),
   ]);
+
+  const isMagazineArticle = article.category?.slug === "magazine";
+  const magazineLink =
+    (settings as { magazineLink?: string })?.magazineLink ||
+    "https://folio-one-lemon.vercel.app/m/saj";
+  const magazinePdf = (settings as { magazinePdf?: string })?.magazinePdf || "";
+  const pdfHref = magazinePdf || `${magazineLink}?print=true`;
 
   const jsonLd = newsArticleJsonLd({
     headline: article.title,
@@ -137,6 +146,30 @@ export default async function StoryPage({ params }: Props) {
                 <ShareBar title={article.title} slug={article.slug} />
               </div>
 
+              {isMagazineArticle ? (
+                <div className="mb-10 flex flex-wrap items-center justify-center gap-3 rounded-sm border border-rule bg-paper-2 py-4">
+                  <a
+                    href={magazineLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 rounded-sm border border-ink bg-ink px-5 py-2.5 font-sans text-[0.82rem] font-semibold text-paper no-underline transition-all hover:bg-transparent hover:text-ink"
+                  >
+                    View Digital Magazine
+                    <ExternalLink className="h-3.5 w-3.5" />
+                  </a>
+                  <a
+                    href={pdfHref}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    {...(magazinePdf ? { download: "" } : {})}
+                    className="inline-flex items-center gap-2 rounded-sm border border-ink px-5 py-2.5 font-sans text-[0.82rem] font-semibold text-ink no-underline transition-all hover:bg-ink hover:text-paper"
+                  >
+                    Download PDF
+                    <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                  </a>
+                </div>
+              ) : null}
+
               <ArticleBody html={article.content} />
 
               {article.pullQuote?.text ? (
@@ -155,6 +188,30 @@ export default async function StoryPage({ params }: Props) {
               {inlineAd ? (
                 <div className="my-12">
                   <AdUnit slot={inlineAd.slot} campaign={inlineAd.campaign} />
+                </div>
+              ) : null}
+
+              {isMagazineArticle ? (
+                <div className="mt-10 flex flex-wrap items-center justify-center gap-3 rounded-sm border border-rule bg-paper-2 py-4">
+                  <a
+                    href={magazineLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 rounded-sm border border-ink bg-ink px-5 py-2.5 font-sans text-[0.82rem] font-semibold text-paper no-underline transition-all hover:bg-transparent hover:text-ink"
+                  >
+                    View Digital Magazine
+                    <ExternalLink className="h-3.5 w-3.5" />
+                  </a>
+                  <a
+                    href={pdfHref}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    {...(magazinePdf ? { download: "" } : {})}
+                    className="inline-flex items-center gap-2 rounded-sm border border-ink px-5 py-2.5 font-sans text-[0.82rem] font-semibold text-ink no-underline transition-all hover:bg-ink hover:text-paper"
+                  >
+                    Download PDF
+                    <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                  </a>
                 </div>
               ) : null}
 

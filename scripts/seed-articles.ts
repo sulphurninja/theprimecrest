@@ -344,4 +344,61 @@ export const SEED_ARTICLES: SeedArticle[] = [
 <p>The appeal is easy to diagnose. A stack is modular: components chosen, swapped, optimised. To describe your life as a stack is to claim an engineer's relationship to it — nothing inherited, everything selected, every layer replaceable when a better one ships. It is the vocabulary of control, borrowed by people who feel they have little.</p>
 <p>What the metaphor quietly deletes is everything unstackable: the friendships that arrived by accident, the tastes you did not choose, the parts of a self that resist versioning. Languages always borrow their metaphors from the reigning technology — we were clockwork once, then steam, then computers. Now we are architectures. It is worth remembering, between optimisations, that the metaphor is the machine's. The life is still yours.</p>`,
   },
+  {
+    title: "Master of the Deal: Shermel A. Jeffers Chandwani",
+    dek: "A banker's discipline, a broker's nerve, and a luxury real estate practice built on an island that still rewards people who know the difference.",
+    excerpt:
+      "From banking powerhouse to Caribbean real estate authority — how Shermel A. Jeffers Chandwani built SAJ Interior Design & Real Estate Services into a US$300M+ portfolio.",
+    categorySlug: "women-in-business",
+    authorIndex: 0,
+    coverImage: "https://folio-one-lemon.vercel.app/issues/saj/cover.jpg",
+    coverCredit: "Photograph courtesy SAJ Interior Design & Real Estate Services",
+    tags: ["Real Estate", "Caribbean", "Luxury", "Women in Business", "Entrepreneurship"],
+    format: "feature" as const,
+    featured: true,
+    daysAgo: 1,
+    pullQuote: {
+      text: "Always master the art of the deal.",
+      attribution: "Shermel A. Jeffers Chandwani",
+    },
+    seoDescription:
+      "A profile of Shermel A. Jeffers Chandwani — Managing Director of SAJ Interior Design & Real Estate Services, from the lending desk to a US$300M luxury portfolio in the Caribbean.",
+    content: `<p>Thirteen years in banking. Ten in real estate. A portfolio now in excess of US$300 million — and a practice that still begins with a pre-approval, not a showing. Shermel A. Jeffers Chandwani leads SAJ Interior Designs and Real Estate Services from St. Kitts & Nevis, where the work is listings, yes, but also counsel: which bank, which product, which appointment, before a key turns in a lock.</p>
+<p>A friend in the banking years put it plainly. She was great with people, and she could sell anything. She should do it. She did.</p>
+<h2>From the lending desk to the listing</h2>
+<p>As Managing Director of SAJ Interior Designs and Real Estate Services, Shermel leads a luxury consultancy on St. Kitts & Nevis. The work is not only listings. It is the unglamorous middle — mortgage introductions at the local banks, appointments booked, the financial picture made clear before anyone stands in a doorway.</p>
+<p>The early years were the Royal Bank of Canada: top personal lending officer from 2005 to 2012, more than twenty-five Royal Performance awards in sales, locally and across the Eastern Caribbean. Then a friend said the obvious thing. She should sell. The island has been the proving ground ever since.</p>
+<blockquote><p>Always master the art of the deal.</p><cite>Shermel A. Jeffers Chandwani</cite></blockquote>
+<h2>What the awards actually mark</h2>
+<p>2005–2012: Top Personal Lending Officer, RBC Royal Bank of Canada. More than 25 Royal Performance awards in sales. 2024 in New York: Best Luxury Boutique Real Estate Consultancy, St. Kitts & Nevis — Luxury Lifestyle Awards. Named among the Top 100 Real Estate Brokers of the World. 2025 in Switzerland: Leading Luxury Real Estate Consultancy for Personalized Investment Guidance — Global Elite Awards.</p>
+<p>Coverage in CEO Magazine, EliteX, MSN, the New York Herald, and USA Today.</p>
+<h2>If there is a deal to be made, make it</h2>
+<p>SAJ's brief is complete: every detail of a client's real estate need, including the middle that luxury marketing usually skips. Which bank. Which product. Which appointment. Creativity here is not a mood board. It is a path through financing that actually closes.</p>
+<p>The websites hold the listings. The practice holds the rest — empathy during the transaction and after it, and accurate information on every property in play. Ten years in, SAJ is a primary listing agent on the island, trusted by local banks to help liquidate foreclosed balances.</p>
+<h2>The next five years</h2>
+<p>She sees sales and new development rising — lifestyle buyers and Citizenship by Investment alike. The horizon she names for SAJ is not the island only, but the Caribbean region: a powerhouse broker, built the same way the first decade was built. To anyone who wants the work: it is not all glamour. Be focused. Know the market. Hear what the client actually needs. Stay determined to finish the task at hand.</p>`,
+  },
+  {
+    title: "Inside the Caribbean Issue: A New Kind of Business Magazine",
+    dek: "Our inaugural digital magazine profiles the dealmakers, builders, and quiet authorities who shape commerce in the Caribbean — starting with a woman who turned banking into real estate empire.",
+    excerpt:
+      "The first PrimeCrest digital magazine is live. Flip through The Caribbean Issue — an immersive, interactive reading experience.",
+    categorySlug: "magazine",
+    authorIndex: 0,
+    coverImage: "https://folio-one-lemon.vercel.app/issues/saj/cover.jpg",
+    coverCredit: "SAJ Interior Design & Real Estate Services",
+    tags: ["Magazine", "Caribbean", "Digital Publishing", "Real Estate"],
+    format: "feature" as const,
+    featured: true,
+    daysAgo: 1,
+    seoDescription:
+      "The first PrimeCrest digital magazine — The Caribbean Issue — is now live. An interactive flipbook featuring Shermel A. Jeffers Chandwani.",
+    content: `<p>We are delighted to announce the launch of PrimeCrest's first digital magazine — <strong>The Caribbean Issue</strong>. This is not a PDF. It is an immersive, page-turning reading experience built for screens of every size, designed to feel like holding a print magazine while offering everything digital can.</p>
+<h2>What's inside</h2>
+<p>Our cover story profiles <strong>Shermel A. Jeffers Chandwani</strong>, Managing Director of SAJ Interior Design & Real Estate Services. From the Royal Bank of Canada's lending desk to a luxury consultancy with a portfolio exceeding US$300 million, her story is one of discipline, nerve, and an island that rewards people who know the difference between a showing and counsel.</p>
+<p>The issue also explores the Caribbean's position as a destination for lifestyle buyers and Citizenship by Investment, the evolving luxury real estate landscape of St. Kitts & Nevis, and what it means to build a business where trust precedes the transaction.</p>
+<h2>A new format for PrimeCrest</h2>
+<p>The digital magazine is part of our commitment to offering journalism in the form that best serves each story. Some stories belong in a daily briefing. Some deserve a long, beautifully set reading experience with full-bleed photography, pull quotes, and room to breathe. The magazine is where those stories live.</p>
+<p>Future issues will profile leaders, builders, and dealmakers across industries and geographies — always with the editorial rigour PrimeCrest readers expect, set in a format that respects their time and their taste.</p>`,
+  },
 ];

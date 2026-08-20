@@ -10,6 +10,9 @@ type Settings = {
   description: string;
   issueLabel: string;
   ticker: string;
+  magazineLink: string;
+  magazineCover: string;
+  magazinePdf: string;
   contactEmail: string;
   advertiseEmail: string;
   footerBlurb: string;
@@ -96,6 +99,33 @@ export default function SettingsPage() {
               value={settings.ticker}
               onChange={(e) => set({ ticker: e.target.value })}
               placeholder="A short line pinned above the masthead"
+              className="admin-input"
+            />
+          </label>
+          <label>
+            <span className="admin-label">Digital Magazine link (Folio URL)</span>
+            <input
+              value={settings.magazineLink || ""}
+              onChange={(e) => set({ magazineLink: e.target.value })}
+              placeholder="https://folio.yoursite.com/m/issue-slug"
+              className="admin-input"
+            />
+          </label>
+          <label>
+            <span className="admin-label">Magazine cover image URL</span>
+            <input
+              value={settings.magazineCover || ""}
+              onChange={(e) => set({ magazineCover: e.target.value })}
+              placeholder="https://res.cloudinary.com/... (portrait magazine cover)"
+              className="admin-input"
+            />
+          </label>
+          <label>
+            <span className="admin-label">Magazine PDF download URL</span>
+            <input
+              value={settings.magazinePdf || ""}
+              onChange={(e) => set({ magazinePdf: e.target.value })}
+              placeholder="https://res.cloudinary.com/.../magazine.pdf"
               className="admin-input"
             />
           </label>

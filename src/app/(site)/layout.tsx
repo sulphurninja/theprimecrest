@@ -26,6 +26,7 @@ export default async function SiteLayout({ children }: LayoutProps<"/">) {
         issueLabel={settings?.issueLabel || "Vol. IV · No. 33"}
         ticker={settings?.ticker}
         categories={cats}
+        socials={settings?.socials}
       />
       <Suspense fallback={null}>
         <MarketStrip />

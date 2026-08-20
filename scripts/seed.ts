@@ -68,34 +68,46 @@ const CATEGORIES = [
     order: 2,
   },
   {
+    name: "Women in Business",
+    kicker: "Breaking Barriers",
+    description: "Profiles, analysis, and reporting on women shaping commerce, leadership, and policy.",
+    order: 3,
+  },
+  {
     name: "Leadership",
     kicker: "The Corner Office",
     description: "Management, decision-making, and organisational craft — what actually works, reported without the seminar gloss.",
-    order: 3,
+    order: 4,
   },
   {
     name: "Culture",
     kicker: "Arts & Society",
     description: "Music, food, screens, and the shared life. Criticism with a pulse and features with a point.",
-    order: 4,
+    order: 5,
   },
   {
     name: "Ideas",
     kicker: "Essays & Argument",
     description: "Long thoughts, carefully made. Essays on technology, language, and how we live now.",
-    order: 5,
+    order: 6,
   },
   {
     name: "Science",
     kicker: "The Frontier",
     description: "From the seafloor to the grid to the lab — the systems that hold the modern world together.",
-    order: 6,
+    order: 7,
   },
   {
     name: "Lifestyle",
     kicker: "Living Well",
     description: "Style, health, and taste — covered with rigour, worn lightly.",
-    order: 7,
+    order: 8,
+  },
+  {
+    name: "Magazine",
+    kicker: "The Journal",
+    description: "In-depth features, long reads, and exclusive stories from our digital magazine.",
+    order: 9,
   },
 ];
 
