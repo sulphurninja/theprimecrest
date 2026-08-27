@@ -4,6 +4,46 @@ import "./globals.css";
 import { SITE } from "@/lib/constants";
 import { siteUrl } from "@/lib/utils";
 
+function OrganizationSchema() {
+  const schema = {
+    "@context": "https://schema.org",
+    "@type": "NewsMediaOrganization",
+    name: SITE.name,
+    url: siteUrl(),
+    logo: siteUrl("/favicon.svg"),
+    description: SITE.description,
+    slogan: SITE.slogan,
+    parentOrganization: {
+      "@type": "Organization",
+      name: SITE.company,
+      address: {
+        "@type": "PostalAddress",
+        streetAddress: SITE.address.street,
+        addressLocality: SITE.address.city,
+        addressRegion: SITE.address.state,
+        postalCode: SITE.address.zip,
+        addressCountry: SITE.address.country,
+      },
+      email: SITE.email,
+    },
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: SITE.address.street,
+      addressLocality: SITE.address.city,
+      addressRegion: SITE.address.state,
+      postalCode: SITE.address.zip,
+      addressCountry: SITE.address.country,
+    },
+    email: SITE.email,
+  };
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+    />
+  );
+}
+
 const display = Newsreader({
   variable: "--font-display",
   subsets: ["latin"],
@@ -55,7 +95,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       data-scroll-behavior="smooth"
       className={`${display.variable} ${serif.variable} ${sans.variable} h-full`}
     >
-      <body className="flex min-h-full flex-col bg-paper text-ink antialiased">{children}</body>
+      <body className="flex min-h-full flex-col bg-paper text-ink antialiased">
+        <OrganizationSchema />
+        {children}
+      </body>
     </html>
   );
 }

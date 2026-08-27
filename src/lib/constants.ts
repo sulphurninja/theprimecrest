@@ -1,9 +1,19 @@
 export const SITE = {
   name: "PrimeCrest",
   tagline: "A journal of affairs, business, and culture.",
+  slogan: "Where Vision Meets Voice",
   description:
     "PrimeCrest is a weekly editorial on power, capital, culture, and the people who shape them. Independent reporting. Considered writing.",
   issue: "Vol. IV · No. 33",
+  company: "Fortiora Group LLC",
+  address: {
+    street: "30 N Gould St Ste R",
+    city: "Sheridan",
+    state: "WY",
+    zip: "82801",
+    country: "US",
+  },
+  email: "Hello@thefortiora.com",
 } as const;
 
 export const NAV = [

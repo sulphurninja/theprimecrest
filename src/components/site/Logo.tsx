@@ -4,22 +4,33 @@ import { cn } from "@/lib/utils";
 /**
  * PrimeCrest wordmark with integrated crest mark above the P.
  */
+export const TAGLINE = "Where Vision Meets Voice";
+
 export function Wordmark({
   name = "PrimeCrest",
   className = "",
   href = "/",
+  showTagline = false,
 }: {
   name?: string;
   className?: string;
   href?: string | null;
+  showTagline?: boolean;
 }) {
   const mark = (
-    <span className={cn("inline-flex items-center gap-1.5 whitespace-nowrap", className)}>
-      <CrestIcon className="h-[0.85em] w-auto" />
-      <span className="wordmark">
-        {name}
-        <span className="text-accent">.</span>
+    <span className={cn("inline-flex flex-col", className)}>
+      <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
+        <CrestIcon className="h-[0.85em] w-auto" />
+        <span className="wordmark">
+          {name}
+          <span className="text-accent">.</span>
+        </span>
       </span>
+      {showTagline && (
+        <span className="mt-[0.1em] whitespace-nowrap font-sans text-[0.36em] font-semibold uppercase tracking-[0.32em] opacity-45">
+          {TAGLINE}
+        </span>
+      )}
     </span>
   );
   if (!href) return mark;

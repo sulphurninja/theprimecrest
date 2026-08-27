@@ -120,8 +120,8 @@ export function SiteHeader({
             <MobileNav items={allItems} siteName={siteName} tagline={tagline} dark />
           </div>
 
-          <div className="hidden min-w-0 items-center gap-8 lg:flex">
-            <Wordmark name={siteName} className="text-[1.7rem] text-paper" />
+          <div className="hidden min-w-0 items-center gap-7 lg:flex">
+            <Wordmark name={siteName} className="text-[1.7rem] text-paper" showTagline />
             <nav className="flex items-center gap-1" aria-label="Sections">
               {visibleItems.map((item) => (
                 <Link

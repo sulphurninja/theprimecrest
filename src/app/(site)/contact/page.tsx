@@ -1,6 +1,7 @@
 import { getSettings } from "@/lib/queries";
 import { buildMetadata } from "@/lib/seo";
 import { ContactForm } from "@/components/site/ContactForm";
+import { SITE } from "@/lib/constants";
 
 export const revalidate = 3600;
 
@@ -26,7 +27,7 @@ export default async function ContactPage() {
         </p>
       </header>
 
-      <div className="grid gap-10 py-12 sm:grid-cols-2">
+      <div className="grid gap-10 py-12 sm:grid-cols-3">
         <div>
           <h2 className="section-title mb-3">Editorial</h2>
           <p className="font-serif text-[0.95rem] leading-relaxed text-ink-soft">
@@ -49,6 +50,22 @@ export default async function ContactPage() {
             className="mt-3 inline-block font-sans text-[0.88rem] font-semibold text-accent no-underline hover:text-accent-hover"
           >
             {advertiseEmail}
+          </a>
+        </div>
+        <div>
+          <h2 className="section-title mb-3">Headquarters</h2>
+          <p className="font-serif text-[0.95rem] leading-relaxed text-ink-soft">
+            {SITE.company}
+          </p>
+          <address className="mt-2 font-serif text-[0.88rem] not-italic leading-relaxed text-ink-soft">
+            {SITE.address.street}<br />
+            {SITE.address.city}, {SITE.address.state} {SITE.address.zip}
+          </address>
+          <a
+            href={`mailto:${SITE.email}`}
+            className="mt-2 inline-block font-sans text-[0.88rem] font-semibold text-accent no-underline hover:text-accent-hover"
+          >
+            {SITE.email}
           </a>
         </div>
       </div>

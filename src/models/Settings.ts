@@ -10,9 +10,9 @@ const SettingsSchema = new Schema(
     logo: { type: String, default: "" },
     ogImage: { type: String, default: "" },
     socials: {
-      twitter: { type: String, default: "https://x.com/primecrest" },
-      instagram: { type: String, default: "https://instagram.com/primecrest" },
-      linkedin: { type: String, default: "https://linkedin.com/company/primecrest" },
+      twitter: { type: String, default: "" },
+      instagram: { type: String, default: "https://www.instagram.com/primecrest_" },
+      linkedin: { type: String, default: "" },
       facebook: { type: String, default: "" },
       youtube: { type: String, default: "" },
     },

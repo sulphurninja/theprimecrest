@@ -56,7 +56,7 @@ export function SiteFooter({
       <div className="mx-auto max-w-[1280px] px-5 py-14 lg:px-8">
         <div className="grid gap-12 lg:grid-cols-12">
           <div className="lg:col-span-4">
-            <Wordmark name={siteName} className="text-[1.8rem] text-paper" />
+            <Wordmark name={siteName} className="text-[1.8rem] text-paper" showTagline />
             <p className="mt-5 max-w-sm font-serif text-[0.95rem] leading-relaxed text-paper/60">
               {blurb}
             </p>

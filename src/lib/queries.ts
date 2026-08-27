@@ -199,8 +199,27 @@ export async function getHomePayload() {
   const pickMany = (ids: unknown[] | undefined) =>
     (ids || []).map(pick).filter(Boolean);
 
-  let hero = homepage ? pick(homepage.heroArticle) : undefined;
-  if (!hero) hero = all.find((a) => a.isHero) || all[0];
+  // Get multiple hero articles for carousel
+  let heroArticles: HydratedArticle[] = [];
+  if (homepage?.heroArticle) {
+    const mainHero = pick(homepage.heroArticle);
+    if (mainHero) heroArticles.push(mainHero);
+  }
+  // Add articles marked as hero
+  const markedHeroes = all.filter((a) => a.isHero && !heroArticles.find(h => h._id === a._id));
+  heroArticles = [...heroArticles, ...markedHeroes];
+  // If still not enough, fill with latest featured articles
+  if (heroArticles.length < 4) {
+    const remaining = all.filter(
+      (a) => a.featured && !heroArticles.find(h => h._id === a._id)
+    ).slice(0, 4 - heroArticles.length);
+    heroArticles = [...heroArticles, ...remaining];
+  }
+  // Fallback to latest articles if still empty
+  if (heroArticles.length === 0) {
+    heroArticles = all.slice(0, 4);
+  }
+  const hero = heroArticles[0];
 
   let featured = homepage ? pickMany(homepage.featuredArticles as unknown[]) : [];
   if (!featured.length) {
@@ -246,6 +265,7 @@ export async function getHomePayload() {
   return {
     settings,
     hero: hero || null,
+    heroArticles,
     featured,
     cover: cover || null,
     briefing,

@@ -4,6 +4,7 @@ import { AdUnit } from "@/components/site/AdUnit";
 import { ArticleCard, type CardArticle } from "@/components/site/ArticleCard";
 import { NewsletterForm } from "@/components/site/NewsletterForm";
 import { LatestPostsTabs } from "@/components/site/LatestPostsTabs";
+import { HeroCarousel } from "@/components/site/HeroCarousel";
 import { Reveal } from "@/components/site/Reveal";
 import { getActiveAd, getHomePayload, getSettings, getTrendingArticles } from "@/lib/queries";
 import { buildMetadata } from "@/lib/seo";
@@ -124,54 +125,12 @@ export default async function HomePage() {
           </div>
         </div>
 
-        {/* Center — Main featured article — shows FIRST on mobile */}
-        <div className="order-1 lg:order-2 lg:border-l lg:border-rule lg:px-6">
-          {(payload.hero as CardArticle).coverImage ? (
-            <Link
-              href={`/story/${(payload.hero as CardArticle).slug}`}
-              className="img-hover relative mb-5 block aspect-[16/9] bg-paper-2"
-            >
-              <Image
-                src={(payload.hero as CardArticle).coverImage!}
-                alt={(payload.hero as CardArticle).title}
-                fill
-                priority
-                className="object-cover"
-                sizes="(min-width: 1024px) 640px, 100vw"
-              />
-            </Link>
-          ) : null}
-          {(payload.hero as CardArticle).category?.name ? (
-            <Link
-              href={`/c/${(payload.hero as CardArticle).category!.slug}`}
-              className="kicker no-underline"
-            >
-              {(payload.hero as CardArticle).category!.name}
-            </Link>
-          ) : null}
-          <h1 className="headline mt-2 text-[1.8rem] leading-tight sm:text-[2.4rem]">
-            <Link href={`/story/${(payload.hero as CardArticle).slug}`}>
-              {(payload.hero as CardArticle).title}
-            </Link>
-          </h1>
-          {(payload.hero as CardArticle).dek ? (
-            <p className="dek mt-3 max-w-xl text-[1.05rem]">
-              {(payload.hero as CardArticle).dek}
-            </p>
-          ) : null}
-          <p className="meta mt-3">
-            {(payload.hero as CardArticle).author?.name ? (
-              <>
-                By{" "}
-                <span className="font-medium text-ink-soft">
-                  {(payload.hero as CardArticle).author!.name}
-                </span>
-              </>
-            ) : null}
-            {(payload.hero as CardArticle).readTime ? (
-              <> · {(payload.hero as CardArticle).readTime} min read</>
-            ) : null}
-          </p>
+        {/* Center — Hero carousel — shows FIRST on mobile */}
+        <div className="group order-1 lg:order-2 lg:border-l lg:border-rule lg:px-6">
+          <HeroCarousel 
+            articles={payload.heroArticles as CardArticle[]} 
+            interval={6000} 
+          />
         </div>
 
         {/* Right — Latest Posts / Trending / Most Shared */}
