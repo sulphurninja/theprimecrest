@@ -1,7 +1,8 @@
 import { config } from "dotenv";
 config({ path: ".env.local" });
 
-import { dbConnect, dbDisconnect } from "../src/lib/db";
+import mongoose from "mongoose";
+import { dbConnect } from "../src/lib/db";
 import { Settings } from "../src/models";
 
 async function updateSocials() {
@@ -22,7 +23,7 @@ async function updateSocials() {
   );
 
   console.log("✓ Social links updated — only Instagram is now active");
-  await dbDisconnect();
+  await mongoose.disconnect();
 }
 
 updateSocials().catch(console.error);
