@@ -34,6 +34,7 @@ export function buildMetadata(input: SeoInput): Metadata {
       title: input.title,
       description,
       url,
+      locale: "en_US",
       images: [{ url: image, width: 1200, height: 630, alt: input.title }],
       publishedTime: input.publishedTime,
       modifiedTime: input.modifiedTime,

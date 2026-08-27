@@ -80,13 +80,24 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     siteName: SITE.name,
-    title: SITE.name,
+    title: `${SITE.name} — ${SITE.tagline}`,
     description: SITE.description,
+    url: siteUrl(),
+    locale: "en_US",
+    images: [
+      {
+        url: "/og.jpg",
+        width: 1200,
+        height: 630,
+        alt: `${SITE.name} — ${SITE.slogan}`,
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
-    title: SITE.name,
+    title: `${SITE.name} — ${SITE.tagline}`,
     description: SITE.description,
+    images: ["/og.jpg"],
   },
   robots: { index: true, follow: true },
   icons: { icon: "/favicon.svg" },
