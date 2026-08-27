@@ -23,7 +23,7 @@ const SettingsSchema = new Schema(
     magazineCover: { type: String, default: "" },
     magazinePdf: { type: String, default: "" },
     footerBlurb: { type: String, default: "" },
-    copyright: { type: String, default: "PrimeCrest Media Ltd." },
+    copyright: { type: String, default: "Fortiora Group LLC." },
   },
   { timestamps: true },
 );

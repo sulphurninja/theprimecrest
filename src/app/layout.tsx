@@ -16,6 +16,7 @@ function OrganizationSchema() {
     parentOrganization: {
       "@type": "Organization",
       name: SITE.company,
+      url: "https://thefortiora.com",
       address: {
         "@type": "PostalAddress",
         streetAddress: SITE.address.street,
@@ -73,6 +74,9 @@ export const metadata: Metadata = {
   description: SITE.description,
   applicationName: SITE.name,
   authors: [{ name: SITE.name }],
+  publisher: SITE.company,
+  creator: SITE.company,
+  other: { "owner": SITE.company },
   openGraph: {
     type: "website",
     siteName: SITE.name,

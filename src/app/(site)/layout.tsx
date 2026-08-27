@@ -38,7 +38,7 @@ export default async function SiteLayout({ children }: LayoutProps<"/">) {
           settings?.footerBlurb ||
           "PrimeCrest publishes considered journalism on power, capital, culture, and the people who shape them."
         }
-        copyright={settings?.copyright || "PrimeCrest Media Ltd."}
+        copyright={settings?.copyright || "Fortiora Group LLC."}
         categories={cats}
       />
       <WelcomeModal />

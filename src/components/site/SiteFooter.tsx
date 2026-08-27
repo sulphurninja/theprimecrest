@@ -3,6 +3,7 @@ import { Wordmark } from "@/components/site/Logo";
 import { NewsletterForm } from "@/components/site/NewsletterForm";
 import { BackToTop } from "@/components/site/BackToTop";
 import { ArrowUpRight } from "lucide-react";
+import { SITE } from "@/lib/constants";
 
 type Cat = { name: string; slug: string };
 
@@ -60,6 +61,29 @@ export function SiteFooter({
             <p className="mt-5 max-w-sm font-serif text-[0.95rem] leading-relaxed text-paper/60">
               {blurb}
             </p>
+            <div className="mt-6 border-t border-paper/10 pt-5">
+              <p className="font-sans text-[0.72rem] text-paper/50">
+                {siteName} is a product of{" "}
+                <a
+                  href="https://thefortiora.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-semibold text-paper/80 no-underline transition-colors hover:text-paper"
+                >
+                  {SITE.company}
+                </a>
+              </p>
+              <address className="mt-2 font-sans text-[0.72rem] not-italic leading-relaxed text-paper/40">
+                {SITE.address.street}, {SITE.address.city}, {SITE.address.state} {SITE.address.zip}
+                <br />
+                <a
+                  href={`mailto:${SITE.email}`}
+                  className="text-paper/40 no-underline transition-colors hover:text-paper/70"
+                >
+                  {SITE.email}
+                </a>
+              </address>
+            </div>
           </div>
 
           <div className="grid grid-cols-2 gap-10 sm:grid-cols-3 lg:col-span-8">
