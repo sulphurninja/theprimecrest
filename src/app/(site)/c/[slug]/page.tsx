@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { AdUnit } from "@/components/site/AdUnit";
 import { ArticleCard, type CardArticle } from "@/components/site/ArticleCard";
 import { getActiveAd, getCategoryArticles, getCategoryBySlug } from "@/lib/queries";
@@ -16,6 +16,7 @@ type Props = {
 
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
+  if (slug === "magazine") redirect("/magazine");
   const category = await getCategoryBySlug(slug).catch(() => null);
   if (!category) return buildMetadata({ title: "Section not found", noIndex: true });
   return buildMetadata({
@@ -30,6 +31,7 @@ export async function generateMetadata({ params }: Props) {
 
 export default async function CategoryPage({ params, searchParams }: Props) {
   const [{ slug }, { page: pageParam }] = await Promise.all([params, searchParams]);
+  if (slug === "magazine") redirect("/magazine");
   const category = await getCategoryBySlug(slug).catch(() => null);
   if (!category) notFound();
 

@@ -8,6 +8,7 @@ import { SITE } from "@/lib/constants";
 type Cat = { name: string; slug: string };
 
 const JOURNAL_LINKS = [
+  { label: "Magazine", href: "/magazine" },
   { label: "About", href: "/about" },
   { label: "Advertise", href: "/advertise" },
   { label: "Newsletter", href: "/newsletter" },

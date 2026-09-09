@@ -1,12 +1,12 @@
 import Link from "next/link";
-import Image from "next/image";
 import { AdUnit } from "@/components/site/AdUnit";
 import { ArticleCard, type CardArticle } from "@/components/site/ArticleCard";
 import { NewsletterForm } from "@/components/site/NewsletterForm";
 import { LatestPostsTabs } from "@/components/site/LatestPostsTabs";
 import { HeroCarousel } from "@/components/site/HeroCarousel";
 import { Reveal } from "@/components/site/Reveal";
-import { getActiveAd, getHomePayload, getSettings, getTrendingArticles } from "@/lib/queries";
+import { MagazineComingSoonCover } from "@/components/site/MagazineComingSoon";
+import { getActiveAd, getHomePayload, getTrendingArticles } from "@/lib/queries";
 import { buildMetadata } from "@/lib/seo";
 import { SITE } from "@/lib/constants";
 
@@ -70,10 +70,6 @@ export default async function HomePage() {
   const briefing = allBriefing.filter(
     (a) => a.category?.slug !== "women-in-business" && a.category?.slug !== "magazine",
   );
-  const settings = payload.settings;
-  const magazineLink = (settings as { magazineLink?: string })?.magazineLink || "";
-  const magazineCover = (settings as { magazineCover?: string })?.magazineCover || "https://folio-one-lemon.vercel.app/issues/saj/cover.jpg";
-  const magazineUrl = magazineLink || "https://folio-one-lemon.vercel.app/m/saj";
   const trending = await getTrendingArticles(6).catch(() => []) as CardArticle[];
 
   return (
@@ -86,41 +82,19 @@ export default async function HomePage() {
             Latest Issue
           </p>
           <div className="magazine-3d mx-auto w-[180px] lg:mx-0 lg:w-full">
-            <a
-              href={magazineUrl}
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link
+              href="/magazine"
               className="magazine-cover relative block aspect-[3/4] overflow-hidden shadow-2xl"
             >
-              {magazineCover ? (
-                <Image
-                  src={magazineCover}
-                  alt="Latest Issue — PrimeCrest Magazine"
-                  fill
-                  className="object-cover"
-                  sizes="220px"
-                />
-              ) : (
-                <span className="flex h-full flex-col items-center justify-center gap-3 bg-gradient-to-br from-ink via-ink/90 to-ink/80 p-5 text-center">
-                  <span className="font-serif text-[1.3rem] font-bold leading-tight text-paper">
-                    Master of<br />the Deal.
-                  </span>
-                  <span className="h-px w-10 bg-paper/30" />
-                  <span className="font-sans text-[0.6rem] uppercase tracking-[0.16em] text-paper/50">
-                    PrimeCrest · Vol. I
-                  </span>
-                </span>
-              )}
-            </a>
+              <MagazineComingSoonCover />
+            </Link>
             <p className="mt-3 text-center font-sans text-[0.7rem] text-muted lg:text-left">
-              <a
-                href={magazineUrl}
-                target="_blank"
-                rel="noopener noreferrer"
+              <Link
+                href="/magazine"
                 className="font-semibold text-accent no-underline hover:text-accent-hover"
               >
-                Read Digital Issue →
-              </a>
+                Coming soon
+              </Link>
             </p>
           </div>
         </div>
