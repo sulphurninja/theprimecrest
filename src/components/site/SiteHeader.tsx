@@ -69,19 +69,17 @@ export function SiteHeader({
   categories: NavItem[];
   socials?: Socials;
 }) {
+  const magazine = { label: "Magazine", href: "/magazine" };
+  const contact = { label: "Contact Us", href: "/contact" };
+  // Magazine sits second, right after the lead section.
+  const placeMagazine = (items: { label: string; href: string }[]) =>
+    items.length === 0 ? [magazine, contact] : [items[0], magazine, ...items.slice(1), contact];
+
   const catItems = categories.slice(0, 5).map((c) => ({ label: c.name, href: `/c/${c.slug}` }));
-  const visibleItems = [
-    ...catItems,
-    { label: "Magazine", href: "/magazine" },
-    { label: "Contact Us", href: "/contact" },
-  ];
+  const visibleItems = placeMagazine(catItems);
   const hasMore = categories.length > 5;
 
-  const allItems = [
-    ...categories.map((c) => ({ label: c.name, href: `/c/${c.slug}` })),
-    { label: "Magazine", href: "/magazine" },
-    { label: "Contact Us", href: "/contact" },
-  ];
+  const allItems = placeMagazine(categories.map((c) => ({ label: c.name, href: `/c/${c.slug}` })));
 
   const socialLinks = [
     { url: socials?.twitter, icon: <TwitterIcon />, label: "Twitter" },

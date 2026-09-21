@@ -1,4 +1,5 @@
 import { dbConnect } from "@/lib/db";
+import { MAGAZINE_ISSUES } from "@/lib/magazines";
 import { serialize } from "@/lib/utils";
 import {
   Article,
@@ -199,25 +200,13 @@ export async function getHomePayload() {
   const pickMany = (ids: unknown[] | undefined) =>
     (ids || []).map(pick).filter(Boolean);
 
-  // Get multiple hero articles for carousel
-  let heroArticles: HydratedArticle[] = [];
-  if (homepage?.heroArticle) {
-    const mainHero = pick(homepage.heroArticle);
-    if (mainHero) heroArticles.push(mainHero);
-  }
-  // Add articles marked as hero
-  const markedHeroes = all.filter((a) => a.isHero && !heroArticles.find(h => h._id === a._id));
-  heroArticles = [...heroArticles, ...markedHeroes];
-  // If still not enough, fill with latest featured articles
-  if (heroArticles.length < 4) {
-    const remaining = all.filter(
-      (a) => a.featured && !heroArticles.find(h => h._id === a._id)
-    ).slice(0, 4 - heroArticles.length);
-    heroArticles = [...heroArticles, ...remaining];
-  }
-  // Fallback to latest articles if still empty
+  // Hero carousel is the five published magazine features, in issue order.
+  const bySlug = new Map(all.map((a) => [a.slug, a]));
+  let heroArticles = MAGAZINE_ISSUES.map((issue) => bySlug.get(issue.articleSlug)).filter(
+    (a): a is HydratedArticle => Boolean(a),
+  );
   if (heroArticles.length === 0) {
-    heroArticles = all.slice(0, 4);
+    heroArticles = all.slice(0, 5);
   }
   const hero = heroArticles[0];
 
