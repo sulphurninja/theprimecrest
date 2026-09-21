@@ -25,10 +25,10 @@ export default function MagazinePage() {
         </p>
       </header>
 
-      <div className="mt-14 grid gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-12 grid grid-cols-2 gap-x-6 gap-y-12 sm:grid-cols-3 lg:grid-cols-5">
         {MAGAZINE_ISSUES.map((issue) => (
           <article key={issue.slug} className="flex flex-col">
-            <div className="magazine-3d">
+            <div className="magazine-3d mx-auto w-full max-w-[210px]">
               <Link
                 href={`/story/${issue.articleSlug}`}
                 className="magazine-cover relative block aspect-[3/4] overflow-hidden"
@@ -46,7 +46,7 @@ export default function MagazinePage() {
             <p className="mt-5 font-sans text-[0.68rem] font-bold uppercase tracking-[0.16em] text-accent">
               {issue.volume} · 2026
             </p>
-            <h2 className="headline mt-1.5 text-[1.35rem]">
+            <h2 className="headline mt-1.5 text-[1.15rem] leading-snug">
               <Link href={`/story/${issue.articleSlug}`} className="no-underline hover:text-accent">
                 {issue.name}
               </Link>

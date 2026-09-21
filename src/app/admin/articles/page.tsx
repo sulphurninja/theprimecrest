@@ -20,6 +20,7 @@ type Row = {
   views?: number;
   author?: { name: string };
   category?: { name: string };
+  categories?: { name: string }[];
 };
 
 const FILTERS = ["all", "published", "draft", "scheduled", "archived"] as const;
@@ -129,7 +130,12 @@ function ArticlesInner() {
                     </div>
                   </td>
                   <td className="px-4 py-3.5 font-sans text-[0.85rem] text-ink-soft">
-                    {row.category?.name || "—"}
+                    {[
+                      row.category?.name,
+                      ...(row.categories || []).map((section) => section.name),
+                    ]
+                      .filter((name, index, all) => name && all.indexOf(name) === index)
+                      .join(", ") || "—"}
                   </td>
                   <td className="px-4 py-3.5 font-sans text-[0.85rem] text-ink-soft">
                     {row.author?.name || "—"}

@@ -21,13 +21,33 @@ export type HydratedArticle = Omit<
   _id: string;
   publishedAt?: string | null;
   category?: { _id: string; name: string; slug: string; kicker?: string };
+  categories?: { _id: string; name: string; slug: string; kicker?: string }[];
   author?: { _id: string; name: string; slug: string; title?: string; avatar?: string; bio?: string };
 };
 
 const articlePopulate = [
   { path: "author", select: "name slug title avatar bio socials" },
   { path: "category", select: "name slug kicker" },
+  { path: "categories", select: "name slug kicker" },
 ];
+
+type CatRef = { _id?: string } | string | null | undefined;
+
+/** Primary section plus any additional sections an article is filed under. */
+export function articleSectionIds(article: { category?: CatRef; categories?: CatRef[] }) {
+  const ids = new Set<string>();
+  const add = (value: CatRef) => {
+    if (!value) return;
+    ids.add(typeof value === "string" ? value : String(value._id));
+  };
+  add(article.category);
+  for (const section of article.categories || []) add(section);
+  return ids;
+}
+
+function inSection(categoryId: string) {
+  return { $or: [{ category: categoryId }, { categories: categoryId }] };
+}
 
 export async function getSettings() {
   await dbConnect();
@@ -50,8 +70,8 @@ export async function getRelatedArticles(articleId: string, categoryId: string, 
   await dbConnect();
   const related = await Article.find({
     _id: { $ne: articleId },
-    category: categoryId,
     status: "published",
+    ...inSection(categoryId),
   })
     .sort({ publishedAt: -1 })
     .limit(limit)
@@ -70,13 +90,13 @@ export async function getCategoryArticles(categoryId: string, page = 1, limit = 
   await dbConnect();
   const skip = (page - 1) * limit;
   const [items, total] = await Promise.all([
-    Article.find({ category: categoryId, status: "published" })
+    Article.find({ status: "published", ...inSection(categoryId) })
       .sort({ publishedAt: -1 })
       .skip(skip)
       .limit(limit)
       .populate(articlePopulate)
       .lean(),
-    Article.countDocuments({ category: categoryId, status: "published" }),
+    Article.countDocuments({ status: "published", ...inSection(categoryId) }),
   ]);
   return { items: serialize(items), total };
 }
@@ -234,6 +254,8 @@ export async function getHomePayload() {
       .map((a) => String(a!._id)),
   );
 
+  const magazineSlugs = new Set(MAGAZINE_ISSUES.map((issue) => issue.articleSlug));
+
   const rails = (homepage?.categoryRails?.length
     ? homepage.categoryRails.map((id) => String(id))
     : categories.slice(0, 6).map((c) => String(c._id))
@@ -245,8 +267,9 @@ export async function getHomePayload() {
       articles: all
         .filter(
           (a) =>
-            String(a.category?._id || a.category) === String(cat!._id) &&
-            !usedIds.has(String(a._id)),
+            articleSectionIds(a).has(String(cat!._id)) &&
+            !usedIds.has(String(a._id)) &&
+            !magazineSlugs.has(a.slug),
         )
         .slice(0, 4),
     }));
@@ -262,6 +285,9 @@ export async function getHomePayload() {
     rails,
     categories: serialize(categories),
     latest: all.slice(0, 8),
+    more: all
+      .filter((a) => !magazineSlugs.has(a.slug) && !usedIds.has(String(a._id)))
+      .slice(0, 4),
     showAds: homepage?.showAds !== false,
     showNewsletter: homepage?.showNewsletter !== false,
     showAdvertiseBand: homepage?.showAdvertiseBand !== false,

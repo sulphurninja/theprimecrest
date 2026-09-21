@@ -134,6 +134,19 @@ export default async function HomePage() {
       {/* Digital magazine marquee */}
       <MagazineMarquee />
 
+      {payload.heroArticles.length > 0 ? (
+        <section className="border-t border-rule py-12">
+          <Reveal>
+            <SectionHeader title="The Magazine" href="/magazine" />
+            <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
+              {(payload.heroArticles as CardArticle[]).map((article) => (
+                <ArticleCard key={article._id} article={article} variant="feature" />
+              ))}
+            </div>
+          </Reveal>
+        </section>
+      ) : null}
+
       {leaderboard ? (
         <div className="border-t border-rule py-8">
           <AdUnit slot={leaderboard.slot} campaign={leaderboard.campaign} className="mx-auto max-w-[970px]" />
@@ -249,9 +262,22 @@ export default async function HomePage() {
       ) : null}
 
       {footerAd ? (
-        <div className="py-8">
+        <div className="border-t border-rule py-8">
           <AdUnit slot={footerAd.slot} campaign={footerAd.campaign} className="mx-auto max-w-[970px]" />
         </div>
+      ) : null}
+
+      {payload.more.length > 0 ? (
+        <section className="border-t border-rule py-12">
+          <Reveal>
+            <SectionHeader title="More to read" />
+            <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
+              {payload.more.map((article) => (
+                <ArticleCard key={article._id} article={article as CardArticle} variant="feature" />
+              ))}
+            </div>
+          </Reveal>
+        </section>
       ) : null}
     </div>
   );

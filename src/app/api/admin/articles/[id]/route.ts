@@ -5,6 +5,16 @@ import { readingTime, slugify, excerptFromHtml } from "@/lib/utils";
 import { sanitizeArticleHtml } from "@/lib/sanitize";
 import { revalidatePath } from "next/cache";
 
+function normalizeSections(body: Record<string, unknown>) {
+  if (!Array.isArray(body.categories) && !body.category) return;
+  const raw = Array.isArray(body.categories) ? body.categories.map(String).filter(Boolean) : [];
+  if (body.category) raw.unshift(String(body.category));
+  const categories = [...new Set(raw)];
+  if (!categories.length) return;
+  body.categories = categories;
+  body.category = categories.includes(String(body.category)) ? body.category : categories[0];
+}
+
 type Ctx = { params: Promise<{ id: string }> };
 
 export async function GET(_: Request, ctx: Ctx) {
@@ -15,6 +25,7 @@ export async function GET(_: Request, ctx: Ctx) {
   const item = await Article.findById(id)
     .populate("author", "name slug")
     .populate("category", "name slug")
+    .populate("categories", "name slug")
     .lean();
   if (!item) return jsonError("Article not found", 404);
   return jsonOk({ item });
@@ -43,6 +54,7 @@ export async function PUT(request: Request, ctx: Ctx) {
   if (body.status === "published" && !current.publishedAt && !body.publishedAt) {
     body.publishedAt = new Date();
   }
+  normalizeSections(body);
 
   const item = await Article.findByIdAndUpdate(id, body, { new: true });
   revalidatePath("/");

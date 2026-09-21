@@ -176,6 +176,9 @@ async function main() {
     console.log("Created Magazine category.");
   }
 
+  const articlesSection = await Category.findOne({ slug: "affairs" });
+  const sectionIds = [category._id, articlesSection?._id].filter(Boolean);
+
   const author = await User.findOne({ role: "admin" }) || await User.findOne();
   if (!author) throw new Error("No users found — run the main seed first.");
 
@@ -199,6 +202,7 @@ async function main() {
           coverCredit: "Photograph for PrimeCrest",
           ogImage: issue.cover,
           category: category._id,
+          categories: sectionIds,
           tags: a.tags,
           author: author._id,
           status: "published",

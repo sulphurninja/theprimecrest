@@ -22,6 +22,7 @@ export type ArticleFormValue = {
   coverCredit: string;
   ogImage: string;
   category: string;
+  categories: string[];
   author: string;
   tags: string[];
   status: string;
@@ -48,6 +49,7 @@ export const EMPTY_ARTICLE: ArticleFormValue = {
   coverCredit: "",
   ogImage: "",
   category: "",
+  categories: [],
   author: "",
   tags: [],
   status: "draft",
@@ -141,11 +143,16 @@ export function ArticleForm({ initial }: { initial: ArticleFormValue }) {
       .then(([cats, users]) => {
         setCategories(cats.items);
         setAuthors(users.items);
-        setValue((v) => ({
-          ...v,
-          category: v.category || cats.items[0]?._id || "",
-          author: v.author || users.items[0]?._id || "",
-        }));
+        setValue((v) => {
+          const category = v.category || cats.items[0]?._id || "";
+          const categories = v.categories.length ? v.categories : category ? [category] : [];
+          return {
+            ...v,
+            category: categories.includes(category) ? category : categories[0] || "",
+            categories,
+            author: v.author || users.items[0]?._id || "",
+          };
+        });
       })
       .catch(() => {});
   }, []);
@@ -308,19 +315,38 @@ export function ArticleForm({ initial }: { initial: ArticleFormValue }) {
                   className="admin-input"
                 />
               </Field>
-              <Field label="Section">
-                <select
-                  value={value.category}
-                  onChange={(e) => set("category", e.target.value)}
-                  className="admin-input"
-                >
-                  {categories.map((c) => (
-                    <option key={c._id} value={c._id}>
-                      {c.name}
-                    </option>
-                  ))}
-                </select>
-              </Field>
+              <div>
+                <span className="admin-label">Sections</span>
+                <div className="mt-1 grid gap-1.5">
+                  {categories.map((c) => {
+                    const checked = value.categories.includes(c._id);
+                    return (
+                      <label key={c._id} className="flex items-center gap-2 font-sans text-[0.85rem]">
+                        <input
+                          type="checkbox"
+                          checked={checked}
+                          onChange={() => {
+                            const next = checked
+                              ? value.categories.filter((id) => id !== c._id)
+                              : [...value.categories, c._id];
+                            if (!next.length) return;
+                            setValue((v) => ({
+                              ...v,
+                              categories: next,
+                              category: next.includes(v.category) ? v.category : next[0],
+                            }));
+                          }}
+                          className="h-3.5 w-3.5 accent-ink"
+                        />
+                        {c.name}
+                      </label>
+                    );
+                  })}
+                </div>
+                <span className="mt-1 block font-sans text-[0.72rem] text-muted">
+                  Check every section this story should appear in.
+                </span>
+              </div>
               <Field label="Author">
                 <select
                   value={value.author}

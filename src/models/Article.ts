@@ -30,6 +30,7 @@ const ArticleSchema = new Schema(
     coverCredit: { type: String, default: "" },
     ogImage: { type: String, default: "" },
     category: { type: Schema.Types.ObjectId, ref: "Category", required: true },
+    categories: [{ type: Schema.Types.ObjectId, ref: "Category" }],
     tags: { type: [String], default: [] },
     author: { type: Schema.Types.ObjectId, ref: "User", required: true },
     contributors: { type: [ContributorSchema], default: [] },
@@ -69,6 +70,7 @@ const ArticleSchema = new Schema(
 ArticleSchema.index({ title: "text", dek: "text", excerpt: "text", content: "text" });
 ArticleSchema.index({ status: 1, publishedAt: -1 });
 ArticleSchema.index({ category: 1, status: 1, publishedAt: -1 });
+ArticleSchema.index({ categories: 1, status: 1, publishedAt: -1 });
 
 export type ArticleDoc = mongoose.InferSchemaType<typeof ArticleSchema> & {
   _id: mongoose.Types.ObjectId;

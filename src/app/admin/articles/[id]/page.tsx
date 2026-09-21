@@ -9,6 +9,7 @@ import { AdminLoader } from "@/components/admin/ui";
 type Loaded = Record<string, unknown> & {
   _id: string;
   category?: { _id: string } | string;
+  categories?: ({ _id: string } | string)[];
   author?: { _id: string } | string;
   publishedAt?: string;
   pullQuote?: { text?: string; attribution?: string };
@@ -24,6 +25,7 @@ function toFormValue(item: Loaded): ArticleFormValue {
     ),
     _id: item._id,
     category: refId(item.category),
+    categories: (item.categories || []).map((section) => refId(section)).filter(Boolean),
     author: refId(item.author),
     publishedAt: item.publishedAt ? String(item.publishedAt).slice(0, 16) : "",
     tags: (item.tags as string[]) || [],

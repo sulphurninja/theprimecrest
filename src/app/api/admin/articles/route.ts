@@ -5,6 +5,16 @@ import { readingTime, slugify, excerptFromHtml } from "@/lib/utils";
 import { sanitizeArticleHtml } from "@/lib/sanitize";
 import { revalidatePath } from "next/cache";
 
+function normalizeSections(body: Record<string, unknown>) {
+  const raw = Array.isArray(body.categories) ? body.categories.map(String).filter(Boolean) : [];
+  if (body.category) raw.unshift(String(body.category));
+  const categories = [...new Set(raw)];
+  if (!categories.length) return false;
+  body.categories = categories;
+  body.category = categories.includes(String(body.category)) ? body.category : categories[0];
+  return true;
+}
+
 export async function GET(request: Request) {
   const { error } = await requireAdmin();
   if (error) return error;
@@ -19,6 +29,7 @@ export async function GET(request: Request) {
     .sort({ updatedAt: -1 })
     .populate("author", "name")
     .populate("category", "name slug")
+    .populate("categories", "name slug")
     .lean();
   return jsonOk({ items });
 }
@@ -27,8 +38,8 @@ export async function POST(request: Request) {
   const { error } = await requireAdmin();
   if (error) return error;
   const body = await request.json();
-  if (!body.title || !body.category || !body.author) {
-    return jsonError("Title, category, and author are required.");
+  if (!body.title || !body.author || !normalizeSections(body)) {
+    return jsonError("Title, at least one section, and author are required.");
   }
   await dbConnect();
   const slug = body.slug ? slugify(body.slug) : slugify(body.title);

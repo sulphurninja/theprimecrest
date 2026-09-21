@@ -93,7 +93,7 @@ export function SiteFooter({
                 Sections
               </p>
               <ul className="mt-4 space-y-2">
-                {categories.map((c) => (
+                {categories.filter((c) => c.slug !== "magazine").map((c) => (
                   <li key={c.slug}>
                     <Link
                       href={c.slug === "home" ? "/" : `/c/${c.slug}`}
