@@ -5,7 +5,8 @@ import { NewsletterForm } from "@/components/site/NewsletterForm";
 import { LatestPostsTabs } from "@/components/site/LatestPostsTabs";
 import { HeroCarousel } from "@/components/site/HeroCarousel";
 import { Reveal } from "@/components/site/Reveal";
-import { MagazineComingSoonCover } from "@/components/site/MagazineComingSoon";
+import { MagazineMarquee } from "@/components/site/MagazineMarquee";
+import { MAGAZINE_ISSUES } from "@/lib/magazines";
 import { getActiveAd, getHomePayload, getTrendingArticles } from "@/lib/queries";
 import { buildMetadata } from "@/lib/seo";
 import { SITE } from "@/lib/constants";
@@ -74,44 +75,64 @@ export default async function HomePage() {
 
   return (
     <div className="mx-auto max-w-[1280px] px-5 lg:px-8">
-      {/* Hero: three-column — Latest Issue | Featured Story | Latest Posts */}
-      <section className="grid gap-8 border-b border-rule py-8 lg:grid-cols-[220px_1fr_280px] lg:gap-0">
-        {/* Left — Latest Issue (3D magazine) — on mobile shows AFTER main post */}
-        <div className="order-2 lg:order-1 lg:pr-6">
-          <p className="mb-4 border-b-2 border-accent pb-2 font-sans text-[0.7rem] font-bold uppercase tracking-[0.14em] text-accent">
-            Latest Issue
-          </p>
-          <div className="magazine-3d mx-auto w-[180px] lg:mx-0 lg:w-full">
-            <Link
-              href="/magazine"
-              className="magazine-cover relative block aspect-[3/4] overflow-hidden shadow-2xl"
-            >
-              <MagazineComingSoonCover />
-            </Link>
-            <p className="mt-3 text-center font-sans text-[0.7rem] text-muted lg:text-left">
-              <Link
-                href="/magazine"
-                className="font-semibold text-accent no-underline hover:text-accent-hover"
-              >
-                Coming soon
-              </Link>
-            </p>
-          </div>
-        </div>
-
-        {/* Center — Hero carousel — shows FIRST on mobile */}
-        <div className="group order-1 lg:order-2 lg:border-l lg:border-rule lg:px-6">
-          <HeroCarousel 
-            articles={payload.heroArticles as CardArticle[]} 
-            interval={6000} 
+      {/* Hero: cinematic carousel + right rail (latest issue, latest posts) */}
+      <section className="grid gap-8 border-b border-rule py-8 lg:grid-cols-[1fr_320px] lg:gap-0">
+        {/* Lead — overlay carousel */}
+        <div className="lg:pr-8">
+          <HeroCarousel
+            articles={payload.heroArticles as CardArticle[]}
+            interval={6000}
           />
         </div>
 
-        {/* Right — Latest Posts / Trending / Most Shared */}
-        <aside className="order-3 lg:border-l lg:border-rule lg:pl-6">
+        {/* Right rail — Latest Issue + Latest Posts */}
+        <aside className="lg:border-l lg:border-rule lg:pl-8">
+          <div className="mb-8 border-b border-rule pb-8">
+            <p className="mb-4 border-b-2 border-accent pb-2 font-sans text-[0.7rem] font-bold uppercase tracking-[0.14em] text-accent">
+              Latest Issue
+            </p>
+            <div className="flex items-start gap-4">
+              <div className="magazine-3d w-[104px] shrink-0">
+                <Link
+                  href={`/story/${MAGAZINE_ISSUES[2].articleSlug}`}
+                  className="magazine-cover relative block aspect-[3/4] overflow-hidden"
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={MAGAZINE_ISSUES[2].cover}
+                    alt={`PrimeCrest ${MAGAZINE_ISSUES[2].volume} — ${MAGAZINE_ISSUES[2].name}`}
+                    className="absolute inset-0 h-full w-full object-cover"
+                  />
+                </Link>
+              </div>
+              <div className="min-w-0">
+                <p className="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.14em] text-muted">
+                  {MAGAZINE_ISSUES[2].volume} · The September Issue
+                </p>
+                <Link
+                  href={`/story/${MAGAZINE_ISSUES[2].articleSlug}`}
+                  className="headline mt-1.5 block text-[1.05rem] leading-snug no-underline hover:text-accent"
+                >
+                  {MAGAZINE_ISSUES[2].name}
+                </Link>
+                <p className="mt-1 font-sans text-[0.75rem] leading-snug text-muted">
+                  {MAGAZINE_ISSUES[2].role}
+                </p>
+                <Link
+                  href="/magazine"
+                  className="mt-2.5 inline-block font-sans text-[0.75rem] font-semibold text-accent no-underline hover:text-accent-hover"
+                >
+                  All issues →
+                </Link>
+              </div>
+            </div>
+          </div>
           <LatestPostsTabs latest={featured.slice(0, 6)} trending={trending} />
         </aside>
       </section>
+
+      {/* Digital magazine marquee */}
+      <MagazineMarquee />
 
       {leaderboard ? (
         <div className="border-t border-rule py-8">

@@ -55,6 +55,7 @@ const ArticleSchema = new Schema(
     canonical: { type: String, default: "" },
     noIndex: { type: Boolean, default: false },
     readTime: { type: Number, default: 1 },
+    magazineUrl: { type: String, default: "" },
     views: { type: Number, default: 0 },
     gallery: { type: [GallerySchema], default: [] },
     pullQuote: {

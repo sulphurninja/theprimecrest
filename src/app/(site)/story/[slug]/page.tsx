@@ -72,6 +72,39 @@ export default async function StoryPage({ params }: Props) {
 
       {/* Story header */}
       <header className="mx-auto max-w-[840px] px-5 pt-12 text-center lg:px-8">
+        {article.magazineUrl ? (
+          <div className="mb-6 flex justify-center">
+            <a
+              href={article.magazineUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group inline-flex items-center gap-2.5 border border-ink bg-ink px-5 py-2.5 font-sans text-[0.78rem] font-semibold uppercase tracking-[0.14em] text-paper no-underline transition-colors hover:bg-paper hover:text-ink"
+            >
+              <svg
+                className="h-4 w-4 transition-transform group-hover:-rotate-6"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                aria-hidden
+              >
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+              </svg>
+              Read the Digital Magazine
+              <svg
+                className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                aria-hidden
+              >
+                <path d="M7 17L17 7M7 7h10v10" />
+              </svg>
+            </a>
+          </div>
+        ) : null}
         {article.category?.name ? (
           <Link href={`/c/${article.category.slug}`} className="kicker no-underline">
             {article.category.name}
