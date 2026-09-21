@@ -96,7 +96,7 @@ export function SiteFooter({
                 {categories.map((c) => (
                   <li key={c.slug}>
                     <Link
-                      href={`/c/${c.slug}`}
+                      href={c.slug === "home" ? "/" : `/c/${c.slug}`}
                       className="group inline-flex items-center gap-1 font-sans text-[0.875rem] text-paper/70 no-underline transition-colors hover:text-paper"
                     >
                       {c.name}

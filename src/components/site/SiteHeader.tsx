@@ -75,11 +75,12 @@ export function SiteHeader({
   const placeMagazine = (items: { label: string; href: string }[]) =>
     items.length === 0 ? [magazine, contact] : [items[0], magazine, ...items.slice(1), contact];
 
-  const catItems = categories.slice(0, 5).map((c) => ({ label: c.name, href: `/c/${c.slug}` }));
+  const sectionHref = (c: NavItem) => (c.slug === "home" ? "/" : `/c/${c.slug}`);
+  const catItems = categories.slice(0, 5).map((c) => ({ label: c.name, href: sectionHref(c) }));
   const visibleItems = placeMagazine(catItems);
   const hasMore = categories.length > 5;
 
-  const allItems = placeMagazine(categories.map((c) => ({ label: c.name, href: `/c/${c.slug}` })));
+  const allItems = placeMagazine(categories.map((c) => ({ label: c.name, href: sectionHref(c) })));
 
   const socialLinks = [
     { url: socials?.twitter, icon: <TwitterIcon />, label: "Twitter" },
