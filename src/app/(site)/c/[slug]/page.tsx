@@ -1,3 +1,4 @@
+import { Fragment } from "react";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { AdUnit } from "@/components/site/AdUnit";
@@ -46,6 +47,12 @@ export default async function CategoryPage({ params, searchParams }: Props) {
   const rest = page === 1 ? articles.slice(1) : articles;
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
+  const ad = topAd ? (
+    <div className="border-b border-rule py-8">
+      <AdUnit slot={topAd.slot} campaign={topAd.campaign} className="mx-auto max-w-[728px]" />
+    </div>
+  ) : null;
+
   return (
     <div className="mx-auto max-w-[1280px] px-5 lg:px-8">
       {/* Section masthead */}
@@ -56,12 +63,6 @@ export default async function CategoryPage({ params, searchParams }: Props) {
           <p className="dek mt-4 max-w-2xl">{category.description}</p>
         ) : null}
       </header>
-
-      {topAd ? (
-        <div className="border-b border-rule py-8">
-          <AdUnit slot={topAd.slot} campaign={topAd.campaign} className="mx-auto max-w-[728px]" />
-        </div>
-      ) : null}
 
       {articles.length === 0 ? (
         <div className="py-24 text-center">
@@ -78,9 +79,16 @@ export default async function CategoryPage({ params, searchParams }: Props) {
             </section>
           ) : null}
 
+          {ad && lead ? ad : null}
+
           <section className="grid gap-x-10 gap-y-12 py-12 sm:grid-cols-2 lg:grid-cols-3">
-            {rest.map((article) => (
-              <ArticleCard key={article._id} article={article} variant="feature" />
+            {rest.map((article, index) => (
+              <Fragment key={article._id}>
+                <ArticleCard article={article} variant="feature" />
+                {ad && !lead && index === 0 ? (
+                  <div className="sm:col-span-2 lg:col-span-3">{ad}</div>
+                ) : null}
+              </Fragment>
             ))}
           </section>
 
