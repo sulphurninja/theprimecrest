@@ -36,7 +36,15 @@ function WhatsAppIcon({ className }: { className?: string }) {
   );
 }
 
-export function ShareBar({ title, slug }: { title: string; slug: string }) {
+export function ShareBar({
+  title,
+  slug,
+  magazineUrl,
+}: {
+  title: string;
+  slug: string;
+  magazineUrl?: string;
+}) {
   const [copied, setCopied] = useState(false);
   const url = useMemo(() => siteUrl(`/story/${slug}`), [slug]);
   const encoded = encodeURIComponent(url);
@@ -79,7 +87,7 @@ export function ShareBar({ title, slug }: { title: string; slug: string }) {
   }
 
   return (
-    <div className="flex flex-wrap items-center gap-3">
+    <div className="flex flex-wrap items-center gap-x-4 gap-y-3">
       <span className="font-sans text-[0.7rem] font-bold uppercase tracking-[0.14em] text-muted">
         Share
       </span>
@@ -105,6 +113,27 @@ export function ShareBar({ title, slug }: { title: string; slug: string }) {
           {copied ? <Check className="h-4 w-4 text-accent" /> : <Link2 className="h-4 w-4" />}
         </button>
       </div>
+      {magazineUrl ? (
+        <a
+          href={magazineUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group ml-auto inline-flex items-center gap-2 border border-ink bg-ink px-3.5 py-2 font-sans text-[0.68rem] font-semibold uppercase tracking-[0.12em] text-paper no-underline transition-colors hover:bg-paper hover:text-ink"
+        >
+          <svg
+            className="h-3.5 w-3.5 transition-transform group-hover:-rotate-6"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            aria-hidden
+          >
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+          </svg>
+          Read the Digital Magazine
+        </a>
+      ) : null}
     </div>
   );
 }

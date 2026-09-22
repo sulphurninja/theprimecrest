@@ -167,7 +167,11 @@ export default async function StoryPage({ params }: Props) {
           <div className="lg:col-span-8 lg:pr-14">
             <div className="mx-auto max-w-[680px]">
               <div className="mb-8 border-b border-rule pb-5">
-                <ShareBar title={article.title} slug={article.slug} />
+                <ShareBar
+                  title={article.title}
+                  slug={article.slug}
+                  magazineUrl={article.magazineUrl || undefined}
+                />
               </div>
 
               <ArticleBody html={article.content} />
@@ -209,7 +213,11 @@ export default async function StoryPage({ params }: Props) {
               ) : null}
 
               <div className="mt-8 border-t border-rule pt-6">
-                <ShareBar title={article.title} slug={article.slug} />
+                <ShareBar
+                  title={article.title}
+                  slug={article.slug}
+                  magazineUrl={article.magazineUrl || undefined}
+                />
               </div>
 
               {/* Author card */}
