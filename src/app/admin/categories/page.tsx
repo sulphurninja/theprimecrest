@@ -11,20 +11,43 @@ type Category = {
   kicker?: string;
   description?: string;
   order: number;
+  magazines?: string[];
 };
 
-const EMPTY = { name: "", kicker: "", description: "", order: 0 };
+type MagazineOption = {
+  _id: string;
+  title: string;
+  slug: string;
+  magazineEnabled?: boolean;
+  magazineUrl?: string;
+};
+
+const EMPTY = { name: "", kicker: "", description: "", order: 0, magazines: [] as string[] };
 
 export default function CategoriesPage() {
   const [items, setItems] = useState<Category[]>([]);
+  const [magazineOptions, setMagazineOptions] = useState<MagazineOption[]>([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<Partial<Category> | null>(null);
   const [error, setError] = useState("");
   const { toast, element } = useToast();
 
   useEffect(() => {
-    api<{ items: Category[] }>("/api/admin/categories")
-      .then((d) => setItems(d.items))
+    Promise.all([
+      api<{ items: Category[] }>("/api/admin/categories"),
+      api<{ items: MagazineOption[] }>("/api/admin/articles"),
+    ])
+      .then(([sections, articles]) => {
+        setItems(
+          sections.items.map((section) => ({
+            ...section,
+            magazines: (section.magazines || []).map(String),
+          })),
+        );
+        setMagazineOptions(
+          articles.items.filter((article) => article.magazineEnabled || article.magazineUrl),
+        );
+      })
       .finally(() => setLoading(false));
   }, []);
 
@@ -109,7 +132,7 @@ export default function CategoriesPage() {
       {editing ? (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-ink/40" onClick={() => setEditing(null)} />
-          <div className="relative w-full max-w-md border border-rule bg-white p-6 shadow-2xl animate-in">
+          <div className="relative max-h-[90vh] w-full max-w-lg overflow-y-auto border border-rule bg-white p-6 shadow-2xl animate-in">
             <h2 className="headline mb-5 text-[1.4rem]">
               {editing._id ? "Edit section" : "New section"}
             </h2>
@@ -141,6 +164,44 @@ export default function CategoriesPage() {
                   className="admin-input resize-none"
                 />
               </label>
+              <div>
+                <span className="admin-label">Magazines</span>
+                <p className="mb-2 font-sans text-[0.72rem] text-muted">
+                  Covers shown on this section. A click opens the feature article. Turn on Digital
+                  magazine on a story to add it here.
+                </p>
+                {magazineOptions.length ? (
+                  <div className="grid max-h-48 gap-1.5 overflow-y-auto border border-rule p-2">
+                    {magazineOptions.map((article) => {
+                      const selected = (editing.magazines || []).includes(article._id);
+                      return (
+                        <label
+                          key={article._id}
+                          className="flex cursor-pointer items-start gap-2 px-1 py-1 font-sans text-[0.82rem]"
+                        >
+                          <input
+                            type="checkbox"
+                            className="mt-1 h-3.5 w-3.5 accent-ink"
+                            checked={selected}
+                            onChange={() => {
+                              const current = editing.magazines || [];
+                              setEditing({
+                                ...editing,
+                                magazines: selected
+                                  ? current.filter((id) => id !== article._id)
+                                  : [...current, article._id],
+                              });
+                            }}
+                          />
+                          <span>{article.title}</span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <p className="font-sans text-[0.8rem] text-muted">No magazine stories yet.</p>
+                )}
+              </div>
               <label>
                 <span className="admin-label">Order</span>
                 <input

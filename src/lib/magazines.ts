@@ -4,7 +4,7 @@
  * Covers are the actual issue covers, exported from the press PDFs.
  */
 
-export const MAGAZINE_DOMAIN = "https://theprimecrestdrafts.vercel.app";
+export const MAGAZINE_DOMAIN = "https://magazines.theprimecrest.com";
 
 export type MagazineIssue = {
   /** folio issue slug — also the /public/issues folder */

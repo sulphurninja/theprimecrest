@@ -33,6 +33,11 @@ function toFormValue(item: Loaded): ArticleFormValue {
       text: item.pullQuote?.text || "",
       attribution: item.pullQuote?.attribution || "",
     },
+    magazineUrl: typeof item.magazineUrl === "string" ? item.magazineUrl : "",
+    magazineEnabled:
+      typeof item.magazineEnabled === "boolean"
+        ? item.magazineEnabled
+        : Boolean(typeof item.magazineUrl === "string" && item.magazineUrl.trim()),
   } as ArticleFormValue;
 }
 

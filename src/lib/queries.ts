@@ -80,6 +80,21 @@ export async function getRelatedArticles(articleId: string, categoryId: string, 
   return serialize(related);
 }
 
+export async function getSectionMagazines(slug: string) {
+  await dbConnect();
+  const category = await Category.findOne({ slug }).select("magazines").lean();
+  const ids = (category?.magazines || []).map(String);
+  if (!ids.length) return [];
+  const items = await Article.find({ _id: { $in: ids }, status: "published" })
+    .select("title slug magazineCover ogImage coverImage magazineEnabled")
+    .lean();
+  const order = new Map(ids.map((id, index) => [id, index]));
+  return serialize(items).sort(
+    (a: { _id: string }, b: { _id: string }) =>
+      (order.get(String(a._id)) ?? 0) - (order.get(String(b._id)) ?? 0),
+  );
+}
+
 export async function getCategoryBySlug(slug: string) {
   await dbConnect();
   const category = await Category.findOne({ slug }).lean();

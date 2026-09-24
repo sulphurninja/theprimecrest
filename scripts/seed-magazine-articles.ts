@@ -212,6 +212,7 @@ async function main() {
           seoDescription: a.excerpt,
           readTime: readingTime(a.content),
           magazineUrl: issue.magazineUrl,
+          magazineEnabled: true,
           pullQuote: a.pullQuote,
         },
         $setOnInsert: { publishedAt, views: Math.floor(Math.random() * 2000) + 400 },

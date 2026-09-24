@@ -50,6 +50,9 @@ export default async function StoryPage({ params }: Props) {
     article.allowAds ? getActiveAd("article-inline").catch(() => null) : null,
   ]);
 
+  const magazineHref =
+    article.magazineEnabled === false ? "" : String(article.magazineUrl || "").trim();
+
   const jsonLd = newsArticleJsonLd({
     headline: article.title,
     description: article.excerpt || article.dek || "",
@@ -72,10 +75,10 @@ export default async function StoryPage({ params }: Props) {
 
       {/* Story header */}
       <header className="mx-auto max-w-[840px] px-5 pt-12 text-center lg:px-8">
-        {article.magazineUrl ? (
+        {magazineHref ? (
           <div className="mb-6 flex justify-center">
             <a
-              href={article.magazineUrl}
+              href={magazineHref}
               target="_blank"
               rel="noopener noreferrer"
               className="group inline-flex items-center gap-2.5 border border-ink bg-ink px-5 py-2.5 font-sans text-[0.78rem] font-semibold uppercase tracking-[0.14em] text-paper no-underline transition-colors hover:bg-paper hover:text-ink"
@@ -170,7 +173,7 @@ export default async function StoryPage({ params }: Props) {
                 <ShareBar
                   title={article.title}
                   slug={article.slug}
-                  magazineUrl={article.magazineUrl || undefined}
+                  magazineUrl={magazineHref || undefined}
                 />
               </div>
 
@@ -216,7 +219,7 @@ export default async function StoryPage({ params }: Props) {
                 <ShareBar
                   title={article.title}
                   slug={article.slug}
-                  magazineUrl={article.magazineUrl || undefined}
+                  magazineUrl={magazineHref || undefined}
                 />
               </div>
 

@@ -41,6 +41,8 @@ export async function POST(request: Request) {
   if (!body.title || !body.author || !normalizeSections(body)) {
     return jsonError("Title, at least one section, and author are required.");
   }
+  if ("magazineUrl" in body) body.magazineUrl = String(body.magazineUrl ?? "").trim();
+  if ("magazineEnabled" in body) body.magazineEnabled = Boolean(body.magazineEnabled);
   await dbConnect();
   const slug = body.slug ? slugify(body.slug) : slugify(body.title);
   const exists = await Article.findOne({ slug });

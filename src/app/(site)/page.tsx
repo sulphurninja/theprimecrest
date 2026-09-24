@@ -7,7 +7,8 @@ import { HeroCarousel } from "@/components/site/HeroCarousel";
 import { Reveal } from "@/components/site/Reveal";
 import { MagazineMarquee } from "@/components/site/MagazineMarquee";
 import { MAGAZINE_ISSUES } from "@/lib/magazines";
-import { getActiveAd, getHomePayload, getTrendingArticles } from "@/lib/queries";
+import { MagazineCoverGrid, type MagazineShelfItem } from "@/components/site/MagazineCoverGrid";
+import { getActiveAd, getHomePayload, getSectionMagazines, getTrendingArticles } from "@/lib/queries";
 import { buildMetadata } from "@/lib/seo";
 import { SITE } from "@/lib/constants";
 
@@ -71,7 +72,10 @@ export default async function HomePage() {
   const briefing = allBriefing.filter(
     (a) => a.category?.slug !== "women-in-business" && a.category?.slug !== "magazine",
   );
-  const trending = await getTrendingArticles(6).catch(() => []) as CardArticle[];
+  const [trending, wibMagazines] = await Promise.all([
+    getTrendingArticles(6).catch(() => []) as Promise<CardArticle[]>,
+    getSectionMagazines("women-in-business").catch(() => []) as Promise<MagazineShelfItem[]>,
+  ]);
 
   return (
     <div className="mx-auto max-w-[1280px] px-5 lg:px-8">
@@ -203,7 +207,14 @@ export default async function HomePage() {
       ) : null}
 
       {/* Women in Business */}
-      {wibArticles.length > 0 ? (
+      {wibMagazines.length > 0 ? (
+        <section className="border-t border-rule py-12">
+          <Reveal>
+            <SectionHeader title="Women in Business" href="/c/women-in-business" />
+            <MagazineCoverGrid items={wibMagazines} />
+          </Reveal>
+        </section>
+      ) : wibArticles.length > 0 ? (
         <section className="border-t border-rule py-12">
           <Reveal>
             <SectionHeader title="Women in Business" href="/c/women-in-business" />

@@ -10,6 +10,7 @@ const CategorySchema = new Schema(
     seoDescription: { type: String, default: "" },
     order: { type: Number, default: 0 },
     featured: { type: Boolean, default: true },
+    magazines: [{ type: Schema.Types.ObjectId, ref: "Article" }],
   },
   { timestamps: true },
 );

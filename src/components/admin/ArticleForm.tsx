@@ -32,6 +32,9 @@ export type ArticleFormValue = {
   isCoverStory: boolean;
   format: string;
   allowAds: boolean;
+  magazineEnabled: boolean;
+  magazineUrl: string;
+  magazineCover: string;
   seoTitle: string;
   seoDescription: string;
   noIndex: boolean;
@@ -59,6 +62,9 @@ export const EMPTY_ARTICLE: ArticleFormValue = {
   isCoverStory: false,
   format: "standard",
   allowAds: true,
+  magazineEnabled: false,
+  magazineUrl: "",
+  magazineCover: "",
   seoTitle: "",
   seoDescription: "",
   noIndex: false,
@@ -400,6 +406,32 @@ export function ArticleForm({ initial }: { initial: ArticleFormValue }) {
                 checked={value.allowAds}
                 onChange={(v) => set("allowAds", v)}
               />
+              <Toggle
+                label="Digital magazine"
+                hint="Show the read button on this story."
+                checked={value.magazineEnabled}
+                onChange={(v) => set("magazineEnabled", v)}
+              />
+              <div className="mt-3">
+                <Field
+                  label="Magazine link"
+                  hint="Opens in a new tab. Leave blank if this story has no edition."
+                >
+                  <input
+                    value={value.magazineUrl}
+                    onChange={(e) => set("magazineUrl", e.target.value)}
+                    placeholder="https://magazines.theprimecrest.com/m/espey"
+                    className="admin-input"
+                  />
+                </Field>
+                <div className="mt-3">
+                  <ImageField
+                    label="Magazine cover"
+                    value={value.magazineCover}
+                    onChange={(url) => set("magazineCover", url)}
+                  />
+                </div>
+              </div>
             </div>
           </div>
 

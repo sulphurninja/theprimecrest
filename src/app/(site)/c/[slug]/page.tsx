@@ -3,7 +3,8 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { AdUnit } from "@/components/site/AdUnit";
 import { ArticleCard, type CardArticle } from "@/components/site/ArticleCard";
-import { getActiveAd, getCategoryArticles, getCategoryBySlug } from "@/lib/queries";
+import { MagazineCoverGrid, type MagazineShelfItem } from "@/components/site/MagazineCoverGrid";
+import { getActiveAd, getCategoryArticles, getCategoryBySlug, getSectionMagazines } from "@/lib/queries";
 import { buildMetadata } from "@/lib/seo";
 
 export const revalidate = 120;
@@ -37,12 +38,15 @@ export default async function CategoryPage({ params, searchParams }: Props) {
   if (!category) notFound();
 
   const page = Math.max(1, Number(pageParam) || 1);
-  const [{ items, total }, topAd] = await Promise.all([
+  const [{ items, total }, topAd, magazines] = await Promise.all([
     getCategoryArticles(String(category._id), page, PAGE_SIZE),
     getActiveAd("category-top").catch(() => null),
+    page === 1 ? getSectionMagazines(category.slug).catch(() => []) : Promise.resolve([]),
   ]);
 
-  const articles = items as CardArticle[];
+  const shelf = magazines as MagazineShelfItem[];
+  const shelfIds = new Set(shelf.map((item) => item._id));
+  const articles = (items as CardArticle[]).filter((article) => !shelfIds.has(article._id));
   const lead = page === 1 ? articles[0] : null;
   const rest = page === 1 ? articles.slice(1) : articles;
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
@@ -64,14 +68,21 @@ export default async function CategoryPage({ params, searchParams }: Props) {
         ) : null}
       </header>
 
-      {articles.length === 0 ? (
+      {shelf.length ? (
+        <section className="border-b border-rule py-12">
+          <p className="kicker mb-8">The magazines</p>
+          <MagazineCoverGrid items={shelf} />
+        </section>
+      ) : null}
+
+      {articles.length === 0 && shelf.length === 0 ? (
         <div className="py-24 text-center">
           <p className="headline text-[1.6rem]">Nothing here yet.</p>
           <p className="mt-3 font-serif text-ink-soft">
             The desk hasn&apos;t filed anything in this section. Check back soon.
           </p>
         </div>
-      ) : (
+      ) : articles.length > 0 ? (
         <>
           {lead ? (
             <section className="border-b border-rule py-12">
@@ -123,7 +134,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
             </nav>
           ) : null}
         </>
-      )}
+      ) : null}
     </div>
   );
 }
