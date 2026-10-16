@@ -70,4 +70,14 @@ export const MAGAZINE_ISSUES: MagazineIssue[] = [
     cover: "/issues/pallavi/magcover.jpg",
     magazineUrl: `${MAGAZINE_DOMAIN}/m/pallavi`,
   },
+  {
+    slug: "katie",
+    articleSlug: "katie-holmes-branding-with-heart",
+    name: "Katie Holmes",
+    role: "Founder & CEO, Brand Studio Creative",
+    volume: "Vol. IX",
+    title: "Branding with heart",
+    cover: "/issues/katie/magcover.jpg",
+    magazineUrl: `${MAGAZINE_DOMAIN}/m/katie`,
+  },
 ];

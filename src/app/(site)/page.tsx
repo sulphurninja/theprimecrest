@@ -98,29 +98,29 @@ export default async function HomePage() {
             <div className="flex items-start gap-4">
               <div className="magazine-3d w-[104px] shrink-0">
                 <Link
-                  href={`/story/${MAGAZINE_ISSUES[2].articleSlug}`}
+                  href={`/story/${MAGAZINE_ISSUES.at(-1)!.articleSlug}`}
                   className="magazine-cover relative block aspect-[3/4] overflow-hidden"
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src={MAGAZINE_ISSUES[2].cover}
-                    alt={`PrimeCrest ${MAGAZINE_ISSUES[2].volume} — ${MAGAZINE_ISSUES[2].name}`}
+                    src={MAGAZINE_ISSUES.at(-1)!.cover}
+                    alt={`PrimeCrest ${MAGAZINE_ISSUES.at(-1)!.volume} — ${MAGAZINE_ISSUES.at(-1)!.name}`}
                     className="absolute inset-0 h-full w-full object-cover"
                   />
                 </Link>
               </div>
               <div className="min-w-0">
                 <p className="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.14em] text-muted">
-                  {MAGAZINE_ISSUES[2].volume} · The September Issue
+                  {MAGAZINE_ISSUES.at(-1)!.volume} · The September Issue
                 </p>
                 <Link
-                  href={`/story/${MAGAZINE_ISSUES[2].articleSlug}`}
+                  href={`/story/${MAGAZINE_ISSUES.at(-1)!.articleSlug}`}
                   className="headline mt-1.5 block text-[1.05rem] leading-snug no-underline hover:text-accent"
                 >
-                  {MAGAZINE_ISSUES[2].name}
+                  {MAGAZINE_ISSUES.at(-1)!.name}
                 </Link>
                 <p className="mt-1 font-sans text-[0.75rem] leading-snug text-muted">
-                  {MAGAZINE_ISSUES[2].role}
+                  {MAGAZINE_ISSUES.at(-1)!.role}
                 </p>
                 <Link
                   href="/magazine"

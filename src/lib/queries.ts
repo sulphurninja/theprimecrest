@@ -235,7 +235,7 @@ export async function getHomePayload() {
   const pickMany = (ids: unknown[] | undefined) =>
     (ids || []).map(pick).filter(Boolean);
 
-  // Hero carousel is the five published magazine features, in issue order.
+  // Hero carousel is the published magazine features, in issue order.
   const bySlug = new Map(all.map((a) => [a.slug, a]));
   let heroArticles = MAGAZINE_ISSUES.map((issue) => bySlug.get(issue.articleSlug)).filter(
     (a): a is HydratedArticle => Boolean(a),
