@@ -1,13 +1,13 @@
 import Link from "next/link";
 import { buildMetadata } from "@/lib/seo";
-import { MAGAZINE_ISSUES } from "@/lib/magazines";
+import { MAGAZINE_ISSUES, issueMonth } from "@/lib/magazines";
 
 export const revalidate = 3600;
 
 export const metadata = buildMetadata({
   title: "The Digital Magazine",
   description:
-    "The PrimeCrest digital magazine — The September Issue, 2026. Five covers, five leaders, each with a feature story and a full flipbook edition.",
+    "The PrimeCrest digital magazine. Each cover has a feature story and a full flipbook edition.",
   path: "/magazine",
 });
 
@@ -15,7 +15,7 @@ export default function MagazinePage() {
   return (
     <div className="mx-auto max-w-[1280px] px-5 py-14 lg:px-8">
       <header className="mx-auto max-w-[760px] text-center">
-        <p className="kicker">The September Issue · 2026</p>
+        <p className="kicker">2026</p>
         <h1 className="headline mt-4 text-[2.4rem] sm:text-[3.2rem]">
           The Digital Magazine
         </h1>
@@ -44,7 +44,7 @@ export default function MagazinePage() {
               </Link>
             </div>
             <p className="mt-5 font-sans text-[0.68rem] font-bold uppercase tracking-[0.16em] text-accent">
-              {issue.volume} · 2026
+              {issue.volume} · {issueMonth(issue.issue)}
             </p>
             <h2 className="headline mt-1.5 text-[1.15rem] leading-snug">
               <Link href={`/story/${issue.articleSlug}`} className="no-underline hover:text-accent">

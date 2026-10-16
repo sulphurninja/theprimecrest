@@ -14,10 +14,16 @@ export type MagazineIssue = {
   name: string;
   role: string;
   volume: string;
+  /** Issue month, as printed on the cover. */
+  issue: string;
   title: string;
   cover: string;
   magazineUrl: string;
 };
+
+export function issueMonth(issue: string) {
+  return issue.replace(/^The /, "").replace(/ Issue$/, "");
+}
 
 export const MAGAZINE_ISSUES: MagazineIssue[] = [
   {
@@ -26,6 +32,7 @@ export const MAGAZINE_ISSUES: MagazineIssue[] = [
     name: "James Espey OBE",
     role: "Investor & Chairman, Wiltshire Whisky Distillery",
     volume: "Vol. I",
+    issue: "The September Issue",
     title: "Sixty years behind the world's back bar",
     cover: "/issues/espey/magcover.jpg",
     magazineUrl: `${MAGAZINE_DOMAIN}/m/espey`,
@@ -36,6 +43,7 @@ export const MAGAZINE_ISSUES: MagazineIssue[] = [
     name: "Joan Gillman",
     role: "Science Teacher, The Browning School, New York",
     volume: "Vol. II",
+    issue: "The September Issue",
     title: "Forty-four years of making room for wonder",
     cover: "/issues/joan/magcover.jpg",
     magazineUrl: `${MAGAZINE_DOMAIN}/m/joan`,
@@ -46,6 +54,7 @@ export const MAGAZINE_ISSUES: MagazineIssue[] = [
     name: "Dr. Nichole Pettway",
     role: "Deputy Director, BOSS, California",
     volume: "Vol. III",
+    issue: "The September Issue",
     title: "Where you have been does not decide where you are going",
     cover: "/issues/nichole/magcover.jpg",
     magazineUrl: `${MAGAZINE_DOMAIN}/m/nichole`,
@@ -56,6 +65,7 @@ export const MAGAZINE_ISSUES: MagazineIssue[] = [
     name: "Kohila Sivas",
     role: "Founder & Master Coach, Wholistic SuccessCodes",
     volume: "Vol. IV",
+    issue: "The September Issue",
     title: "Readiness before performance",
     cover: "/issues/kohila/magcover.jpg",
     magazineUrl: `${MAGAZINE_DOMAIN}/m/kohila`,
@@ -66,6 +76,7 @@ export const MAGAZINE_ISSUES: MagazineIssue[] = [
     name: "Pallavi Pande",
     role: "Founder & Owner, DTOCS & DTOCS Consulting",
     volume: "Vol. V",
+    issue: "The September Issue",
     title: "Twenty million plates later",
     cover: "/issues/pallavi/magcover.jpg",
     magazineUrl: `${MAGAZINE_DOMAIN}/m/pallavi`,
@@ -76,6 +87,7 @@ export const MAGAZINE_ISSUES: MagazineIssue[] = [
     name: "Katie Holmes",
     role: "Founder & CEO, Brand Studio Creative",
     volume: "Vol. IX",
+    issue: "The October Issue",
     title: "Branding with heart",
     cover: "/issues/katie/magcover.jpg",
     magazineUrl: `${MAGAZINE_DOMAIN}/m/katie`,
@@ -86,6 +98,7 @@ export const MAGAZINE_ISSUES: MagazineIssue[] = [
     name: "Nick Hill",
     role: "President & CEO, Bethany Children's Home",
     volume: "Vol. III",
+    issue: "The October Issue",
     title: "The floor, first",
     cover: "/issues/bethany/magcover.jpg",
     magazineUrl: `${MAGAZINE_DOMAIN}/m/bethany`,

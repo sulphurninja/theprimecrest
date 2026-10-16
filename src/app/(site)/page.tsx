@@ -111,7 +111,7 @@ export default async function HomePage() {
               </div>
               <div className="min-w-0">
                 <p className="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.14em] text-muted">
-                  {MAGAZINE_ISSUES.at(-1)!.volume} · The September Issue
+                  {MAGAZINE_ISSUES.at(-1)!.volume} · {MAGAZINE_ISSUES.at(-1)!.issue}
                 </p>
                 <Link
                   href={`/story/${MAGAZINE_ISSUES.at(-1)!.articleSlug}`}

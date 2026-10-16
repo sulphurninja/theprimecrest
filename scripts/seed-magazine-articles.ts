@@ -160,8 +160,8 @@ const ARTICLES: MagArticle[] = [
     excerpt:
       "Founder and CEO of Brand Studio Creative. Branding with Heart, Flower House Dallas, and the walkthrough that stays useful after launch day.",
     coverImage: "/issues/katie/wide.jpg",
-    coverCaption: "Katie Holmes, photographed for The September Issue.",
-    tags: ["The September Issue", "Branding", "Women in Business", "Digital Magazine"],
+    coverCaption: "Katie Holmes, photographed for The October Issue.",
+    tags: ["The October Issue", "Branding", "Women in Business", "Digital Magazine"],
     pullQuote: {
       text: "Your business has a heart. Your brand should feel like it.",
       attribution: "Katie Holmes",
@@ -186,8 +186,8 @@ const ARTICLES: MagArticle[] = [
     excerpt:
       "Nick Hill learned Bethany Children's Home from the cottage floor. In July 2026 the board named him President and CEO. Circumstances, he says, should never determine potential.",
     coverImage: "/issues/bethany/wide.jpg",
-    coverCaption: "Nick Hill, photographed for The September Issue.",
-    tags: ["The September Issue", "Leadership", "Digital Magazine"],
+    coverCaption: "Nick Hill, photographed for The October Issue.",
+    tags: ["The October Issue", "Leadership", "Digital Magazine"],
     pullQuote: {
       text: "A title does not make someone a leader. People do. Accountability does. Purpose does.",
       attribution: "Nick Hill",

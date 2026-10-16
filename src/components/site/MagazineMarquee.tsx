@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { MAGAZINE_ISSUES } from "@/lib/magazines";
+import { MAGAZINE_ISSUES, issueMonth } from "@/lib/magazines";
 
 /**
  * 3D showcase marquee of the digital magazine covers.
@@ -15,7 +15,7 @@ export function MagazineMarquee() {
         <div className="flex items-baseline justify-between gap-6">
           <div>
             <p className="font-sans text-[0.7rem] font-bold uppercase tracking-[0.2em] text-[#c39a4b]">
-              The September Issue · 2026
+              2026
             </p>
             <h2 className="headline mt-2 text-[1.7rem] text-paper sm:text-[2.1rem]">
               The Digital Magazines
@@ -54,7 +54,7 @@ export function MagazineMarquee() {
               </span>
               <span className="mt-4 block text-center">
                 <span className="block font-sans text-[0.66rem] font-semibold uppercase tracking-[0.16em] text-[#c39a4b]">
-                  {issue.volume} · 2026
+                  {issue.volume} · {issueMonth(issue.issue)}
                 </span>
                 <span className="mt-1 block font-sans text-[0.86rem] font-semibold text-paper transition-colors group-hover:text-[#e5c98c]">
                   {issue.name}
