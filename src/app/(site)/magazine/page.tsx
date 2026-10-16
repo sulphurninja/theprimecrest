@@ -20,12 +20,12 @@ export default function MagazinePage() {
           The Digital Magazine
         </h1>
         <p className="dek mx-auto mt-5 max-w-xl text-[1.15rem]">
-          Six covers. Read the feature story here, or open the
+          Read the feature story here, or open the
           full flipbook edition — designed page by page, like print.
         </p>
       </header>
 
-      <div className="mt-12 grid grid-cols-2 gap-x-6 gap-y-12 sm:grid-cols-3 lg:grid-cols-6">
+      <div className="mt-12 grid grid-cols-2 gap-x-6 gap-y-12 sm:grid-cols-3 lg:grid-cols-4">
         {MAGAZINE_ISSUES.map((issue) => (
           <article key={issue.slug} className="flex flex-col">
             <div className="magazine-3d mx-auto w-full max-w-[210px]">

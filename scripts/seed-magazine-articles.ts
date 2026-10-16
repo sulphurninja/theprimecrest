@@ -179,6 +179,30 @@ const ARTICLES: MagArticle[] = [
 <p>Flower House Dallas grew past the original job: the site, the marketing, the merchandise, and the wraps on the cars. Lauren is still using what they made. The brand, Katie says, helped her attract the clients she wanted. Watching someone go from embarrassed by her brand to proud enough to share it never gets old.</p>
 <p>Websites, she says, will have to do more than post information. They will have to move a person from first look to trust to the next step. Tools will get faster. That does not make the brand. The heart and the story still have to be protected, or the work is only a file.</p>`,
   },
+  {
+    issueSlug: "bethany",
+    title: "Nick Hill: The Floor, First",
+    dek: "He started as Cottage Support Staff at Bethany Children's Home, then carried the work through the programs until the board named him President and Chief Executive Officer.",
+    excerpt:
+      "Nick Hill learned Bethany Children's Home from the cottage floor. In July 2026 the board named him President and CEO. Circumstances, he says, should never determine potential.",
+    coverImage: "/issues/bethany/wide.jpg",
+    coverCaption: "Nick Hill, photographed for The September Issue.",
+    tags: ["The September Issue", "Leadership", "Digital Magazine"],
+    pullQuote: {
+      text: "A title does not make someone a leader. People do. Accountability does. Purpose does.",
+      attribution: "Nick Hill",
+    },
+    content: `<p>Bethany Children's Home sits on the Philadelphia side of Pennsylvania. It takes young people in when the systems around them run thin: shelter beds for the night, residential cottages for the longer road, and transitional living for the step toward independence. The services are in-house. Aftercare stays with a young person after they leave. A young person does not arrive with a tidy problem.</p>
+<p>Nick Hill came up inside those programs. Cottage Support Staff first: the floor, the direct work with youth. Then the other posts, administrative and on the floor, until the board moved him to the chair. He still talks like a man who worked the cottages, because he did.</p>
+<h2>The order of the file</h2>
+<p>The cottages are thirteen buildings, like big houses: living rooms, kitchens, bedrooms. They hold more than one young person. Some licenses go as high as thirty-two. Most hold up to twelve. Direct care is unglamorous and exact. The same shift, the same cottage, the same group, held steady until steadiness starts to mean something. He watched how often the difference between giving up and going on was a single adult who refused to leave.</p>
+<p>He moved through leadership posts, served as Deputy Chief Executive and Chief Human Resources Officer, and in July 2026 the board named him President and Chief Executive Officer. The title changed. The work with youth did not.</p>
+<p>Ask him what he wants from a leader when the week turns hard and the answer arrives in that order. Listen first. Make the hard call. Take the blame when it lands. Staff should have a voice, work that matters, and room to grow. Circumstances should never determine potential. A child's address is not a verdict, and the file is never the whole story.</p>
+<h2>What the door receives</h2>
+<p>By the time a young person reaches residential or emergency care, years usually sit behind that night. What is not visible is the slow accumulation that led to it: mental and behavioral health left unaddressed, family instability, poverty, trauma, isolation, barriers at school. Many arrive unable to find a floor that holds.</p>
+<p>Hill's argument is not complicated, and he makes it often. Put the money earlier. Families, schools, mental health, work, the ordinary good days that keep a child out of a crisis bed. By the time the door at Bethany is the last one open, the least expensive help is already years in the past.</p>
+<p>A title does not make someone a leader. People do. Accountability does. Purpose does. If he is any good at this, he will tell you, the programs are stronger because of the people he has developed.</p>`,
+  },
 ];
 
 async function main() {

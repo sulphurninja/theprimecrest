@@ -80,4 +80,14 @@ export const MAGAZINE_ISSUES: MagazineIssue[] = [
     cover: "/issues/katie/magcover.jpg",
     magazineUrl: `${MAGAZINE_DOMAIN}/m/katie`,
   },
+  {
+    slug: "bethany",
+    articleSlug: "nick-hill-the-floor-first",
+    name: "Nick Hill",
+    role: "President & CEO, Bethany Children's Home",
+    volume: "Vol. III",
+    title: "The floor, first",
+    cover: "/issues/bethany/magcover.jpg",
+    magazineUrl: `${MAGAZINE_DOMAIN}/m/bethany`,
+  },
 ];
