@@ -54,3 +54,18 @@ export function excerptFromHtml(html: string, length = 180) {
 export function cn(...parts: Array<string | false | null | undefined>) {
   return parts.filter(Boolean).join(" ");
 }
+
+/** "12m ago", "3h ago", "2d ago" — falls back to a date after a week. */
+export function timeAgo(value?: string | Date | null, now = Date.now()) {
+  if (!value) return "";
+  const then = new Date(value).getTime();
+  if (Number.isNaN(then)) return "";
+  const minutes = Math.max(0, Math.round((now - then) / 60000));
+  if (minutes < 1) return "Just now";
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.round(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.round(hours / 24);
+  if (days < 7) return `${days}d ago`;
+  return formatDate(value, { day: "numeric", month: "short", year: undefined });
+}

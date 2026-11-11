@@ -4,6 +4,8 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
+import { ArrowBackIcon, ArrowIcon, IssueIcon } from "@/components/site/Icons";
+import { MAGAZINE_ISSUES, issueLabel } from "@/lib/magazines";
 import type { CardArticle } from "./ArticleCard";
 
 interface HeroCarouselProps {
@@ -11,13 +13,16 @@ interface HeroCarouselProps {
   interval?: number;
 }
 
-const textVariants = {
-  enter: { opacity: 0, y: 26 },
-  center: { opacity: 1, y: 0 },
-  exit: { opacity: 0, y: -14 },
-};
+const issueBySlug = new Map(MAGAZINE_ISSUES.map((issue) => [issue.articleSlug, issue]));
 
-export function HeroCarousel({ articles, interval = 6000 }: HeroCarouselProps) {
+const ease = [0.16, 1, 0.3, 1] as const;
+
+/**
+ * Editorial cover: the lead photograph beside its headline and standfirst,
+ * with the other cover stories as a row of cards underneath. It rotates on
+ * its own; any card can be picked.
+ */
+export function HeroCarousel({ articles, interval = 7000 }: HeroCarouselProps) {
   const [current, setCurrent] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const touchX = useRef<number | null>(null);
@@ -38,164 +43,210 @@ export function HeroCarousel({ articles, interval = 6000 }: HeroCarouselProps) {
   if (!articles.length) return null;
 
   const article = articles[current];
+  const issue = issueBySlug.get(article.slug);
+  const label = (a: CardArticle) => {
+    const i = issueBySlug.get(a.slug);
+    return i ? issueLabel(i) : a.category?.name || "";
+  };
 
   return (
-    <div
-      className="group/hero relative overflow-hidden bg-ink"
+    <section
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
-      onTouchStart={(e) => {
-        touchX.current = e.touches[0].clientX;
-        setIsPaused(true);
-      }}
-      onTouchEnd={(e) => {
-        if (touchX.current !== null) {
-          const dx = e.changedTouches[0].clientX - touchX.current;
-          if (dx < -40) next();
-          else if (dx > 40) prev();
-        }
-        touchX.current = null;
-        setIsPaused(false);
-      }}
+      aria-roledescription="carousel"
+      aria-label="Cover stories"
     >
-      {/* Art */}
-      <div className="relative aspect-[4/3] sm:aspect-[16/9] lg:aspect-auto lg:h-[560px]">
-        <AnimatePresence initial={false}>
-          <motion.div
-            key={article._id}
-            className="absolute inset-0"
-            initial={{ opacity: 0, scale: 1.05 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{
-              opacity: { duration: 0.7, ease: "easeOut" },
-              scale: { duration: 7, ease: "linear" },
-            }}
-          >
-            {article.coverImage ? (
-              <Image
-                src={article.coverImage}
-                alt={article.title}
-                fill
-                priority
-                className="object-cover"
-                sizes="(min-width: 1024px) 900px, 100vw"
-              />
-            ) : null}
-          </motion.div>
-        </AnimatePresence>
-
-        {/* Scrims */}
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-black/10" />
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/35 via-transparent to-transparent" />
-
-        {/* Counter */}
-        <div className="absolute right-4 top-4 border border-white/25 bg-black/35 px-2.5 py-1 font-sans text-[0.7rem] font-medium tabular-nums text-white/90 backdrop-blur-sm">
-          {String(current + 1).padStart(2, "0")} — {String(articles.length).padStart(2, "0")}
-        </div>
-
-        {/* Full-slide click target */}
-        <Link
-          href={`/story/${article.slug}`}
-          className="absolute inset-0"
-          aria-label={article.title}
-        />
-
-        {/* Copy */}
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 p-5 pb-16 sm:p-8 sm:pb-16 lg:p-10 lg:pb-[4.5rem]">
-          <AnimatePresence mode="wait">
+      <div className="grid grid-cols-1 items-center gap-8 lg:grid-cols-12 lg:gap-12">
+        {/* Photograph */}
+        <div
+          className="relative aspect-[4/3] overflow-hidden rounded-lg bg-paper-2 lg:col-span-7 lg:aspect-[5/4]"
+          onTouchStart={(e) => {
+            touchX.current = e.touches[0].clientX;
+          }}
+          onTouchEnd={(e) => {
+            if (touchX.current !== null) {
+              const dx = e.changedTouches[0].clientX - touchX.current;
+              if (dx < -40) next();
+              else if (dx > 40) prev();
+            }
+            touchX.current = null;
+          }}
+        >
+          <AnimatePresence initial={false}>
             <motion.div
               key={article._id}
-              variants={textVariants}
-              initial="enter"
-              animate="center"
-              exit="exit"
-              transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-              className="pointer-events-auto max-w-[640px]"
+              className="absolute inset-0"
+              initial={{ opacity: 0, scale: 1.04 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{
+                opacity: { duration: 0.7, ease: "easeOut" },
+                scale: { duration: interval / 1000 + 1, ease: "linear" },
+              }}
             >
-              {article.category?.name ? (
-                <Link
-                  href={`/c/${article.category.slug}`}
-                  className="inline-flex items-center gap-2 font-sans text-[0.7rem] font-bold uppercase tracking-[0.2em] text-white no-underline"
-                >
-                  <span className="h-[2px] w-7 bg-accent" aria-hidden />
-                  {article.category.name}
-                </Link>
+              {article.coverImage ? (
+                <Image
+                  src={article.coverImage}
+                  alt={article.title}
+                  fill
+                  priority={current === 0}
+                  className="object-cover"
+                  sizes="(min-width: 1024px) 760px, 100vw"
+                />
               ) : null}
-              <h1 className="headline mt-3 text-[1.65rem] leading-[1.08] text-white [text-shadow:0_2px_24px_rgba(0,0,0,0.45)] sm:text-[2.3rem] lg:text-[2.7rem]">
-                <Link href={`/story/${article.slug}`} className="no-underline hover:text-white/85">
-                  {article.title}
-                </Link>
+            </motion.div>
+          </AnimatePresence>
+          <Link href={`/story/${article.slug}`} className="absolute inset-0" aria-label={article.title} />
+          {issue ? (
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.a
+                key={issue.slug}
+                href={issue.magazineUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                initial={{ opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -6 }}
+                transition={{ duration: 0.5, ease }}
+                className="absolute bottom-5 right-5 hidden w-[104px] overflow-hidden rounded-[3px] shadow-[0_24px_48px_-12px_rgba(0,0,0,0.65)] ring-1 ring-white/20 transition-transform hover:-translate-y-1 sm:block"
+                aria-label={`Open the ${issueLabel(issue)} flipbook`}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={issue.cover} alt="" className="aspect-[3/4] w-full object-cover" />
+              </motion.a>
+            </AnimatePresence>
+          ) : null}
+        </div>
+
+        {/* Headline */}
+        <div className="lg:col-span-5">
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.div
+              key={article._id}
+              initial={{ opacity: 0, y: 18 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.45, ease }}
+            >
+              <p className="label flex flex-wrap items-center gap-x-3 gap-y-1 text-accent">
+                {issue ? "Cover story" : article.category?.name || "Featured"}
+                {issue ? (
+                  <>
+                    <span className="h-1 w-1 rounded-full bg-ink/25" aria-hidden />
+                    <span className="text-muted">{issueLabel(issue)}</span>
+                  </>
+                ) : null}
+              </p>
+              <h1 className="statement mt-4 text-[2.3rem] sm:text-[3rem] lg:text-[3.4rem]">
+                <Link href={`/story/${article.slug}`}>{article.title}</Link>
               </h1>
               {article.dek ? (
-                <p className="mt-3 hidden max-w-[520px] font-serif text-[1.02rem] leading-relaxed text-white/80 sm:block">
+                <p className="mt-5 font-serif text-[1.12rem] leading-relaxed text-ink-soft line-clamp-4">
                   {article.dek}
                 </p>
               ) : null}
-              <p className="mt-3 font-sans text-[0.8rem] text-white/65">
-                {article.author?.name ? (
-                  <>
-                    By <span className="font-medium text-white/90">{article.author.name}</span>
-                  </>
+              {issue ? (
+                <p className="mt-5 font-sans text-[0.86rem] text-muted">
+                  <span className="font-semibold text-ink">{issue.name}</span> · {issue.role}
+                </p>
+              ) : article.author?.name ? (
+                <p className="mt-5 font-sans text-[0.86rem] text-muted">
+                  By <span className="font-semibold text-ink">{article.author.name}</span>
+                  {article.readTime ? ` · ${article.readTime} min read` : ""}
+                </p>
+              ) : null}
+              <div className="mt-8 flex flex-wrap items-center gap-3">
+                <Link href={`/story/${article.slug}`} className="btn-primary group">
+                  Read the story
+                  <ArrowIcon className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+                </Link>
+                {issue ? (
+                  <a href={issue.magazineUrl} target="_blank" rel="noopener noreferrer" className="btn-outline">
+                    <IssueIcon className="h-4 w-4" /> Flipbook
+                  </a>
                 ) : null}
-                {article.readTime ? <> · {article.readTime} min read</> : null}
-              </p>
+              </div>
             </motion.div>
           </AnimatePresence>
         </div>
+      </div>
 
-        {/* Bottom control bar */}
-        {articles.length > 1 && (
-          <div className="absolute inset-x-0 bottom-0 flex items-center gap-4 px-5 pb-4 sm:px-8 lg:px-10">
-            <div className="flex gap-1.5">
-              {articles.map((a, i) => (
-                <button
-                  key={a._id}
-                  onClick={() => go(i)}
-                  className={`h-[3px] transition-all duration-300 ${
-                    i === current ? "w-9 bg-accent" : "w-4 bg-white/35 hover:bg-white/70"
-                  }`}
-                  aria-label={`Go to story ${i + 1}`}
-                  aria-current={i === current ? "true" : undefined}
-                />
-              ))}
-            </div>
-            {!isPaused ? (
-              <div className="h-[2px] max-w-[160px] flex-1 overflow-hidden bg-white/15">
-                <motion.div
-                  className="h-full bg-white/60"
-                  initial={{ width: "0%" }}
-                  animate={{ width: "100%" }}
-                  transition={{ duration: interval / 1000, ease: "linear" }}
-                  key={`progress-${current}`}
-                />
-              </div>
-            ) : (
-              <div className="h-[2px] max-w-[160px] flex-1 bg-white/15" />
-            )}
-            <div className="ml-auto flex gap-2">
+      {/* Other cover stories */}
+      {articles.length > 1 ? (
+        <div className="mt-10 border-t border-ink/10 pt-6">
+          <div className="mb-4 flex items-center justify-between gap-4">
+            <p className="label text-muted">More cover stories</p>
+            <div className="flex gap-2">
               <button
+                type="button"
                 onClick={prev}
-                className="flex h-9 w-9 items-center justify-center border border-white/30 text-white/85 backdrop-blur-sm transition-colors hover:border-white hover:bg-white hover:text-ink"
+                className="flex h-9 w-9 items-center justify-center rounded-full border border-ink/15 text-ink transition-colors hover:border-ink hover:bg-ink hover:text-white"
                 aria-label="Previous story"
               >
-                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                  <path d="M15 19l-7-7 7-7" />
-                </svg>
+                <ArrowBackIcon className="h-3.5 w-3.5" />
               </button>
               <button
+                type="button"
                 onClick={next}
-                className="flex h-9 w-9 items-center justify-center border border-white/30 text-white/85 backdrop-blur-sm transition-colors hover:border-white hover:bg-white hover:text-ink"
+                className="flex h-9 w-9 items-center justify-center rounded-full border border-ink/15 text-ink transition-colors hover:border-ink hover:bg-ink hover:text-white"
                 aria-label="Next story"
               >
-                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                  <path d="M9 5l7 7-7 7" />
-                </svg>
+                <ArrowIcon className="h-3.5 w-3.5" />
               </button>
             </div>
           </div>
-        )}
-      </div>
-    </div>
+          <div className="scrollbar-none -mx-4 flex snap-x gap-5 overflow-x-auto px-4 sm:-mx-6 sm:px-6 lg:mx-0 lg:grid lg:grid-cols-7 lg:overflow-visible lg:px-0">
+            {articles.map((a, i) => {
+              const active = i === current;
+              return (
+                <button
+                  key={a._id}
+                  type="button"
+                  onClick={() => go(i)}
+                  aria-current={active ? "true" : undefined}
+                  aria-label={`Show story: ${a.title}`}
+                  className="group flex w-[170px] shrink-0 snap-start flex-col self-start text-left lg:w-auto"
+                >
+                  <span
+                    className={`relative block aspect-[4/3] overflow-hidden rounded-md bg-paper-2 transition-opacity ${
+                      active ? "" : "opacity-70 group-hover:opacity-100"
+                    }`}
+                  >
+                    {a.coverImage ? (
+                      <Image src={a.coverImage} alt="" fill className="object-cover" sizes="180px" />
+                    ) : null}
+                  </span>
+                  <span className="relative mt-3 block h-[2px] overflow-hidden bg-ink/10">
+                    {active ? (
+                      isPaused ? (
+                        <span className="block h-full w-full bg-accent" />
+                      ) : (
+                        <motion.span
+                          key={`progress-${current}`}
+                          className="block h-full bg-accent"
+                          initial={{ width: "0%" }}
+                          animate={{ width: "100%" }}
+                          transition={{ duration: interval / 1000, ease: "linear" }}
+                        />
+                      )
+                    ) : null}
+                  </span>
+                  <span className={`label mt-2.5 block !text-[0.6rem] ${active ? "text-accent" : "text-muted"}`}>
+                    {label(a)}
+                  </span>
+                  <span
+                    className={`mt-1 block font-sans text-[0.86rem] font-semibold leading-snug line-clamp-2 ${
+                      active ? "text-ink" : "text-ink-soft group-hover:text-ink"
+                    }`}
+                  >
+                    {a.title}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      ) : null}
+    </section>
   );
 }

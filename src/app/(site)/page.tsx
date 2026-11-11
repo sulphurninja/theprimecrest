@@ -1,16 +1,25 @@
+import { Suspense } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { AdUnit } from "@/components/site/AdUnit";
 import { ArticleCard, type CardArticle } from "@/components/site/ArticleCard";
-import { NewsletterForm } from "@/components/site/NewsletterForm";
-import { LatestPostsTabs } from "@/components/site/LatestPostsTabs";
 import { HeroCarousel } from "@/components/site/HeroCarousel";
 import { Reveal } from "@/components/site/Reveal";
 import { MagazineMarquee } from "@/components/site/MagazineMarquee";
+import { NewsDesk } from "@/components/site/NewsDesk";
+import { SectionTitle } from "@/components/site/SectionHead";
+import { ArrowIcon } from "@/components/site/Icons";
+import {
+  MagazineCoverGrid,
+  magazineShelfMeta,
+  type MagazineShelfItem,
+} from "@/components/site/MagazineCoverGrid";
 import { MAGAZINE_ISSUES } from "@/lib/magazines";
-import { MagazineCoverGrid, type MagazineShelfItem } from "@/components/site/MagazineCoverGrid";
-import { getActiveAd, getHomePayload, getSectionMagazines, getTrendingArticles } from "@/lib/queries";
+import { NEWS_TOPICS, getNews, newsCredit } from "@/lib/news";
+import { getActiveAd, getHomePayload, getSectionMagazines } from "@/lib/queries";
 import { buildMetadata } from "@/lib/seo";
 import { SITE } from "@/lib/constants";
+import { formatDate, timeAgo } from "@/lib/utils";
 
 export const revalidate = 60;
 
@@ -20,19 +29,83 @@ export const metadata = buildMetadata({
   path: "/",
 });
 
-function SectionHeader({ title, href }: { title: string; href?: string }) {
+const container = "mx-auto max-w-[1320px] px-4 sm:px-6";
+const magazineSlugs = new Set(MAGAZINE_ISSUES.map((issue) => issue.articleSlug));
+
+/** Live news band. Renders nothing until the news API returns headlines. */
+async function NewsSection() {
+  const items = await getNews("business", 10);
+  if (items.length < 3) return null;
   return (
-    <div className="mb-7 flex items-baseline justify-between border-b-2 border-ink pb-3">
-      <h2 className="section-title text-[0.9rem]">{title}</h2>
-      {href ? (
+    <section className="border-y border-ink/10 bg-surface" aria-label="Live news">
+      <div className={`${container} py-20`}>
+        <NewsDesk topics={NEWS_TOPICS} initial={items} credit={newsCredit()} />
+      </div>
+    </section>
+  );
+}
+
+/** "3h ago" for fresh posts, a short date for older ones. */
+function when(date?: string) {
+  if (!date) return "";
+  const hours = (Date.now() - new Date(date).getTime()) / 3_600_000;
+  return hours < 48 ? timeAgo(date) : formatDate(date, { month: "short", year: undefined });
+}
+
+function LeadStory({ article }: { article: CardArticle }) {
+  return (
+    <article className="group">
+      {article.coverImage ? (
         <Link
-          href={href}
-          className="font-sans text-[0.8rem] font-medium text-muted no-underline transition-colors hover:text-accent"
+          href={`/story/${article.slug}`}
+          className="img-hover relative block aspect-[3/2] overflow-hidden rounded-md bg-paper-2"
         >
-          View all →
+          <Image
+            src={article.coverImage}
+            alt={article.title}
+            fill
+            className="object-cover"
+            sizes="(min-width: 1024px) 640px, 100vw"
+          />
         </Link>
       ) : null}
-    </div>
+      {article.category?.name ? (
+        <Link href={`/c/${article.category.slug}`} className="label mt-6 block text-accent no-underline">
+          {article.category.name}
+        </Link>
+      ) : null}
+      <h3 className="statement mt-2 text-[1.9rem] sm:text-[2.3rem]">
+        <Link href={`/story/${article.slug}`}>{article.title}</Link>
+      </h3>
+      {article.dek || article.excerpt ? (
+        <p className="mt-3 font-serif text-[1.06rem] leading-relaxed text-ink-soft line-clamp-3">
+          {article.dek || article.excerpt}
+        </p>
+      ) : null}
+      <p className="meta mt-4">
+        {article.author?.name ? <span className="font-semibold text-ink">{article.author.name}</span> : null}
+        {article.readTime ? ` · ${article.readTime} min read` : ""}
+      </p>
+    </article>
+  );
+}
+
+function SecondaryStory({ article }: { article: CardArticle }) {
+  return (
+    <article className="group border-b border-ink/10 pb-6 last:border-b-0 last:pb-0">
+      {article.coverImage ? (
+        <Link
+          href={`/story/${article.slug}`}
+          className="img-hover relative mb-4 block aspect-[16/10] overflow-hidden rounded-md bg-paper-2"
+        >
+          <Image src={article.coverImage} alt="" fill className="object-cover" sizes="320px" />
+        </Link>
+      ) : null}
+      {article.category?.name ? <p className="label !text-[0.62rem] text-accent">{article.category.name}</p> : null}
+      <h3 className="headline mt-1.5 text-[1.08rem] leading-snug">
+        <Link href={`/story/${article.slug}`}>{article.title}</Link>
+      </h3>
+    </article>
   );
 }
 
@@ -47,8 +120,7 @@ export default async function HomePage() {
   if (!payload?.hero) {
     return (
       <div className="mx-auto max-w-[720px] px-5 py-28 text-center">
-        <p className="kicker">The presses are quiet</p>
-        <h1 className="headline mt-4 text-[2.5rem]">Nothing has been published yet.</h1>
+        <h1 className="statement text-[2.6rem]">Nothing has been published yet</h1>
         <p className="mt-4 font-serif text-ink-soft">
           Seed the database with <code className="font-sans text-sm">bun run seed</code>, then
           refresh this page.
@@ -64,230 +136,233 @@ export default async function HomePage() {
     payload.showAds ? getActiveAd("footer-strip") : null,
   ]);
 
-  const featured = payload.featured.filter(Boolean) as CardArticle[];
   const allBriefing = payload.briefing.filter(Boolean) as CardArticle[];
-  const wibArticles = allBriefing.filter(
-    (a) => a.category?.slug === "women-in-business",
+  const wibArticles = allBriefing.filter((a) => a.category?.slug === "women-in-business");
+
+  // Today's briefing: the editors' picks first, topped up with the latest non-magazine posts.
+  const seen = new Set<string>();
+  const topStories = [...allBriefing, ...(payload.latest as CardArticle[])].filter((a) => {
+    if (seen.has(a._id) || magazineSlugs.has(a.slug) || a.category?.slug === "women-in-business") {
+      return false;
+    }
+    seen.add(a._id);
+    return true;
+  });
+  const [lead, ...others] = topStories;
+  const latest = (payload.latest as CardArticle[]).slice(0, 6);
+
+  const wibMagazines = (await getSectionMagazines("women-in-business").catch(
+    () => [],
+  )) as MagazineShelfItem[];
+  const [wibLead, ...wibRest] = wibMagazines;
+  const wibLeadMeta = wibLead ? magazineShelfMeta(wibLead) : null;
+
+  const rails = payload.rails.filter(
+    (rail) =>
+      rail.articles.length > 0 &&
+      rail.category.slug !== "women-in-business" &&
+      rail.category.slug !== "magazine",
   );
-  const briefing = allBriefing.filter(
-    (a) => a.category?.slug !== "women-in-business" && a.category?.slug !== "magazine",
-  );
-  const [trending, wibMagazines] = await Promise.all([
-    getTrendingArticles(6).catch(() => []) as Promise<CardArticle[]>,
-    getSectionMagazines("women-in-business").catch(() => []) as Promise<MagazineShelfItem[]>,
-  ]);
 
   return (
-    <div className="mx-auto max-w-[1280px] px-5 lg:px-8">
-      {/* Hero: cinematic carousel + right rail (latest issue, latest posts) */}
-      <section className="grid gap-8 border-b border-rule py-8 lg:grid-cols-[1fr_320px] lg:gap-0">
-        {/* Lead — overlay carousel */}
-        <div className="lg:pr-8">
-          <HeroCarousel
-            articles={payload.heroArticles as CardArticle[]}
-            interval={6000}
-          />
-        </div>
+    <div>
+      {/* Cover stories */}
+      <div className={`${container} pb-16 pt-10 lg:pt-12`}>
+        <HeroCarousel articles={payload.heroArticles as CardArticle[]} />
+      </div>
 
-        {/* Right rail — Latest Issue + Latest Posts */}
-        <aside className="lg:border-l lg:border-rule lg:pl-8">
-          <div className="mb-8 border-b border-rule pb-8">
-            <p className="mb-4 border-b-2 border-accent pb-2 font-sans text-[0.7rem] font-bold uppercase tracking-[0.14em] text-accent">
-              Latest Issue
-            </p>
-            <div className="flex items-start gap-4">
-              <div className="magazine-3d w-[104px] shrink-0">
-                <Link
-                  href={`/story/${MAGAZINE_ISSUES.at(-1)!.articleSlug}`}
-                  className="magazine-cover relative block aspect-[3/4] overflow-hidden"
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={MAGAZINE_ISSUES.at(-1)!.cover}
-                    alt={`PrimeCrest ${MAGAZINE_ISSUES.at(-1)!.volume} — ${MAGAZINE_ISSUES.at(-1)!.name}`}
-                    className="absolute inset-0 h-full w-full object-cover"
-                  />
-                </Link>
+      {/* Today's briefing */}
+      {lead ? (
+        <section className="border-t border-ink/10 bg-surface">
+          <div className={`${container} py-16`}>
+            <SectionTitle title="Today's briefing" href="/search" linkLabel="All stories" />
+            <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-12">
+              <div className="md:col-span-2 lg:col-span-6">
+                <LeadStory article={lead} />
               </div>
-              <div className="min-w-0">
-                <p className="font-sans text-[0.66rem] font-semibold uppercase tracking-[0.14em] text-muted">
-                  {MAGAZINE_ISSUES.at(-1)!.volume} · {MAGAZINE_ISSUES.at(-1)!.issue}
+              {others.length ? (
+                <div className="space-y-6 lg:col-span-3">
+                  {others.slice(0, 2).map((article) => (
+                    <SecondaryStory key={article._id} article={article} />
+                  ))}
+                </div>
+              ) : null}
+              <aside className="lg:col-span-3 lg:border-l lg:border-ink/10 lg:pl-8">
+                <p className="label flex items-center gap-2 text-accent">
+                  <span className="wire-pulse !h-1.5 !w-1.5" aria-hidden /> Latest
                 </p>
-                <Link
-                  href={`/story/${MAGAZINE_ISSUES.at(-1)!.articleSlug}`}
-                  className="headline mt-1.5 block text-[1.05rem] leading-snug no-underline hover:text-accent"
-                >
-                  {MAGAZINE_ISSUES.at(-1)!.name}
-                </Link>
-                <p className="mt-1 font-sans text-[0.75rem] leading-snug text-muted">
-                  {MAGAZINE_ISSUES.at(-1)!.role}
-                </p>
-                <Link
-                  href="/magazine"
-                  className="mt-2.5 inline-block font-sans text-[0.75rem] font-semibold text-accent no-underline hover:text-accent-hover"
-                >
-                  All issues →
-                </Link>
-              </div>
+                <ol className="mt-4">
+                  {latest.map((article) => (
+                    <li key={article._id} className="group relative border-l border-ink/10 pb-5 pl-5 last:pb-0">
+                      <span className="absolute -left-[4px] top-1.5 h-[7px] w-[7px] rounded-full border border-ink/25 bg-surface transition-colors group-hover:border-accent group-hover:bg-accent" />
+                      <p className="font-sans text-[0.72rem] font-semibold text-muted">
+                        {when(article.publishedAt)}
+                        {article.category?.name ? ` · ${article.category.name}` : ""}
+                      </p>
+                      <h3 className="headline mt-1 text-[0.96rem] leading-snug">
+                        <Link href={`/story/${article.slug}`}>{article.title}</Link>
+                      </h3>
+                    </li>
+                  ))}
+                </ol>
+                {mpu ? (
+                  <div className="mt-8">
+                    <AdUnit slot={mpu.slot} campaign={mpu.campaign} />
+                  </div>
+                ) : null}
+              </aside>
             </div>
           </div>
-          <LatestPostsTabs latest={featured.slice(0, 6)} trending={trending} />
-        </aside>
-      </section>
-
-      {/* Digital magazine marquee */}
-      <MagazineMarquee />
-
-      {payload.heroArticles.length > 0 ? (
-        <section className="border-t border-rule py-12">
-          <Reveal>
-            <SectionHeader title="The Magazine" href="/magazine" />
-            <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
-              {(payload.heroArticles as CardArticle[]).map((article) => (
-                <ArticleCard key={article._id} article={article} variant="feature" />
-              ))}
-            </div>
-          </Reveal>
         </section>
       ) : null}
 
       {leaderboard ? (
-        <div className="border-t border-rule py-8">
+        <div className={`${container} py-12`}>
           <AdUnit slot={leaderboard.slot} campaign={leaderboard.campaign} className="mx-auto max-w-[970px]" />
         </div>
       ) : null}
 
-      {/* The Briefing + sidebar */}
-      <section className="border-t border-rule py-12">
-        <Reveal>
-        <div className="grid gap-12 lg:grid-cols-12 lg:gap-0">
-          <div className="lg:col-span-8 lg:pr-10">
-            <SectionHeader title="The Briefing" />
-            <div className="grid gap-10 sm:grid-cols-2">
-              {briefing.slice(0, 4).map((article) => (
-                <ArticleCard key={article._id} article={article} variant="feature" />
-              ))}
-            </div>
-          </div>
-          <aside className="lg:col-span-4 lg:border-l lg:border-rule lg:pl-10">
-            {mpu ? <AdUnit slot={mpu.slot} campaign={mpu.campaign} /> : null}
-            {payload.showNewsletter ? (
-              <div className="mt-10 border-t-2 border-ink pt-6">
-                <p className="kicker">The Morning Letter</p>
-                <h3 className="headline mt-2 text-[1.5rem]">
-                  The day&apos;s sharpest reading, in one email.
-                </h3>
-                <p className="mt-2.5 mb-5 font-serif text-[0.95rem] leading-relaxed text-ink-soft">
-                  A considered briefing from our editors, weekday mornings. No aggregation, no
-                  filler — just what matters and why.
+      {/* Live news */}
+      <Suspense fallback={null}>
+        <NewsSection />
+      </Suspense>
+
+      {/* Digital magazines */}
+      <MagazineMarquee />
+
+      {/* Women in Business */}
+      {wibLead && wibLeadMeta ? (
+        <section className={`${container} py-20`}>
+          <SectionTitle
+            eyebrow="A PrimeCrest series"
+            title="Women in Business"
+            href="/c/women-in-business"
+            linkLabel="The full series"
+          />
+          <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-14">
+            <article className="issue-card group grid grid-cols-1 content-start gap-6 sm:grid-cols-[minmax(0,240px)_1fr] lg:col-span-5 lg:grid-cols-1">
+              <Link
+                href={`/story/${wibLead.slug}`}
+                className="issue-cover max-w-[340px]"
+                aria-label={`${wibLeadMeta.name}: read the feature`}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={wibLeadMeta.cover} alt={`PrimeCrest ${wibLeadMeta.label}: ${wibLeadMeta.name}`} />
+              </Link>
+              <div>
+                <p className="label text-accent">
+                  Latest in the series{wibLeadMeta.label ? ` · ${wibLeadMeta.label}` : ""}
                 </p>
-                <NewsletterForm />
+                <h3 className="statement mt-2 text-[1.9rem]">
+                  <Link href={`/story/${wibLead.slug}`}>{wibLeadMeta.name}</Link>
+                </h3>
+                {wibLeadMeta.role ? <p className="mt-1 text-[0.88rem] text-muted">{wibLeadMeta.role}</p> : null}
+                {wibLeadMeta.title ? (
+                  <p className="mt-3 font-serif text-[1.15rem] italic text-ink-soft">{wibLeadMeta.title}</p>
+                ) : null}
+              </div>
+            </article>
+            {wibRest.length ? (
+              <div className="lg:col-span-7">
+                <MagazineCoverGrid items={wibRest} columns={3} />
               </div>
             ) : null}
-          </aside>
-        </div>
-        </Reveal>
-      </section>
+          </div>
+        </section>
+      ) : wibArticles.length > 0 ? (
+        <section className={`${container} py-20`}>
+          <SectionTitle eyebrow="A PrimeCrest series" title="Women in Business" href="/c/women-in-business" />
+          <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3">
+            {wibArticles.slice(0, 3).map((article) => (
+              <ArticleCard key={article._id} article={article} variant="feature" />
+            ))}
+          </div>
+        </section>
+      ) : null}
 
-      {/* Mid-page ad */}
       {mid ? (
-        <div className="border-t border-rule py-8">
+        <div className={`${container} pb-16`}>
           <AdUnit slot={mid.slot} campaign={mid.campaign} className="mx-auto max-w-[728px]" />
         </div>
       ) : null}
 
       {/* The Interview */}
       {payload.interview ? (
-        <section className="border-t border-rule py-12">
-          <Reveal>
-            <SectionHeader title="The Interview" />
-            <ArticleCard article={payload.interview as CardArticle} variant="standard" />
-          </Reveal>
-        </section>
-      ) : null}
-
-      {/* Women in Business */}
-      {wibMagazines.length > 0 ? (
-        <section className="border-t border-rule py-12">
-          <Reveal>
-            <SectionHeader title="Women in Business" href="/c/women-in-business" />
-            <MagazineCoverGrid items={wibMagazines} />
-          </Reveal>
-        </section>
-      ) : wibArticles.length > 0 ? (
-        <section className="border-t border-rule py-12">
-          <Reveal>
-            <SectionHeader title="Women in Business" href="/c/women-in-business" />
-            <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
-              {wibArticles.slice(0, 3).map((article) => (
-                <ArticleCard key={article._id} article={article} variant="feature" />
-              ))}
-            </div>
-          </Reveal>
-        </section>
-      ) : null}
-
-      {/* Section rails */}
-      {payload.rails
-        .filter((rail) => rail.articles.length > 0 && rail.category.slug !== "women-in-business" && rail.category.slug !== "magazine")
-        .map((rail) => (
-          <section key={rail.category.slug} className="border-t border-rule py-12">
+        <section className="border-y border-ink/10 bg-surface">
+          <div className={`${container} py-16`}>
             <Reveal>
-              <SectionHeader title={rail.category.name} href={`/c/${rail.category.slug}`} />
-              <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
-                {rail.articles.slice(0, 4).map((article) => (
-                  <ArticleCard key={article._id} article={article as CardArticle} variant="feature" />
-                ))}
-              </div>
+              <SectionTitle eyebrow="In conversation" title="The Interview" />
+              <ArticleCard article={payload.interview as CardArticle} variant="standard" />
             </Reveal>
-          </section>
-        ))}
+          </div>
+        </section>
+      ) : null}
 
-      {/* Advertise band */}
-      {payload.showAdvertiseBand ? (
-        <section className="-mx-5 bg-ink text-paper lg:-mx-8">
-          <div className="mx-auto grid max-w-[1280px] gap-10 px-5 py-16 lg:grid-cols-2 lg:items-center lg:px-8">
-            <div>
-              <p className="font-sans text-[0.72rem] font-semibold uppercase tracking-[0.16em] text-paper/50">
-                Advertise with us
-              </p>
-              <h2 className="headline mt-4 text-[2.2rem] text-paper sm:text-[2.8rem]">
-                Reach the people who still read.
-              </h2>
-            </div>
-            <div>
-              <p className="max-w-md font-serif text-[1.02rem] leading-relaxed text-paper/75">
-                PrimeCrest reaches executives, investors, policymakers, and the quietly ambitious.
-                Reserved placements, sponsorships, and native features — set with the same care
-                as the journalism around them.
-              </p>
-              <Link
-                href="/advertise"
-                className="mt-7 inline-flex items-center border border-paper/60 px-6 py-3 font-sans text-[0.82rem] font-semibold text-paper no-underline transition-colors hover:border-paper hover:bg-paper hover:text-ink"
-              >
-                View the media kit
-              </Link>
+      {/* Sections: title column beside its latest stories */}
+      {rails.length ? (
+        <div className={`${container} py-6`}>
+          {rails.map((rail) => (
+            <section
+              key={rail.category.slug}
+              className="grid grid-cols-1 gap-8 border-b border-ink/10 py-14 last:border-b-0 lg:grid-cols-12 lg:gap-12"
+            >
+              <Reveal className="lg:col-span-3">
+                <p className="label text-accent">{rail.category.kicker || "Section"}</p>
+                <h2 className="statement mt-2 text-[2rem] sm:text-[2.4rem]">{rail.category.name}</h2>
+                {rail.category.description ? (
+                  <p className="mt-3 font-serif text-[1rem] leading-relaxed text-ink-soft line-clamp-4">
+                    {rail.category.description}
+                  </p>
+                ) : null}
+                <Link href={`/c/${rail.category.slug}`} className="btn-outline group mt-6 !py-2">
+                  All {rail.category.name}
+                  <ArrowIcon className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+                </Link>
+              </Reveal>
+              <Reveal className="lg:col-span-9">
+                <div className="grid grid-cols-1 gap-x-8 gap-y-10 sm:grid-cols-3">
+                  {rail.articles.slice(0, 3).map((article) => (
+                    <ArticleCard key={article._id} article={article as CardArticle} variant="feature" />
+                  ))}
+                </div>
+              </Reveal>
+            </section>
+          ))}
+        </div>
+      ) : null}
+
+      {payload.more.length > 0 ? (
+        <section className="border-t border-ink/10 bg-surface">
+          <div className={`${container} py-16`}>
+            <SectionTitle title="More to read" />
+            <div className="grid grid-cols-1 gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-4">
+              {payload.more.map((article) => (
+                <ArticleCard key={article._id} article={article as CardArticle} variant="feature" />
+              ))}
             </div>
           </div>
         </section>
       ) : null}
 
       {footerAd ? (
-        <div className="border-t border-rule py-8">
+        <div className={`${container} pt-16`}>
           <AdUnit slot={footerAd.slot} campaign={footerAd.campaign} className="mx-auto max-w-[970px]" />
         </div>
       ) : null}
 
-      {payload.more.length > 0 ? (
-        <section className="border-t border-rule py-12">
-          <Reveal>
-            <SectionHeader title="More to read" />
-            <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
-              {payload.more.map((article) => (
-                <ArticleCard key={article._id} article={article as CardArticle} variant="feature" />
-              ))}
+      {/* Advertise — the newsletter signup lives in the site footer */}
+      {payload.showAdvertiseBand ? (
+        <section className={`${container} pt-16`}>
+          <div className="flex flex-col gap-4 rounded-lg bg-paper-2 px-6 py-8 sm:flex-row sm:items-center sm:justify-between sm:px-10">
+            <div>
+              <p className="label text-accent">Partnerships</p>
+              <p className="statement mt-1.5 text-[1.5rem]">Reach the people who still read</p>
             </div>
-          </Reveal>
+            <Link href="/advertise" className="btn-primary group self-start sm:self-auto">
+              Advertise with us
+              <ArrowIcon className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+            </Link>
+          </div>
         </section>
       ) : null}
     </div>

@@ -1,35 +1,71 @@
 @import "tailwindcss";
 
 :root {
-  --paper: #ffffff;
-  --paper-2: #f7f6f2;
-  --ink: #121110;
-  --ink-soft: #45423d;
-  --muted: #85817a;
-  --rule: #e7e4de;
-  --rule-dark: #121110;
-  --accent: #b3212b;
-  --accent-hover: #8c1721;
-  --ad-bg: #f3f1ec;
+  --paper: #f6f3ee;
+  --surface: #ffffff;
+  --paper-2: #ede8df;
+  --paper-3: #e0d9cc;
+  --ink: #0e0e10;
+  --ink-soft: #3a3b40;
+  --muted: #73747a;
+  --rule: #e3ded4;
+  --rule-dark: #0e0e10;
+  --accent: #c8102e;
+  --accent-hover: #a10d25;
+  --gold: #b8925a;
+  --gold-soft: #d9be8c;
+  --rose: #f3e3dd;
+  --night: #0b0b0d;
+  --night-2: #141417;
+  --night-3: #1e1f23;
+  --ad-bg: #ece6db;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  /* The wordmark keeps the house serif even inside .site-theme. */
+  --font-brand: var(--font-display);
+}
+
+/*
+ * Public site type: Schibsted Grotesk for headlines and UI, Source Serif for
+ * reading. Scoped here so the flipbook editions (/m/*), which use the same
+ * Tailwind font classes, keep their print typography.
+ */
+.site-theme {
+  --font-display: var(--font-head);
+  --font-sans: var(--font-head);
+  font-family: var(--font-head), system-ui, sans-serif;
+  font-size: 1rem;
+  line-height: 1.6;
+  overflow-x: clip;
 }
 
 @theme inline {
   --color-paper: var(--paper);
+  --color-surface: var(--surface);
   --color-paper-2: var(--paper-2);
+  --color-paper-3: var(--paper-3);
   --color-ink: var(--ink);
   --color-ink-soft: var(--ink-soft);
   --color-muted: var(--muted);
   --color-rule: var(--rule);
   --color-accent: var(--accent);
   --color-accent-hover: var(--accent-hover);
+  --color-gold: var(--gold);
+  --color-gold-soft: var(--gold-soft);
+  --color-rose: var(--rose);
+  --color-night: var(--night);
+  --color-night-2: var(--night-2);
+  --color-night-3: var(--night-3);
   --color-ad-bg: var(--ad-bg);
   --font-display: var(--font-display);
   --font-serif: var(--font-serif);
   --font-sans: var(--font-sans);
 }
 
-* {
-  border-color: var(--rule);
+/* Layered so border-color utilities (border-ink etc.) can override it. */
+@layer base {
+  * {
+    border-color: var(--rule);
+  }
 }
 
 html {
@@ -90,7 +126,7 @@ select:focus-visible {
 /* ---------- Typographic voice ---------- */
 
 .wordmark {
-  font-family: var(--font-display), Georgia, serif;
+  font-family: var(--font-brand), Georgia, serif;
   font-weight: 700;
   letter-spacing: -0.03em;
   line-height: 1;
@@ -98,20 +134,44 @@ select:focus-visible {
 
 .headline {
   font-family: var(--font-display), Georgia, serif;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: -0.022em;
-  line-height: 1.08;
+  line-height: 1.12;
   text-wrap: balance;
 }
 
-.headline a {
-  text-decoration: none;
+/* Oversized statement type for heroes and section mastheads. */
+.statement {
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.032em;
+  line-height: 1.04;
+  text-wrap: balance;
 }
 
-.headline a:hover {
-  text-decoration: underline;
-  text-decoration-thickness: 1.5px;
-  text-underline-offset: 4px;
+/* Emphasis in display type is colour, not italics. */
+.statement em,
+.headline em {
+  font-family: var(--font-serif), Georgia, serif;
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+}
+
+.headline a,
+.statement a {
+  text-decoration: none;
+  background-image: linear-gradient(currentColor, currentColor);
+  background-size: 0% 1px;
+  background-position: 0 92%;
+  background-repeat: no-repeat;
+  transition: background-size 0.45s var(--ease-out), color 0.2s ease;
+}
+
+.headline a:hover,
+.statement a:hover,
+.group:hover .headline a {
+  background-size: 100% 1px;
 }
 
 .dek {
@@ -124,11 +184,12 @@ select:focus-visible {
 
 .kicker {
   font-family: var(--font-sans), system-ui, sans-serif;
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.1em;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--accent);
+  text-decoration: none;
 }
 
 .kicker a:hover,
@@ -136,9 +197,32 @@ a.kicker:hover {
   color: var(--accent-hover);
 }
 
+/* Small uppercase label with a leading rule. */
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--font-sans), system-ui, sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+/* The crest chevron from the logo, as the eyebrow's bullet. */
+.eyebrow::before {
+  content: "";
+  width: 0.95em;
+  height: 0.8em;
+  flex-shrink: 0;
+  background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 28'%3E%3Cpath d='M16 2L28 16H22L16 8.5L10 16H4Z'/%3E%3Cpath d='M16 12L24 22H20L16 16.5L12 22H8Z' opacity='.5'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 28'%3E%3Cpath d='M16 2L28 16H22L16 8.5L10 16H4Z'/%3E%3Cpath d='M16 12L24 22H20L16 16.5L12 22H8Z' opacity='.5'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
 .meta {
   font-family: var(--font-sans), system-ui, sans-serif;
-  font-size: 0.8125rem;
+  font-size: 0.78rem;
   font-weight: 400;
   letter-spacing: 0.01em;
   color: var(--muted);
@@ -146,9 +230,9 @@ a.kicker:hover {
 
 .section-title {
   font-family: var(--font-sans), system-ui, sans-serif;
-  font-size: 0.8125rem;
+  font-size: 0.75rem;
   font-weight: 700;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--ink);
 }
@@ -159,83 +243,213 @@ a.kicker:hover {
   font-feature-settings: "lnum" 1;
 }
 
-/* ---------- Buttons ---------- */
-
-.btn-primary {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  background: var(--ink);
-  color: var(--paper);
-  font-family: var(--font-sans), system-ui, sans-serif;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  padding: 0.7rem 1.5rem;
-  border: 1px solid var(--ink);
-  border-radius: 2px;
-  cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+/* Animated underline for nav and text links. */
+.nav-link {
   position: relative;
-  overflow: hidden;
+  text-decoration: none;
 }
 
-.btn-primary::before {
+.nav-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -2px;
+  height: 1.5px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.4s var(--ease-out);
+}
+
+.nav-link:hover::after,
+.nav-link[aria-current="page"]::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+/* Fine film grain for dark bands. */
+.grain {
+  position: relative;
+  isolation: isolate;
+}
+
+.grain::before {
   content: "";
   position: absolute;
   inset: 0;
-  background: var(--accent);
-  transform: translateY(100%);
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.07;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
-.btn-primary:hover::before {
-  transform: translateY(0);
+.tabular {
+  font-variant-numeric: tabular-nums;
 }
 
-.btn-primary span,
-.btn-primary svg {
-  position: relative;
-  z-index: 1;
-}
+/* ---------- Buttons, labels, fields ---------- */
 
-.btn-primary:hover {
-  border-color: var(--accent);
-}
-
-.btn-primary:active {
-  transform: scale(0.98);
-}
-
-.btn-outline {
+.btn-primary,
+.btn-outline,
+.btn-light {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
+  border-radius: 999px;
+  padding: 0.72rem 1.4rem;
+  font-family: var(--font-sans), system-ui, sans-serif;
+  font-size: 0.84rem;
+  font-weight: 600;
+  line-height: 1.2;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.btn-primary {
+  background: var(--ink);
+  color: #fff;
+  border: 1px solid var(--ink);
+}
+
+.btn-primary:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.btn-outline {
   background: transparent;
   color: var(--ink);
-  font-family: var(--font-sans), system-ui, sans-serif;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  padding: 0.7rem 1.5rem;
-  border: 1px solid var(--ink);
-  border-radius: 2px;
-  cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid rgba(14, 14, 16, 0.22);
 }
 
 .btn-outline:hover {
+  border-color: var(--ink);
   background: var(--ink);
-  color: var(--paper);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(18, 17, 16, 0.15);
+  color: #fff;
 }
 
-.btn-outline:active {
-  transform: translateY(0) scale(0.98);
-  box-shadow: none;
+.btn-light {
+  background: #fff;
+  color: var(--ink);
+  border: 1px solid #fff;
+}
+
+.btn-light:hover {
+  background: var(--gold-soft);
+  border-color: var(--gold-soft);
+}
+
+.btn-primary:active,
+.btn-outline:active,
+.btn-light:active {
+  transform: scale(0.98);
+}
+
+/* Small uppercase label used above titles. */
+.label {
+  font-family: var(--font-sans), system-ui, sans-serif;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.input {
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid var(--rule);
+  background: var(--surface);
+  padding: 0.8rem 1rem;
+  font-family: var(--font-sans), system-ui, sans-serif;
+  font-size: 0.95rem;
+  color: var(--ink);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.input::placeholder {
+  color: var(--muted);
+}
+
+.input:hover {
+  border-color: var(--paper-3);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--ink);
+  box-shadow: 0 0 0 4px rgba(14, 14, 16, 0.06);
+}
+
+/* Long-form copy on static pages (about, terms, CMS pages). */
+.prose-page {
+  font-family: var(--font-serif), Georgia, serif;
+  font-size: 1.08rem;
+  line-height: 1.75;
+  color: var(--ink-soft);
+}
+
+.prose-page > * + * {
+  margin-top: 1.1em;
+}
+
+.prose-page h2 {
+  margin-top: 2.2em;
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  color: var(--ink);
+}
+
+.prose-page h3 {
+  margin-top: 1.8em;
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: 1.12rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.prose-page a {
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-color: var(--accent);
+  text-underline-offset: 3px;
+}
+
+.prose-page a:hover {
+  color: var(--accent);
+}
+
+.prose-page ul,
+.prose-page ol {
+  padding-left: 1.3em;
+}
+
+.prose-page ul { list-style: disc; }
+.prose-page ol { list-style: decimal; }
+
+.prose-page li + li {
+  margin-top: 0.4em;
+}
+
+.prose-page li::marker {
+  color: var(--accent);
+}
+
+.prose-page strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+/* Soft surface card. */
+.card {
+  border-radius: 14px;
+  background: var(--surface);
+  box-shadow: 0 1px 2px rgba(14, 14, 16, 0.04), 0 12px 32px -18px rgba(14, 14, 16, 0.18);
 }
 
 /* ---------- Article body ---------- */
@@ -262,8 +476,8 @@ a.kicker:hover {
 
 .article-body h2 {
   font-family: var(--font-display), Georgia, serif;
-  font-size: 1.75rem;
-  font-weight: 600;
+  font-size: 1.7rem;
+  font-weight: 700;
   letter-spacing: -0.015em;
   line-height: 1.22;
   margin: 2.4em 0 0.7em;
@@ -297,12 +511,12 @@ a.kicker:hover {
 .article-body blockquote {
   margin: 2.8em 0;
   padding: 0 0 0 1.75rem;
-  border-left: 2px solid var(--ink);
+  border-left: 2px solid var(--accent);
   font-family: var(--font-display), Georgia, serif;
-  font-size: 1.6rem;
-  line-height: 1.35;
-  letter-spacing: -0.015em;
-  font-weight: 500;
+  font-size: 1.65rem;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  font-weight: 700;
   color: var(--ink);
 }
 
@@ -655,96 +869,69 @@ a.kicker:hover {
   pointer-events: none;
 }
 
-/* ---------- Digital magazine marquee ---------- */
+/* ---------- Dark bands (hero, news, magazine, footer) ---------- */
 
-.mag-marquee-band {
+.mag-band {
+  position: relative;
+  color: #fff;
   background:
-    radial-gradient(90% 120% at 50% -20%, #262019 0%, #14110e 58%, #0d0b09 100%);
-  overflow: hidden;
+    radial-gradient(60% 80% at 100% 0%, rgba(184, 146, 90, 0.14), transparent 60%),
+    var(--night);
 }
 
-.mag-marquee {
+/* ---------- Digital magazine reel ---------- */
+
+.mag-reel {
   position: relative;
   overflow: hidden;
-  perspective: 1400px;
+  mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent);
 }
 
-/* Edge fades so covers emerge from the dark */
-.mag-marquee::before,
-.mag-marquee::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: clamp(40px, 8vw, 140px);
-  z-index: 3;
-  pointer-events: none;
-}
-
-.mag-marquee::before {
-  left: 0;
-  background: linear-gradient(90deg, #14110e, transparent);
-}
-
-.mag-marquee::after {
-  right: 0;
-  background: linear-gradient(270deg, #100d0b, transparent);
-}
-
-.mag-marquee-track {
+.mag-reel-track {
   display: flex;
-  gap: clamp(28px, 4vw, 56px);
   width: max-content;
-  padding: 10px clamp(28px, 4vw, 56px) 6px;
-  transform-style: preserve-3d;
-  animation: mag-marquee-scroll 46s linear infinite;
+  gap: clamp(28px, 3vw, 48px);
+  padding: 28px clamp(28px, 3vw, 48px) 8px;
+  animation: mag-reel-scroll 70s linear infinite;
   will-change: transform;
 }
 
-.mag-marquee:hover .mag-marquee-track {
+.mag-reel:hover .mag-reel-track,
+.mag-reel:focus-within .mag-reel-track {
   animation-play-state: paused;
 }
 
-@keyframes mag-marquee-scroll {
+@keyframes mag-reel-scroll {
   from { transform: translateX(0); }
   to { transform: translateX(-50%); }
 }
 
-.mag-marquee-item {
+.mag-reel-item {
   flex: 0 0 auto;
-  width: clamp(170px, 19vw, 250px);
+  width: clamp(170px, 15vw, 220px);
   text-decoration: none;
   outline-offset: 6px;
 }
 
-.mag-marquee-cover {
+.mag-reel-cover {
   position: relative;
   display: block;
   aspect-ratio: 3 / 4;
   overflow: hidden;
-  border-radius: 2px;
-  background: #1d1915;
-  transform: rotateY(-16deg) rotateX(3deg);
-  transform-origin: left center;
-  transform-style: preserve-3d;
-  transition:
-    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1),
-    box-shadow 0.55s ease;
-  box-shadow:
-    18px 24px 44px rgba(0, 0, 0, 0.55),
-    6px 8px 16px rgba(0, 0, 0, 0.35);
+  border-radius: 3px;
+  background: var(--paper-3);
+  box-shadow: 0 22px 40px -20px rgba(14, 14, 16, 0.55), 0 2px 6px rgba(14, 14, 16, 0.08);
+  transition: transform 0.6s var(--ease-out), box-shadow 0.6s ease;
 }
 
-.mag-marquee-item:hover .mag-marquee-cover,
-.mag-marquee-item:focus-visible .mag-marquee-cover {
-  transform: rotateY(-4deg) rotateX(1deg) translateY(-10px) scale(1.04);
-  box-shadow:
-    22px 34px 60px rgba(0, 0, 0, 0.65),
-    0 0 0 1px rgba(229, 201, 140, 0.35),
-    8px 10px 20px rgba(0, 0, 0, 0.4);
+.mag-reel-item:hover .mag-reel-cover,
+.mag-reel-item:focus-visible .mag-reel-cover {
+  transform: translateY(-10px);
+  box-shadow: 0 36px 60px -24px rgba(14, 14, 16, 0.6), 0 2px 6px rgba(14, 14, 16, 0.08);
 }
 
-.mag-marquee-cover img {
+.mag-reel-cover img {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -753,39 +940,81 @@ a.kicker:hover {
   user-select: none;
 }
 
-/* Book spine shadow along the left edge */
-.mag-marquee-spine {
+.mag-reel-badge {
   position: absolute;
-  inset: 0 auto 0 0;
-  width: 14%;
-  background: linear-gradient(90deg, rgba(0, 0, 0, 0.42), transparent);
-  pointer-events: none;
-}
-
-/* Gloss sweep */
-.mag-marquee-sheen {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    105deg,
-    rgba(255, 255, 255, 0.16) 0%,
-    transparent 34%,
-    transparent 62%,
-    rgba(0, 0, 0, 0.14) 100%
-  );
-  pointer-events: none;
+  top: 10px;
+  left: 10px;
+  z-index: 2;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
+  font-family: var(--font-sans), system-ui, sans-serif;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .mag-marquee-track {
-    animation: none;
-    flex-wrap: wrap;
-    width: auto;
-    justify-content: center;
-  }
-  .mag-marquee-cover {
-    transform: none;
-  }
+  .mag-reel { overflow-x: auto; }
+  .mag-reel-track { animation: none; }
+}
+
+/* ---------- Issue covers (magazine page, Women in Business) ---------- */
+
+.issue-card .issue-cover {
+  position: relative;
+  display: block;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  border-radius: 3px;
+  background: var(--paper-2);
+  box-shadow: 0 22px 40px -22px rgba(14, 14, 16, 0.5), 0 2px 6px rgba(14, 14, 16, 0.06);
+  transition: transform 0.6s var(--ease-out), box-shadow 0.6s ease;
+}
+
+.issue-card .issue-cover img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.issue-card:hover .issue-cover {
+  transform: translateY(-6px);
+  box-shadow: 0 34px 56px -24px rgba(14, 14, 16, 0.55), 0 2px 6px rgba(14, 14, 16, 0.06);
+}
+
+/* ---------- News wire ---------- */
+
+.wire-pulse {
+  position: relative;
+  display: inline-flex;
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--accent);
+}
+
+.wire-pulse::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: inherit;
+  animation: wire-ping 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+@keyframes wire-ping {
+  75%, 100% { transform: scale(2.6); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wire-pulse::after { animation: none; }
+  .issue-card .issue-cover,
+  .issue-card .issue-cover img { transition: none; }
 }
 
 /* ---------- Flipbook Stage (reader) ---------- */

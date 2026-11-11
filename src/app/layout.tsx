@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Newsreader, Source_Serif_4, Inter } from "next/font/google";
+import { Newsreader, Source_Serif_4, Inter, Schibsted_Grotesk } from "next/font/google";
 import "./globals.css";
 import { SITE } from "@/lib/constants";
 import { siteUrl } from "@/lib/utils";
@@ -59,6 +59,12 @@ const serif = Source_Serif_4({
   style: ["normal", "italic"],
 });
 
+const head = Schibsted_Grotesk({
+  variable: "--font-head",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800", "900"],
+});
+
 const sans = Inter({
   variable: "--font-sans",
   subsets: ["latin"],
@@ -108,7 +114,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="en"
       data-scroll-behavior="smooth"
-      className={`${display.variable} ${serif.variable} ${sans.variable} h-full`}
+      className={`${display.variable} ${serif.variable} ${head.variable} ${sans.variable} h-full`}
     >
       <body className="flex min-h-full flex-col bg-paper text-ink antialiased">
         <OrganizationSchema />

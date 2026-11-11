@@ -4,6 +4,7 @@ import { notFound, redirect } from "next/navigation";
 import { AdUnit } from "@/components/site/AdUnit";
 import { ArticleCard, type CardArticle } from "@/components/site/ArticleCard";
 import { MagazineCoverGrid, type MagazineShelfItem } from "@/components/site/MagazineCoverGrid";
+import { SectionTitle } from "@/components/site/SectionHead";
 import { getActiveAd, getCategoryArticles, getCategoryBySlug, getSectionMagazines } from "@/lib/queries";
 import { buildMetadata } from "@/lib/seo";
 
@@ -58,26 +59,39 @@ export default async function CategoryPage({ params, searchParams }: Props) {
   ) : null;
 
   return (
-    <div className="mx-auto max-w-[1280px] px-5 lg:px-8">
+    <div className="mx-auto max-w-[1320px] px-4 sm:px-6">
       {/* Section masthead */}
-      <header className="border-b-2 border-ink py-12">
-        {category.kicker ? <p className="kicker">{category.kicker}</p> : null}
-        <h1 className="headline mt-2 text-[2.6rem] sm:text-[3.4rem]">{category.name}</h1>
-        {category.description ? (
-          <p className="dek mt-4 max-w-2xl">{category.description}</p>
+      <header className="border-b border-ink/10 pb-12 pt-14 lg:pt-20">
+        {category.kicker ? (
+          <p className="label text-accent">{category.kicker}</p>
         ) : null}
+        <h1 className="statement mt-3 text-[2.8rem] sm:text-[3.8rem] lg:text-[4.6rem]">
+          {category.name}
+        </h1>
+        <div className="mt-6 flex flex-wrap items-end justify-between gap-6">
+          {category.description ? (
+            <p className="max-w-2xl font-serif text-[1.15rem] leading-relaxed text-ink-soft">{category.description}</p>
+          ) : (
+            <span />
+          )}
+          <p className="label text-muted">
+            {total > 0 ? `${total} ${total === 1 ? "story" : "stories"} · ` : ""}Newest first
+          </p>
+        </div>
       </header>
 
       {shelf.length ? (
-        <section className="border-b border-rule py-12">
-          <p className="kicker mb-8">The magazines</p>
-          <MagazineCoverGrid items={shelf} />
+        <section className="relative left-1/2 right-1/2 -mx-[50vw] w-screen bg-paper-2">
+          <div className="mx-auto max-w-[1320px] px-4 py-16 sm:px-6">
+            <SectionTitle eyebrow="The covers · Newest first" title="On the magazine stand" href="/magazine" linkLabel="Every issue" />
+            <MagazineCoverGrid items={shelf} />
+          </div>
         </section>
       ) : null}
 
       {articles.length === 0 && shelf.length === 0 ? (
         <div className="py-24 text-center">
-          <p className="headline text-[1.6rem]">Nothing here yet.</p>
+          <p className="statement text-[2rem]">Nothing here yet</p>
           <p className="mt-3 font-serif text-ink-soft">
             The desk hasn&apos;t filed anything in this section. Check back soon.
           </p>
@@ -85,14 +99,14 @@ export default async function CategoryPage({ params, searchParams }: Props) {
       ) : articles.length > 0 ? (
         <>
           {lead ? (
-            <section className="border-b border-rule py-12">
+            <section className="border-b border-ink/10 py-14">
               <ArticleCard article={lead} variant="cover" />
             </section>
           ) : null}
 
           {ad && lead ? ad : null}
 
-          <section className="grid gap-x-10 gap-y-12 py-12 sm:grid-cols-2 lg:grid-cols-3">
+          <section className="grid grid-cols-1 gap-x-10 gap-y-12 py-12 empty:hidden sm:grid-cols-2 lg:grid-cols-3">
             {rest.map((article, index) => (
               <Fragment key={article._id}>
                 <ArticleCard article={article} variant="feature" />
@@ -105,7 +119,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
 
           {totalPages > 1 ? (
             <nav
-              className="flex items-center justify-between border-t border-rule py-8"
+              className="flex items-center justify-between border-t border-ink/10 py-8"
               aria-label="Pagination"
             >
               {page > 1 ? (

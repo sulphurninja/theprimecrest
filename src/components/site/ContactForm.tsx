@@ -38,7 +38,7 @@ export function ContactForm() {
     <form onSubmit={handleSubmit} className="space-y-5">
       <div className="grid gap-5 sm:grid-cols-2">
         <label>
-          <span className="mb-1.5 block font-sans text-[0.75rem] font-semibold uppercase tracking-wider text-muted">
+          <span className="label mb-2 block text-muted">
             Name
           </span>
           <input
@@ -47,11 +47,11 @@ export function ContactForm() {
             value={form.name}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
             placeholder="Your name"
-            className="w-full border border-rule bg-white px-4 py-3 font-sans text-[0.9rem] text-ink outline-none transition-colors focus:border-ink"
+            className="input"
           />
         </label>
         <label>
-          <span className="mb-1.5 block font-sans text-[0.75rem] font-semibold uppercase tracking-wider text-muted">
+          <span className="label mb-2 block text-muted">
             Email
           </span>
           <input
@@ -60,12 +60,12 @@ export function ContactForm() {
             value={form.email}
             onChange={(e) => setForm({ ...form, email: e.target.value })}
             placeholder="you@example.com"
-            className="w-full border border-rule bg-white px-4 py-3 font-sans text-[0.9rem] text-ink outline-none transition-colors focus:border-ink"
+            className="input"
           />
         </label>
       </div>
       <label>
-        <span className="mb-1.5 block font-sans text-[0.75rem] font-semibold uppercase tracking-wider text-muted">
+        <span className="label mb-2 block text-muted">
           Subject
         </span>
         <input
@@ -74,11 +74,11 @@ export function ContactForm() {
           value={form.subject}
           onChange={(e) => setForm({ ...form, subject: e.target.value })}
           placeholder="What is this regarding?"
-          className="w-full border border-rule bg-white px-4 py-3 font-sans text-[0.9rem] text-ink outline-none transition-colors focus:border-ink"
+          className="input"
         />
       </label>
       <label>
-        <span className="mb-1.5 block font-sans text-[0.75rem] font-semibold uppercase tracking-wider text-muted">
+        <span className="label mb-2 block text-muted">
           Message
         </span>
         <textarea
@@ -87,12 +87,12 @@ export function ContactForm() {
           value={form.message}
           onChange={(e) => setForm({ ...form, message: e.target.value })}
           placeholder="Write your message here…"
-          className="w-full resize-none border border-rule bg-white px-4 py-3 font-sans text-[0.9rem] text-ink outline-none transition-colors focus:border-ink"
+          className="input resize-none"
         />
       </label>
 
       {status === "error" ? (
-        <p className="font-sans text-[0.82rem] text-red-600">
+        <p className="font-sans text-[0.82rem] text-accent">
           Something went wrong. Please try again.
         </p>
       ) : null}
@@ -100,7 +100,7 @@ export function ContactForm() {
       <button
         type="submit"
         disabled={status === "sending"}
-        className="inline-flex items-center border border-ink bg-ink px-7 py-3 font-sans text-[0.82rem] font-semibold text-paper transition-all hover:bg-transparent hover:text-ink disabled:opacity-60"
+        className="btn-primary disabled:opacity-60"
       >
         {status === "sending" ? "Sending…" : "Send Message"}
       </button>

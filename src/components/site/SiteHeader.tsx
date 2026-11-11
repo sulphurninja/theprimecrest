@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Search } from "lucide-react";
+import { SearchIcon } from "@/components/site/Icons";
 import { Wordmark } from "@/components/site/Logo";
 import { MobileNav } from "@/components/site/MobileNav";
 import { formatMastheadDate } from "@/lib/utils";
@@ -13,7 +13,14 @@ type Socials = {
   youtube?: string;
 };
 
-const MAX_VISIBLE_CATEGORIES = 8;
+const MAX_VISIBLE_CATEGORIES = 5;
+
+const UTILITY_LINKS = [
+  { label: "The Magazine", href: "/magazine" },
+  { label: "Newsletter", href: "/newsletter" },
+  { label: "Advertise", href: "/advertise" },
+  { label: "About", href: "/about" },
+];
 
 function TwitterIcon() {
   return (
@@ -70,18 +77,20 @@ export function SiteHeader({
   socials?: Socials;
 }) {
   const magazine = { label: "Magazine", href: "/magazine" };
-  const contact = { label: "Contact Us", href: "/contact" };
-  // Magazine sits second, right after the lead section.
-  const placeMagazine = (items: { label: string; href: string }[]) =>
+  const contact = { label: "Contact", href: "/contact" };
+  // Magazine sits right after the lead section.
+  const placeFixed = (items: { label: string; href: string }[]) =>
     items.length === 0 ? [magazine, contact] : [items[0], magazine, ...items.slice(1), contact];
 
   const sectionHref = (c: NavItem) => (c.slug === "home" ? "/" : `/c/${c.slug}`);
   const sections = categories.filter((c) => c.slug !== "magazine");
-  const catItems = sections.slice(0, 5).map((c) => ({ label: c.name, href: sectionHref(c) }));
-  const visibleItems = placeMagazine(catItems);
-  const hasMore = sections.length > 5;
+  const catItems = sections
+    .slice(0, MAX_VISIBLE_CATEGORIES)
+    .map((c) => ({ label: c.name, href: sectionHref(c) }));
+  const visibleItems = placeFixed(catItems);
+  const hasMore = sections.length > MAX_VISIBLE_CATEGORIES;
 
-  const allItems = placeMagazine(sections.map((c) => ({ label: c.name, href: sectionHref(c) })));
+  const allItems = placeFixed(sections.map((c) => ({ label: c.name, href: sectionHref(c) })));
 
   const socialLinks = [
     { url: socials?.twitter, icon: <TwitterIcon />, label: "Twitter" },
@@ -92,66 +101,33 @@ export function SiteHeader({
   ].filter((s) => s.url);
 
   return (
-    <header className="sticky top-0 z-40 bg-ink text-paper">
-      {/* Full-width ticker band — slightly darker for quiet separation */}
-      {ticker ? (
-        <div className="bg-black/25">
-          <div className="mx-auto flex max-w-[1280px] items-center gap-2.5 px-4 py-1.5 sm:px-5 lg:px-8">
-            <span className="relative flex h-1.5 w-1.5 shrink-0" aria-hidden>
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-60" />
-              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-accent" />
+    <>
+      {/* Utility bar */}
+      <div className="border-b border-ink/10 bg-surface">
+        <div className="mx-auto flex h-10 max-w-[1320px] items-center gap-4 px-4 sm:px-6">
+          <span className="shrink-0 font-sans text-[0.76rem] font-semibold text-ink">
+            {formatMastheadDate()}
+          </span>
+          {ticker ? (
+            <span className="hidden min-w-0 items-center gap-2.5 border-l border-ink/10 pl-4 md:flex">
+              <span className="flex shrink-0 items-center gap-1.5 rounded-full bg-accent/10 px-2 py-0.5 font-sans text-[0.6rem] font-bold uppercase tracking-[0.14em] text-accent">
+                <span className="wire-pulse !h-1.5 !w-1.5" aria-hidden /> Live
+              </span>
+              <span className="truncate font-sans text-[0.78rem] text-ink-soft">{ticker}</span>
             </span>
-            <span className="shrink-0 font-sans text-[0.62rem] font-bold uppercase tracking-[0.14em] text-paper/90">
-              Live
-            </span>
-            <p className="min-w-0 truncate font-sans text-[0.78rem] text-paper/60">{ticker}</p>
-            <span className="ml-auto hidden shrink-0 font-sans text-[0.72rem] text-paper/40 md:block">
-              {formatMastheadDate()}
-            </span>
-          </div>
-        </div>
-      ) : null}
-
-      {/* Main bar */}
-      <div className="mx-auto max-w-[1280px] px-4 sm:px-5 lg:px-8">
-        <div className="relative flex h-14 items-center justify-between sm:h-16">
-          {/* Left — hamburger on mobile, wordmark + nav on desktop */}
-          <div className="flex items-center lg:hidden">
-            <MobileNav items={allItems} siteName={siteName} tagline={tagline} dark />
-          </div>
-
-          <div className="hidden min-w-0 items-center gap-7 lg:flex">
-            <Wordmark name={siteName} className="text-[1.7rem] text-paper" showTagline />
-            <nav className="flex items-center gap-1" aria-label="Sections">
-              {visibleItems.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className="rounded-md px-3 py-1.5 font-sans text-[0.875rem] font-medium text-paper/70 no-underline transition-all hover:bg-paper/10 hover:text-paper"
-                >
-                  {item.label}
-                </Link>
-              ))}
-              {hasMore && (
-                <Link
-                  href="/search"
-                  className="rounded-md px-3 py-1.5 font-sans text-[0.875rem] font-medium text-paper/50 no-underline transition-all hover:bg-paper/10 hover:text-paper"
-                >
-                  More
-                </Link>
-              )}
-            </nav>
-          </div>
-
-          {/* Center — wordmark on mobile only */}
-          <div className="absolute left-1/2 -translate-x-1/2 lg:hidden">
-            <Wordmark name={siteName} className="text-[1.45rem] text-paper sm:text-[1.55rem]" />
-          </div>
-
-          {/* Right — socials + actions */}
-          <div className="flex items-center gap-1 sm:gap-2">
+          ) : null}
+          <div className="ml-auto hidden shrink-0 items-center gap-5 lg:flex">
+            {UTILITY_LINKS.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="font-sans text-[0.76rem] font-medium text-ink-soft no-underline transition-colors hover:text-ink"
+              >
+                {link.label}
+              </Link>
+            ))}
             {socialLinks.length > 0 ? (
-              <div className="mr-1 hidden items-center gap-0.5 lg:flex">
+              <span className="flex items-center gap-0.5 border-l border-ink/10 pl-3">
                 {socialLinks.map((s) => (
                   <a
                     key={s.label}
@@ -159,29 +135,61 @@ export function SiteHeader({
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label={s.label}
-                    className="flex h-8 w-8 items-center justify-center rounded-full text-paper/50 transition-all hover:bg-paper/10 hover:text-paper"
+                    className="flex h-7 w-7 items-center justify-center rounded-full text-muted transition-colors hover:text-ink [&_svg]:h-3.5 [&_svg]:w-3.5"
                   >
                     {s.icon}
                   </a>
                 ))}
-              </div>
+              </span>
             ) : null}
+          </div>
+        </div>
+      </div>
+
+      {/* Main bar */}
+      <header className="sticky top-0 z-40 border-b border-ink/10 bg-paper/85 text-ink backdrop-blur-xl backdrop-saturate-150">
+        <div className="mx-auto flex h-16 max-w-[1320px] items-center justify-between gap-6 px-4 sm:px-6 lg:h-[76px]">
+          <div className="flex items-center gap-3">
+            <div className="xl:hidden">
+              <MobileNav items={allItems} siteName={siteName} tagline={tagline} />
+            </div>
+            <Wordmark name={siteName} className="text-[1.6rem] text-ink lg:text-[1.95rem]" />
+          </div>
+
+          <nav className="hidden items-center gap-1 xl:flex" aria-label="Sections">
+            {visibleItems.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="rounded-full px-3.5 py-2 font-sans text-[0.9rem] font-medium text-ink-soft no-underline transition-colors hover:bg-ink/[0.05] hover:text-ink"
+              >
+                {item.label}
+              </Link>
+            ))}
+            {hasMore && (
+              <Link
+                href="/search"
+                className="rounded-full px-3.5 py-2 font-sans text-[0.9rem] font-medium text-muted no-underline transition-colors hover:bg-ink/[0.05] hover:text-ink"
+              >
+                More
+              </Link>
+            )}
+          </nav>
+
+          <div className="flex items-center gap-2">
             <Link
               href="/search"
               aria-label="Search"
-              className="flex h-10 w-10 items-center justify-center rounded-full text-paper/70 transition-all hover:bg-paper/10 hover:text-paper"
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-ink/15 text-ink transition-colors hover:border-ink hover:bg-ink hover:text-white"
             >
-              <Search className="h-[18px] w-[18px]" strokeWidth={1.8} />
+              <SearchIcon className="h-[16px] w-[16px]" />
             </Link>
-            <Link
-              href="/newsletter"
-              className="hidden items-center rounded-sm border border-paper/30 bg-transparent px-4 py-2 font-sans text-[0.78rem] font-semibold text-paper no-underline transition-all hover:border-paper hover:bg-paper hover:text-ink md:inline-flex"
-            >
+            <Link href="/newsletter" className="btn-primary hidden !py-2.5 md:inline-flex">
               Subscribe
             </Link>
           </div>
         </div>
-      </div>
-    </header>
+      </header>
+    </>
   );
 }

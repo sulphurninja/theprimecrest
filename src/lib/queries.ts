@@ -1,5 +1,5 @@
 import { dbConnect } from "@/lib/db";
-import { MAGAZINE_ISSUES } from "@/lib/magazines";
+import { ISSUES_NEWEST_FIRST, MAGAZINE_ISSUES, issueRank } from "@/lib/magazines";
 import { serialize } from "@/lib/utils";
 import {
   Article,
@@ -73,7 +73,7 @@ export async function getRelatedArticles(articleId: string, categoryId: string, 
     status: "published",
     ...inSection(categoryId),
   })
-    .sort({ publishedAt: -1 })
+    .sort({ publishedAt: -1, _id: -1 })
     .limit(limit)
     .populate(articlePopulate)
     .lean();
@@ -88,11 +88,20 @@ export async function getSectionMagazines(slug: string) {
   const items = await Article.find({ _id: { $in: ids }, status: "published" })
     .select("title slug magazineCover ogImage coverImage magazineEnabled")
     .lean();
-  const order = new Map(ids.map((id, index) => [id, index]));
-  return serialize(items).sort(
-    (a: { _id: string }, b: { _id: string }) =>
-      (order.get(String(a._id)) ?? 0) - (order.get(String(b._id)) ?? 0),
-  );
+  return serialize(items).sort(newestFirst);
+}
+
+type Dated = { slug?: string; publishedAt?: string | Date | null };
+
+/**
+ * Newest first. Magazine features sort by issue number, since several
+ * issues can share a publish date; everything else by publish date.
+ */
+export function newestFirst(a: Dated, b: Dated) {
+  const ra = a.slug ? issueRank(a.slug) : -1;
+  const rb = b.slug ? issueRank(b.slug) : -1;
+  if (ra !== -1 && rb !== -1) return rb - ra;
+  return new Date(b.publishedAt || 0).getTime() - new Date(a.publishedAt || 0).getTime();
 }
 
 export async function getCategoryBySlug(slug: string) {
@@ -106,7 +115,7 @@ export async function getCategoryArticles(categoryId: string, page = 1, limit = 
   const skip = (page - 1) * limit;
   const [items, total] = await Promise.all([
     Article.find({ status: "published", ...inSection(categoryId) })
-      .sort({ publishedAt: -1 })
+      .sort({ publishedAt: -1, _id: -1 })
       .skip(skip)
       .limit(limit)
       .populate(articlePopulate)
@@ -125,7 +134,7 @@ export async function getAuthorBySlug(slug: string) {
 export async function getAuthorArticles(authorId: string) {
   await dbConnect();
   const items = await Article.find({ author: authorId, status: "published" })
-    .sort({ publishedAt: -1 })
+    .sort({ publishedAt: -1, _id: -1 })
     .populate(articlePopulate)
     .lean();
   return serialize(items);
@@ -177,7 +186,7 @@ export async function searchArticles(q: string) {
       { tags: new RegExp(query, "i") },
     ],
   })
-    .sort({ publishedAt: -1 })
+    .sort({ publishedAt: -1, _id: -1 })
     .limit(24)
     .populate(articlePopulate)
     .lean();
@@ -224,7 +233,7 @@ export async function getHomePayload() {
   ]);
 
   const published = await Article.find({ status: "published" })
-    .sort({ publishedAt: -1 })
+    .sort({ publishedAt: -1, _id: -1 })
     .populate(articlePopulate)
     .lean();
 
@@ -235,9 +244,9 @@ export async function getHomePayload() {
   const pickMany = (ids: unknown[] | undefined) =>
     (ids || []).map(pick).filter(Boolean);
 
-  // Hero carousel is the published magazine features, in issue order.
+  // Hero carousel is the published magazine features, newest issue first.
   const bySlug = new Map(all.map((a) => [a.slug, a]));
-  let heroArticles = MAGAZINE_ISSUES.map((issue) => bySlug.get(issue.articleSlug)).filter(
+  let heroArticles = ISSUES_NEWEST_FIRST.map((issue) => bySlug.get(issue.articleSlug)).filter(
     (a): a is HydratedArticle => Boolean(a),
   );
   if (heroArticles.length === 0) {
@@ -249,6 +258,7 @@ export async function getHomePayload() {
   if (!featured.length) {
     featured = all.filter((a) => a.featured && String(a._id) !== asId(hero?._id)).slice(0, 4);
   }
+  featured = featured.sort((a, b) => newestFirst(a!, b!));
 
   let cover = homepage ? pick(homepage.coverStory) : undefined;
   if (!cover) cover = all.find((a) => a.isCoverStory && String(a._id) !== asId(hero?._id));
@@ -258,6 +268,7 @@ export async function getHomePayload() {
     const used = new Set([asId(hero?._id), ...featured.map((a) => asId(a?._id)), asId(cover?._id)]);
     briefing = all.filter((a) => !used.has(String(a._id))).slice(0, 5);
   }
+  briefing = briefing.sort((a, b) => newestFirst(a!, b!));
 
   const interview =
     (homepage ? pick(homepage.interviewArticle) : undefined) ||

@@ -1,10 +1,10 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { PageHero } from "@/components/site/PageHero";
 import { ArticleBody } from "@/components/site/ArticleBody";
 import { getPageBySlug } from "@/lib/queries";
 import { buildMetadata } from "@/lib/seo";
 import { RESERVED_PATHS } from "@/lib/constants";
-import { ArrowLeft } from "lucide-react";
 
 export const revalidate = 300;
 
@@ -29,34 +29,16 @@ export default async function StaticPage({ params }: Props) {
   if (!page) notFound();
 
   return (
-    <div className="mx-auto max-w-[760px] px-5 py-8 lg:px-8">
-      {/* Back link */}
-      <Link
-        href="/"
-        className="group mb-8 inline-flex items-center gap-2 font-sans text-[0.8rem] font-medium text-muted no-underline transition-colors hover:text-ink"
-      >
-        <ArrowLeft className="h-3.5 w-3.5 transition-transform group-hover:-translate-x-0.5" />
-        Back to PrimeCrest
-      </Link>
-
-      <article className="animate-in">
-        <header className="border-b border-rule pb-10">
-          <p className="kicker mb-3">The Journal</p>
-          <h1 className="headline text-[2.2rem] sm:text-[2.8rem]">{page.title}</h1>
-          {page.excerpt ? (
-            <p className="dek mt-4 text-[1.1rem]">{page.excerpt}</p>
-          ) : null}
-        </header>
-
-        <div className="py-10">
+    <article>
+      <PageHero eyebrow="The Journal" title={page.title} dek={page.excerpt || undefined} narrow />
+      <div className="mx-auto max-w-[808px] px-4 sm:px-6">
+        <div className="py-12">
           <ArticleBody html={page.content} />
         </div>
 
         {/* Footer links */}
-        <footer className="border-t border-rule pt-8">
-          <p className="mb-4 font-sans text-[0.7rem] font-bold uppercase tracking-[0.14em] text-muted">
-            More from The Journal
-          </p>
+        <footer className="border-t border-ink/10 py-10">
+          <p className="label mb-4 text-muted">More from The Journal</p>
           <div className="flex flex-wrap gap-4">
             {[
               { label: "About", href: "/about" },
@@ -76,7 +58,7 @@ export default async function StaticPage({ params }: Props) {
               ))}
           </div>
         </footer>
-      </article>
-    </div>
+      </div>
+    </article>
   );
 }

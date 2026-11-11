@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PageHero } from "@/components/site/PageHero";
 import { SITE } from "@/lib/constants";
 import { buildMetadata } from "@/lib/seo";
 
@@ -11,15 +12,19 @@ export const metadata = buildMetadata({
 
 export default function TermsPage() {
   return (
-    <div className="mx-auto max-w-[760px] px-5 py-16 lg:px-8">
-      <header className="border-b-2 border-ink pb-8">
-        <p className="kicker">The Journal</p>
-        <h1 className="headline mt-2 text-[2.4rem] sm:text-[3rem]">Terms of Use</h1>
-        <p className="dek mt-4">
-          The rules for reading the journal, the digital magazine, and everything we publish around them.
-        </p>
-        <p className="meta mt-4">Effective 16 October 2026</p>
-      </header>
+    <div>
+      <PageHero
+        eyebrow="The Journal"
+        title="Terms of Use"
+        dek={
+          <>
+            The rules for reading the journal, the digital magazine, and everything we publish around them.
+          </>
+        }
+        meta="Effective 16 October 2026"
+        narrow
+      />
+      <div className="mx-auto max-w-[808px] px-4 sm:px-6">
 
       <div className="space-y-10 py-12 font-serif text-[1.05rem] leading-relaxed text-ink-soft">
         <p>
@@ -29,7 +34,7 @@ export default function TermsPage() {
         </p>
 
         <section>
-          <h2 className="section-title mb-3 text-ink">The work</h2>
+          <h2 className="mb-3 font-sans text-[1.25rem] font-bold tracking-[-0.02em] text-ink">The work</h2>
           <p>
             Stories, photographs, magazine pages, and the PrimeCrest name and
             crest belong to {SITE.company} or to the people who licensed them to
@@ -41,7 +46,7 @@ export default function TermsPage() {
         </section>
 
         <section>
-          <h2 className="section-title mb-3 text-ink">The magazine</h2>
+          <h2 className="mb-3 font-sans text-[1.25rem] font-bold tracking-[-0.02em] text-ink">The magazine</h2>
           <p>
             The digital magazine is for personal reading. Downloading a page to
             keep, reprint, or resell is not allowed. The flipbook is part of the
@@ -50,7 +55,7 @@ export default function TermsPage() {
         </section>
 
         <section>
-          <h2 className="section-title mb-3 text-ink">What we publish</h2>
+          <h2 className="mb-3 font-sans text-[1.25rem] font-bold tracking-[-0.02em] text-ink">What we publish</h2>
           <p>
             Features are journalism. They are not investment, legal, or medical
             advice. Advertising and sponsored work are marked as such. We correct
@@ -63,7 +68,7 @@ export default function TermsPage() {
         </section>
 
         <section>
-          <h2 className="section-title mb-3 text-ink">Your messages</h2>
+          <h2 className="mb-3 font-sans text-[1.25rem] font-bold tracking-[-0.02em] text-ink">Your messages</h2>
           <p>
             If you send a tip, a letter, or a pitch, you confirm it is yours to
             send. We may use a letter in correspondence with you. We will not
@@ -76,7 +81,7 @@ export default function TermsPage() {
         </section>
 
         <section>
-          <h2 className="section-title mb-3 text-ink">The site itself</h2>
+          <h2 className="mb-3 font-sans text-[1.25rem] font-bold tracking-[-0.02em] text-ink">The site itself</h2>
           <p>
             We work to keep PrimeCrest available and accurate. We do not promise
             that every page will be up, uninterrupted, or free of mistakes. To
@@ -93,6 +98,7 @@ export default function TermsPage() {
             .
           </p>
         </section>
+      </div>
       </div>
     </div>
   );

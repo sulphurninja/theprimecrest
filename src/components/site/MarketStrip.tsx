@@ -10,19 +10,19 @@ function formatPrice(q: Quote) {
 
 function QuoteItem({ q }: { q: Quote }) {
   const up = q.change >= 0;
-  const sign = up ? "+" : "−";
-  const color = up ? "text-[#0d7a3f]" : "text-accent";
+  const color = up ? "text-[#0f7a45]" : "text-accent";
   return (
-    <span className="inline-flex items-baseline gap-2 whitespace-nowrap px-5">
-      <span className="font-sans text-[0.72rem] font-semibold text-ink">{q.label}</span>
-      <span className="font-sans text-[0.72rem] tabular-nums text-ink-soft">
-        {formatPrice(q)}
+    <span className="inline-flex items-baseline gap-2.5 whitespace-nowrap border-r border-ink/10 px-6">
+      <span className="font-sans text-[0.66rem] font-bold uppercase tracking-[0.12em] text-ink">
+        {q.label}
       </span>
-      <span className={`font-sans text-[0.72rem] font-medium tabular-nums ${color}`}>
-        {sign}
-        {Math.abs(q.change).toLocaleString("en-US", { maximumFractionDigits: 2 })}
-        {"  "}({sign}
-        {Math.abs(q.changePct).toFixed(2)}%)
+      <span className="font-sans text-[0.74rem] tabular-nums text-ink-soft">{formatPrice(q)}</span>
+      <span className={`font-sans text-[0.72rem] font-semibold tabular-nums ${color}`}>
+        <span className="mr-0.5 text-[0.6rem]" aria-hidden>
+          {up ? "▲" : "▼"}
+        </span>
+        <span className="sr-only">{up ? "up" : "down"} </span>
+        {Math.abs(q.changePct).toFixed(2)}%
       </span>
     </span>
   );
@@ -42,11 +42,11 @@ export async function MarketStrip() {
 
   return (
     <div
-      className="marquee-mask relative overflow-hidden border-b border-rule bg-paper"
+      className="marquee-mask relative overflow-hidden border-b border-ink/10 bg-paper"
       role="marquee"
       aria-label="Market prices"
     >
-      <div className="marquee flex items-center py-2">
+      <div className="marquee flex items-center py-2.5">
         {row(false)}
         {row(true)}
       </div>

@@ -4,10 +4,12 @@ import { notFound } from "next/navigation";
 import { AdUnit } from "@/components/site/AdUnit";
 import { ArticleBody } from "@/components/site/ArticleBody";
 import { ArticleCard, type CardArticle } from "@/components/site/ArticleCard";
-import { NewsletterForm } from "@/components/site/NewsletterForm";
+import { ArrowIcon, ExternalIcon, IssueIcon } from "@/components/site/Icons";
 import { ReadingProgress } from "@/components/site/ReadingProgress";
+import { SectionTitle } from "@/components/site/SectionHead";
 import { ShareBar } from "@/components/site/ShareBar";
 import { getActiveAd, getPublishedArticle, getRelatedArticles } from "@/lib/queries";
+import { MAGAZINE_ISSUES, issueLabel } from "@/lib/magazines";
 import { buildMetadata, newsArticleJsonLd } from "@/lib/seo";
 import { formatDate, siteUrl } from "@/lib/utils";
 
@@ -52,6 +54,7 @@ export default async function StoryPage({ params }: Props) {
 
   const magazineHref =
     article.magazineEnabled === false ? "" : String(article.magazineUrl || "").trim();
+  const issue = MAGAZINE_ISSUES.find((entry) => entry.articleSlug === article.slug);
 
   const jsonLd = newsArticleJsonLd({
     headline: article.title,
@@ -74,89 +77,88 @@ export default async function StoryPage({ params }: Props) {
       />
 
       {/* Story header */}
-      <header className="mx-auto max-w-[840px] px-5 pt-12 text-center lg:px-8">
-        {magazineHref ? (
-          <div className="mb-6 flex justify-center">
-            <a
-              href={magazineHref}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group inline-flex items-center gap-2.5 border border-ink bg-ink px-5 py-2.5 font-sans text-[0.78rem] font-semibold uppercase tracking-[0.14em] text-paper no-underline transition-colors hover:bg-paper hover:text-ink"
-            >
-              <svg
-                className="h-4 w-4 transition-transform group-hover:-rotate-6"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.8"
-                aria-hidden
-              >
-                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
-                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
-              </svg>
-              Read the Digital Magazine
-              <svg
-                className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                aria-hidden
-              >
-                <path d="M7 17L17 7M7 7h10v10" />
-              </svg>
-            </a>
-          </div>
-        ) : null}
-        {article.category?.name ? (
-          <Link href={`/c/${article.category.slug}`} className="kicker no-underline">
-            {article.category.name}
-          </Link>
-        ) : null}
-        <h1 className="headline mt-4 text-[2.1rem] sm:text-[2.9rem] lg:text-[3.4rem]">
-          {article.title}
-        </h1>
+      <header className="mx-auto max-w-[900px] px-4 pt-12 text-center sm:px-6 lg:pt-16">
+        <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2">
+          {article.category?.name ? (
+            <Link href={`/c/${article.category.slug}`} className="label text-accent no-underline hover:text-accent-hover">
+              {article.category.name}
+            </Link>
+          ) : null}
+          {issue ? (
+            <>
+              <span className="h-1 w-1 rounded-full bg-ink/25" aria-hidden />
+              <span className="label text-muted">{issueLabel(issue)}</span>
+            </>
+          ) : null}
+        </div>
+        <h1 className="statement mt-5 text-[2.3rem] sm:text-[3.2rem] lg:text-[3.9rem]">{article.title}</h1>
         {article.dek ? (
-          <p className="dek mx-auto mt-5 max-w-2xl text-[1.22rem]">{article.dek}</p>
+          <p className="mx-auto mt-6 max-w-2xl font-serif text-[1.22rem] leading-relaxed text-ink-soft">
+            {article.dek}
+          </p>
         ) : null}
 
-        <div className="mt-7 flex flex-col items-center gap-1.5">
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-x-4 gap-y-3">
           {article.author?.name ? (
-            <p className="font-sans text-[0.9rem] font-medium">
-              By{" "}
-              <Link
-                href={`/author/${article.author.slug}`}
-                className="no-underline hover:text-accent"
-              >
-                {article.author.name}
-              </Link>
-              {article.author.title ? (
-                <span className="font-normal text-muted"> · {article.author.title}</span>
+            <Link
+              href={`/author/${article.author.slug}`}
+              className="flex items-center gap-3 text-left no-underline"
+            >
+              {article.author.avatar ? (
+                <Image
+                  src={article.author.avatar}
+                  alt=""
+                  width={40}
+                  height={40}
+                  className="h-10 w-10 rounded-full object-cover"
+                />
               ) : null}
-            </p>
+              <span>
+                <span className="block font-sans text-[0.9rem] font-semibold text-ink hover:text-accent">
+                  {article.author.name}
+                </span>
+                {article.author.title ? (
+                  <span className="block font-sans text-[0.76rem] text-muted">{article.author.title}</span>
+                ) : null}
+              </span>
+            </Link>
           ) : null}
-          <p className="meta">
+          <span className="hidden h-8 w-px bg-ink/15 sm:block" aria-hidden />
+          <p className="font-sans text-[0.84rem] text-muted">
             {formatDate(article.publishedAt)}
             {article.readTime ? ` · ${article.readTime} min read` : ""}
           </p>
         </div>
+
+        {magazineHref ? (
+          <a
+            href={magazineHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-primary group mt-8"
+          >
+            <IssueIcon className="h-4 w-4" />
+            Read it in the digital magazine
+            <ExternalIcon className="h-3 w-3 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+          </a>
+        ) : null}
       </header>
 
       {/* Cover art */}
       {article.coverImage ? (
-        <figure className="mx-auto mt-10 max-w-[1280px] px-5 lg:px-8">
-          <div className="relative aspect-[16/8] w-full bg-paper-2">
+        <figure className="mx-auto mt-12 max-w-[1320px] px-4 sm:px-6">
+          <div className="relative aspect-[16/9] w-full overflow-hidden rounded-md bg-paper-2 lg:aspect-[2/1]">
             <Image
               src={article.coverImage}
               alt={article.coverCaption || article.title}
               fill
               priority
               className="object-cover"
-              sizes="(min-width: 1280px) 1216px, 100vw"
+              sizes="(min-width: 1320px) 1272px, 100vw"
             />
           </div>
           {article.coverCaption || article.coverCredit ? (
-            <figcaption className="mt-2.5 flex justify-between gap-6 font-sans text-[0.8rem] text-muted">
+            <figcaption className="mx-auto mt-3 flex max-w-[1272px] justify-between gap-6 font-sans text-[0.8rem] text-muted">
               <span>{article.coverCaption}</span>
               {article.coverCredit ? <span className="shrink-0">{article.coverCredit}</span> : null}
             </figcaption>
@@ -164,123 +166,130 @@ export default async function StoryPage({ params }: Props) {
         </figure>
       ) : null}
 
-      {/* Body + rail */}
-      <div className="mx-auto max-w-[1280px] px-5 py-12 lg:px-8">
-        <div className="grid gap-14 lg:grid-cols-12 lg:gap-0">
-          <div className="lg:col-span-8 lg:pr-14">
-            <div className="mx-auto max-w-[680px]">
-              <div className="mb-8 border-b border-rule pb-5">
-                <ShareBar
-                  title={article.title}
-                  slug={article.slug}
-                  magazineUrl={magazineHref || undefined}
-                />
-              </div>
+      {/* Body */}
+      <div className="mx-auto max-w-[768px] px-4 pb-6 pt-12 sm:px-6 lg:pt-16">
+        <div className="mb-10 border-b border-ink/10 pb-6">
+          <ShareBar title={article.title} slug={article.slug} magazineUrl={magazineHref || undefined} />
+        </div>
 
-              <ArticleBody html={article.content} />
+        <ArticleBody html={article.content} />
 
-              {article.pullQuote?.text ? (
-                <blockquote className="my-12 border-l-2 border-accent pl-7">
-                  <p className="headline text-[1.7rem] leading-snug">
-                    “{article.pullQuote.text}”
-                  </p>
-                  {article.pullQuote.attribution ? (
-                    <cite className="mt-3 block font-sans text-[0.78rem] font-semibold uppercase not-italic tracking-[0.1em] text-muted">
-                      {article.pullQuote.attribution}
-                    </cite>
-                  ) : null}
-                </blockquote>
-              ) : null}
+        {article.pullQuote?.text ? (
+          <blockquote className="my-12 border-l-2 border-accent pl-7">
+            <p className="statement text-[1.7rem] leading-snug">“{article.pullQuote.text}”</p>
+            {article.pullQuote.attribution ? (
+              <cite className="label mt-3 block not-italic text-muted">{article.pullQuote.attribution}</cite>
+            ) : null}
+          </blockquote>
+        ) : null}
 
-              {inlineAd ? (
-                <div className="my-12">
-                  <AdUnit slot={inlineAd.slot} campaign={inlineAd.campaign} />
-                </div>
-              ) : null}
+        {inlineAd ? (
+          <div className="my-12">
+            <AdUnit slot={inlineAd.slot} campaign={inlineAd.campaign} />
+          </div>
+        ) : null}
 
-              {article.tags?.length ? (
-                <div className="mt-10 flex flex-wrap items-center gap-2 border-t border-rule pt-6">
-                  <span className="font-sans text-[0.75rem] font-semibold uppercase tracking-[0.12em] text-muted">
-                    Filed under
-                  </span>
-                  {article.tags.map((tag: string) => (
-                    <Link
-                      key={tag}
-                      href={`/search?q=${encodeURIComponent(tag)}`}
-                      className="border border-rule px-2.5 py-1 font-sans text-[0.78rem] text-ink-soft no-underline transition-colors hover:border-ink"
-                    >
-                      {tag}
-                    </Link>
-                  ))}
-                </div>
-              ) : null}
+        {article.tags?.length ? (
+          <div className="mt-12 flex flex-wrap items-center gap-2">
+            <span className="label mr-2 text-muted">Filed under</span>
+            {article.tags.map((tag: string) => (
+              <Link
+                key={tag}
+                href={`/search?q=${encodeURIComponent(tag)}`}
+                className="rounded-full border border-ink/15 px-3.5 py-1.5 font-sans text-[0.8rem] text-ink-soft no-underline transition-colors hover:border-ink hover:text-ink"
+              >
+                {tag}
+              </Link>
+            ))}
+          </div>
+        ) : null}
 
-              <div className="mt-8 border-t border-rule pt-6">
-                <ShareBar
-                  title={article.title}
-                  slug={article.slug}
-                  magazineUrl={magazineHref || undefined}
-                />
-              </div>
+        <div className="mt-10 border-t border-ink/10 pt-6">
+          <ShareBar title={article.title} slug={article.slug} magazineUrl={magazineHref || undefined} />
+        </div>
 
-              {/* Author card */}
-              {article.author?.name ? (
-                <div className="mt-10 flex gap-5 border-t-2 border-ink pt-7">
-                  {article.author.avatar ? (
-                    <Image
-                      src={article.author.avatar}
-                      alt={article.author.name}
-                      width={64}
-                      height={64}
-                      className="h-16 w-16 shrink-0 rounded-full object-cover"
-                    />
-                  ) : null}
-                  <div>
-                    <p className="font-sans text-[0.75rem] font-semibold uppercase tracking-[0.12em] text-muted">
-                      About the author
-                    </p>
-                    <Link
-                      href={`/author/${article.author.slug}`}
-                      className="headline mt-1 block text-[1.25rem] no-underline hover:text-accent"
-                    >
-                      {article.author.name}
-                    </Link>
-                    {article.author.bio ? (
-                      <p className="mt-2 font-serif text-[0.95rem] leading-relaxed text-ink-soft">
-                        {article.author.bio}
-                      </p>
-                    ) : null}
-                  </div>
-                </div>
+        {/* From the magazine */}
+        {issue ? (
+          <aside className="card mt-12 grid grid-cols-[96px_1fr] items-center gap-6 p-5 sm:grid-cols-[120px_1fr] sm:p-6">
+            <a
+              href={issue.magazineUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block overflow-hidden rounded-[3px] shadow-[0_16px_32px_-16px_rgba(14,14,16,0.6)]"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={issue.cover} alt={`PrimeCrest ${issueLabel(issue)}: ${issue.name}`} className="aspect-[3/4] w-full object-cover" />
+            </a>
+            <div>
+              <p className="label text-accent">From the {issueLabel(issue)}</p>
+              <p className="statement mt-2 text-[1.35rem]">Read the full edition, page by page</p>
+              <p className="mt-2 text-[0.92rem] text-ink-soft">
+                {issue.name}&apos;s story as it runs in the flipbook, designed like print.
+              </p>
+              <a
+                href={issue.magazineUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-primary group mt-4 !py-2"
+              >
+                Open the flipbook
+                <ArrowIcon className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+              </a>
+            </div>
+          </aside>
+        ) : null}
+
+        {/* Author */}
+        {article.author?.name ? (
+          <div className="mt-12 flex gap-5 border-t border-ink/10 pt-8">
+            {article.author.avatar ? (
+              <Image
+                src={article.author.avatar}
+                alt={article.author.name}
+                width={64}
+                height={64}
+                className="h-16 w-16 shrink-0 rounded-full object-cover"
+              />
+            ) : null}
+            <div>
+              <p className="label text-muted">About the author</p>
+              <Link
+                href={`/author/${article.author.slug}`}
+                className="headline mt-1.5 block text-[1.2rem] no-underline hover:text-accent"
+              >
+                {article.author.name}
+              </Link>
+              {article.author.bio ? (
+                <p className="mt-2 font-serif text-[0.98rem] leading-relaxed text-ink-soft">{article.author.bio}</p>
               ) : null}
             </div>
           </div>
+        ) : null}
 
-          {/* Sidebar rail */}
-          <aside className="lg:col-span-4 lg:border-l lg:border-rule lg:pl-10">
-            <div className="lg:sticky lg:top-24">
-              {sidebarAd ? <AdUnit slot={sidebarAd.slot} campaign={sidebarAd.campaign} /> : null}
-
-              {related.length ? (
-                <div className={sidebarAd ? "mt-10" : ""}>
-                  <h2 className="section-title border-b-2 border-ink pb-3">Related reading</h2>
-                  {(related as CardArticle[]).map((item) => (
-                    <ArticleCard key={item._id} article={item} variant="list" />
-                  ))}
-                </div>
-              ) : null}
-
-              <div className="mt-10 border-t-2 border-ink pt-6">
-                <p className="kicker">The Morning Letter</p>
-                <p className="mt-2 mb-4 font-serif text-[0.92rem] leading-relaxed text-ink-soft">
-                  The day&apos;s sharpest reading, delivered weekday mornings.
-                </p>
-                <NewsletterForm />
-              </div>
-            </div>
-          </aside>
-        </div>
+        {sidebarAd ? (
+          <div className="mt-12">
+            <AdUnit slot={sidebarAd.slot} campaign={sidebarAd.campaign} />
+          </div>
+        ) : null}
       </div>
+
+      {/* Keep reading */}
+      {related.length ? (
+        <section className="mt-12 border-t border-ink/10 bg-paper-2">
+          <div className="mx-auto max-w-[1320px] px-4 py-16 sm:px-6">
+            <SectionTitle
+              title="Keep reading"
+              href={article.category?.slug ? `/c/${article.category.slug}` : undefined}
+              linkLabel={article.category?.name ? `More in ${article.category.name}` : undefined}
+            />
+            <div className="grid grid-cols-1 gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-4">
+              {(related as CardArticle[]).map((item) => (
+                <ArticleCard key={item._id} article={item} variant="feature" />
+              ))}
+            </div>
+          </div>
+        </section>
+      ) : null}
     </article>
   );
 }

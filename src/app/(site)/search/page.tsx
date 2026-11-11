@@ -1,7 +1,9 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { ArticleCard, type CardArticle } from "@/components/site/ArticleCard";
+import { PageHero } from "@/components/site/PageHero";
 import { SearchForm } from "@/components/site/SearchForm";
+import { SectionTitle } from "@/components/site/SectionHead";
 import {
   searchArticles,
   getTrendingArticles,
@@ -9,7 +11,6 @@ import {
   getNavCategories,
 } from "@/lib/queries";
 import { buildMetadata } from "@/lib/seo";
-import { TrendingUp, Tag, Layers, Search, ArrowRight } from "lucide-react";
 
 export const metadata = buildMetadata({
   title: "Search",
@@ -20,169 +21,110 @@ export const metadata = buildMetadata({
 
 type Props = { searchParams: Promise<{ q?: string }> };
 
+const chip =
+  "rounded-full border border-ink/15 bg-surface px-4 py-2 font-sans text-[0.84rem] font-medium text-ink no-underline transition-colors hover:border-ink hover:bg-ink hover:text-white";
+
 export default async function SearchPage({ searchParams }: Props) {
   const { q = "" } = await searchParams;
   const [results, trending, tags, categories] = await Promise.all([
     q ? searchArticles(q).catch(() => []) : Promise.resolve([]),
-    getTrendingArticles(5),
-    getPopularTags(10),
+    getTrendingArticles(6),
+    getPopularTags(12),
     getNavCategories(),
   ]);
 
   return (
-    <div className="mx-auto max-w-[1100px] px-5 py-12 lg:px-8 lg:py-16">
-      {/* Header */}
-      <div className="mb-10 text-center">
-        <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-paper-2">
-          <Search className="h-5 w-5 text-ink" />
+    <div>
+      <PageHero
+        eyebrow="The archive"
+        title={q ? <>Results for &ldquo;{q}&rdquo;</> : "Search PrimeCrest"}
+        dek={q ? undefined : "Every story we have published: reporting, interviews, essays and analysis."}
+      >
+        <div className="max-w-2xl">
+          <Suspense>
+            <SearchForm />
+          </Suspense>
         </div>
-        <h1 className="headline text-[2rem] sm:text-[2.6rem]">Explore the Archive</h1>
-        <p className="mx-auto mt-3 max-w-md font-serif text-ink-soft">
-          Search across every story we&apos;ve published — reporting, interviews, essays, and
-          analysis.
-        </p>
-      </div>
+      </PageHero>
 
-      {/* Search Form */}
-      <div className="mx-auto max-w-[600px]">
-        <Suspense>
-          <SearchForm />
-        </Suspense>
-      </div>
-
-      {q ? (
-        /* Search Results */
-        <div className="mt-12">
-          <div className="flex items-center justify-between border-b border-rule pb-4">
-            <p className="meta">
-              <span className="font-semibold text-ink">{results.length}</span>{" "}
-              {results.length === 1 ? "result" : "results"} for &ldquo;{q}&rdquo;
-            </p>
-            {results.length > 0 && (
-              <Link
-                href="/search"
-                className="font-sans text-[0.8rem] font-medium text-accent no-underline hover:underline"
-              >
+      <div className="mx-auto max-w-[1320px] px-4 py-14 sm:px-6">
+        {q ? (
+          <>
+            <div className="mb-10 flex items-center justify-between gap-4">
+              <p className="font-sans text-[0.9rem] text-ink-soft">
+                <span className="font-semibold text-ink">{results.length}</span>{" "}
+                {results.length === 1 ? "story" : "stories"} found
+              </p>
+              <Link href="/search" className="nav-link font-sans text-[0.84rem] font-semibold text-ink">
                 Clear search
               </Link>
-            )}
-          </div>
-
-          {results.length > 0 ? (
-            <div className="divide-y divide-rule">
-              {(results as CardArticle[]).map((article, i) => (
-                <div
-                  key={article._id}
-                  className="py-8 animate-in"
-                  style={{ animationDelay: `${i * 50}ms` }}
-                >
-                  <ArticleCard article={article} variant="standard" />
+            </div>
+            {results.length > 0 ? (
+              <div className="grid grid-cols-1 gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
+                {(results as CardArticle[]).map((article) => (
+                  <ArticleCard key={article._id} article={article} variant="feature" />
+                ))}
+              </div>
+            ) : (
+              <div className="card px-6 py-20 text-center">
+                <p className="statement text-[1.6rem]">No stories matched that search</p>
+                <p className="mt-3 font-serif text-ink-soft">
+                  Try a broader phrase or a name, or browse a section below.
+                </p>
+                <div className="mt-8 flex flex-wrap justify-center gap-2">
+                  {categories.map((cat: { _id: string; name: string; slug: string }) => (
+                    <Link key={cat._id} href={`/c/${cat.slug}`} className={chip}>
+                      {cat.name}
+                    </Link>
+                  ))}
                 </div>
-              ))}
-            </div>
-          ) : (
-            <div className="py-20 text-center">
-              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-paper-2">
-                <Search className="h-6 w-6 text-muted" />
               </div>
-              <p className="headline text-[1.4rem]">No stories found</p>
-              <p className="mt-2 font-serif text-ink-soft">
-                Try a broader phrase, a name, or browse by section below.
-              </p>
-            </div>
-          )}
-        </div>
-      ) : (
-        /* Discovery View */
-        <div className="mt-14 grid gap-12 lg:grid-cols-3 lg:gap-8">
-          {/* Trending Stories */}
-          <div className="lg:col-span-2">
-            <div className="mb-6 flex items-center gap-2">
-              <TrendingUp className="h-4 w-4 text-accent" />
-              <h2 className="section-title">Trending Now</h2>
-            </div>
-            <div className="divide-y divide-rule rounded-lg border border-rule bg-paper">
-              {(trending as CardArticle[]).map((article, i) => (
-                <Link
-                  key={article._id}
-                  href={`/story/${article.slug}`}
-                  className="group flex items-start gap-4 p-5 no-underline transition-colors hover:bg-paper-2"
-                >
-                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-paper-2 font-sans text-[0.8rem] font-bold text-muted transition-colors group-hover:bg-ink group-hover:text-paper">
-                    {i + 1}
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <p className="kicker mb-1">{article.category?.name}</p>
-                    <h3 className="headline text-[1.05rem] leading-tight transition-colors group-hover:text-accent">
-                      {article.title}
-                    </h3>
+            )}
+          </>
+        ) : (
+          <div className="grid grid-cols-1 gap-14 lg:grid-cols-12">
+            <section className="lg:col-span-8">
+              <SectionTitle title="Most read" />
+              <div className="grid grid-cols-1 gap-x-8 gap-y-12 sm:grid-cols-2">
+                {(trending as CardArticle[]).slice(0, 4).map((article) => (
+                  <ArticleCard key={article._id} article={article} variant="feature" />
+                ))}
+              </div>
+            </section>
+
+            <aside className="space-y-12 lg:col-span-4">
+              <div>
+                <p className="label mb-4 text-accent">Browse sections</p>
+                <div className="flex flex-wrap gap-2">
+                  {categories.map((cat: { _id: string; name: string; slug: string }) => (
+                    <Link key={cat._id} href={`/c/${cat.slug}`} className={chip}>
+                      {cat.name}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+              {tags.length ? (
+                <div>
+                  <p className="label mb-4 text-accent">Popular topics</p>
+                  <div className="flex flex-wrap gap-2">
+                    {tags.map((t: { tag: string; count: number }) => (
+                      <Link key={t.tag} href={`/search?q=${encodeURIComponent(t.tag)}`} className={chip}>
+                        {t.tag}
+                      </Link>
+                    ))}
                   </div>
-                </Link>
-              ))}
-            </div>
+                </div>
+              ) : null}
+              <div>
+                <p className="label mb-3 text-accent">More from the archive</p>
+                {(trending as CardArticle[]).slice(4).map((article) => (
+                  <ArticleCard key={article._id} article={article} variant="list" />
+                ))}
+              </div>
+            </aside>
           </div>
-
-          {/* Sidebar */}
-          <div className="space-y-10">
-            {/* Browse Sections */}
-            <div>
-              <div className="mb-4 flex items-center gap-2">
-                <Layers className="h-4 w-4 text-accent" />
-                <h2 className="section-title">Browse Sections</h2>
-              </div>
-              <div className="space-y-1">
-                {categories.map((cat: { _id: string; name: string; slug: string }) => (
-                  <Link
-                    key={cat._id}
-                    href={`/c/${cat.slug}`}
-                    className="group flex items-center justify-between rounded-md px-3 py-2.5 font-sans text-[0.9rem] font-medium text-ink no-underline transition-all hover:bg-paper-2"
-                  >
-                    <span>{cat.name}</span>
-                    <ArrowRight className="h-3.5 w-3.5 text-muted opacity-0 transition-all group-hover:translate-x-0.5 group-hover:text-accent group-hover:opacity-100" />
-                  </Link>
-                ))}
-              </div>
-            </div>
-
-            {/* Popular Topics */}
-            <div>
-              <div className="mb-4 flex items-center gap-2">
-                <Tag className="h-4 w-4 text-accent" />
-                <h2 className="section-title">Popular Topics</h2>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {tags.map((t: { tag: string; count: number }) => (
-                  <Link
-                    key={t.tag}
-                    href={`/search?q=${encodeURIComponent(t.tag)}`}
-                    className="rounded-full border border-rule bg-paper px-3 py-1.5 font-sans text-[0.78rem] font-medium text-ink-soft no-underline transition-all hover:border-ink hover:bg-ink hover:text-paper"
-                  >
-                    {t.tag}
-                  </Link>
-                ))}
-              </div>
-            </div>
-
-            {/* Quick Searches */}
-            <div>
-              <p className="mb-3 font-sans text-[0.7rem] font-bold uppercase tracking-[0.14em] text-muted">
-                Try Searching
-              </p>
-              <div className="space-y-1.5 font-serif text-[0.95rem] text-ink-soft">
-                {["infrastructure", "AI", "leadership", "Taiwan", "branding"].map((term) => (
-                  <Link
-                    key={term}
-                    href={`/search?q=${encodeURIComponent(term)}`}
-                    className="block text-ink-soft no-underline transition-colors hover:text-accent"
-                  >
-                    &ldquo;{term}&rdquo;
-                  </Link>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }

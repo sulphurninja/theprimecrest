@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState, useCallback } from "react";
-import { ArrowRight, Search, Mail, TrendingUp } from "lucide-react";
+import { ArrowIcon, AudienceIcon, LetterIcon, SearchIcon } from "@/components/site/Icons";
 
 type Item = { label: string; href: string };
 
@@ -113,7 +113,7 @@ export function MobileNav({
                     <span className="headline text-[1.35rem] text-ink transition-colors group-hover:text-accent">
                       {item.label}
                     </span>
-                    <ArrowRight className="h-4 w-4 text-muted opacity-0 transition-all group-hover:translate-x-1 group-hover:text-accent group-hover:opacity-100" />
+                    <ArrowIcon className="h-4 w-4 text-muted opacity-0 transition-all group-hover:translate-x-1 group-hover:text-accent group-hover:opacity-100" />
                   </Link>
                 </li>
               ))}
@@ -131,7 +131,7 @@ export function MobileNav({
                 onClick={close}
                 className="flex items-center gap-3 rounded-lg bg-paper-2 px-4 py-3 font-sans text-[0.85rem] font-medium text-ink no-underline transition-all hover:bg-ink hover:text-paper"
               >
-                <Search className="h-4 w-4" />
+                <SearchIcon className="h-4 w-4" />
                 Search Archive
               </Link>
               <Link
@@ -139,7 +139,7 @@ export function MobileNav({
                 onClick={close}
                 className="flex items-center gap-3 rounded-lg bg-ink px-4 py-3 font-sans text-[0.85rem] font-medium text-paper no-underline transition-all hover:bg-accent"
               >
-                <Mail className="h-4 w-4" />
+                <LetterIcon className="h-4 w-4" />
                 Subscribe to {siteName}
               </Link>
             </div>
@@ -152,7 +152,7 @@ export function MobileNav({
               onClick={close}
               className="flex items-center gap-2 font-sans text-[0.8rem] font-medium text-accent no-underline transition-colors hover:text-accent-hover"
             >
-              <TrendingUp className="h-3.5 w-3.5" />
+              <AudienceIcon className="h-3.5 w-3.5" />
               Advertise with us
             </Link>
             <p className="mt-4 font-serif text-[0.85rem] italic leading-relaxed text-muted">

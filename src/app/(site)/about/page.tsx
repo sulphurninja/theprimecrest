@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PageHero } from "@/components/site/PageHero";
 import { SITE } from "@/lib/constants";
 import { buildMetadata } from "@/lib/seo";
 
@@ -11,12 +12,18 @@ export const metadata = buildMetadata({
 
 export default function AboutPage() {
   return (
-    <div className="mx-auto max-w-[760px] px-5 py-16 lg:px-8">
-      <header className="border-b-2 border-ink pb-8">
-        <p className="kicker">The Journal</p>
-        <h1 className="headline mt-2 text-[2.4rem] sm:text-[3rem]">About Us</h1>
-        <p className="dek mt-4">{SITE.slogan}</p>
-      </header>
+    <div>
+      <PageHero
+        eyebrow="The Journal"
+        title="About Us"
+        dek={
+          <>
+            {SITE.slogan}
+          </>
+        }
+        narrow
+      />
+      <div className="mx-auto max-w-[808px] px-4 sm:px-6">
 
       <div className="space-y-10 py-12 font-serif text-[1.05rem] leading-relaxed text-ink-soft">
         <p>
@@ -32,7 +39,7 @@ export default function AboutPage() {
         </p>
 
         <section>
-          <h2 className="section-title mb-3 text-ink">What we publish</h2>
+          <h2 className="mb-3 font-sans text-[1.25rem] font-bold tracking-[-0.02em] text-ink">What we publish</h2>
           <p>
             Section fronts for affairs, business, and women in business. A
             homepage built around the current issue. And the magazine itself,
@@ -46,7 +53,7 @@ export default function AboutPage() {
         </section>
 
         <section>
-          <h2 className="section-title mb-3 text-ink">The publisher</h2>
+          <h2 className="mb-3 font-sans text-[1.25rem] font-bold tracking-[-0.02em] text-ink">The publisher</h2>
           <p>
             PrimeCrest is published by {SITE.company}.
           </p>
@@ -71,6 +78,7 @@ export default function AboutPage() {
             .
           </p>
         </section>
+      </div>
       </div>
     </div>
   );

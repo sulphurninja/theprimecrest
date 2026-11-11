@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { ArticleCard, type CardArticle } from "@/components/site/ArticleCard";
+import { SectionTitle } from "@/components/site/SectionHead";
 import { getAuthorArticles, getAuthorBySlug } from "@/lib/queries";
 import { buildMetadata } from "@/lib/seo";
 
@@ -26,56 +27,54 @@ export default async function AuthorPage({ params }: Props) {
 
   const articles = (await getAuthorArticles(String(author._id)).catch(() => [])) as CardArticle[];
 
+  const socials = [
+    { label: "X", url: author.socials?.twitter },
+    { label: "LinkedIn", url: author.socials?.linkedin },
+  ].filter((social) => social.url);
+
   return (
-    <div className="mx-auto max-w-[1100px] px-5 lg:px-8">
-      <header className="flex flex-col items-start gap-7 border-b-2 border-ink py-14 sm:flex-row sm:items-center">
-        {author.avatar ? (
-          <Image
-            src={author.avatar}
-            alt={author.name}
-            width={112}
-            height={112}
-            className="h-28 w-28 shrink-0 rounded-full object-cover"
-          />
-        ) : null}
-        <div>
-          <p className="kicker">{author.title || "Contributor"}</p>
-          <h1 className="headline mt-2 text-[2.4rem] sm:text-[3rem]">{author.name}</h1>
-          {author.bio ? <p className="dek mt-4 max-w-2xl">{author.bio}</p> : null}
-          <div className="mt-4 flex gap-5">
-            {author.socials?.twitter ? (
-              <a
-                href={author.socials.twitter}
-                target="_blank"
-                rel="noreferrer"
-                className="font-sans text-[0.82rem] font-medium text-ink-soft no-underline hover:text-accent"
-              >
-                X
-              </a>
+    <div>
+      <header className="border-b border-ink/10">
+        <div className="mx-auto flex max-w-[1320px] flex-col items-start gap-8 px-4 pb-12 pt-14 sm:flex-row sm:items-center sm:px-6 lg:pt-20">
+          {author.avatar ? (
+            <Image
+              src={author.avatar}
+              alt={author.name}
+              width={128}
+              height={128}
+              className="h-28 w-28 shrink-0 rounded-full object-cover shadow-[0_18px_40px_-18px_rgba(14,14,16,0.5)] sm:h-32 sm:w-32"
+            />
+          ) : null}
+          <div>
+            <p className="label text-accent">{author.title || "Contributor"}</p>
+            <h1 className="statement mt-3 text-[2.6rem] sm:text-[3.6rem]">{author.name}</h1>
+            {author.bio ? (
+              <p className="mt-4 max-w-2xl font-serif text-[1.1rem] leading-relaxed text-ink-soft">{author.bio}</p>
             ) : null}
-            {author.socials?.linkedin ? (
-              <a
-                href={author.socials.linkedin}
-                target="_blank"
-                rel="noreferrer"
-                className="font-sans text-[0.82rem] font-medium text-ink-soft no-underline hover:text-accent"
-              >
-                LinkedIn
-              </a>
+            {socials.length ? (
+              <div className="mt-5 flex gap-2">
+                {socials.map((social) => (
+                  <a
+                    key={social.label}
+                    href={social.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="btn-outline !px-4 !py-2"
+                  >
+                    {social.label}
+                  </a>
+                ))}
+              </div>
             ) : null}
           </div>
         </div>
       </header>
 
-      <section className="py-12">
-        <p className="meta mb-8">
-          {articles.length} {articles.length === 1 ? "story" : "stories"}
-        </p>
-        <div className="divide-y divide-rule">
+      <section className="mx-auto max-w-[1320px] px-4 py-14 sm:px-6">
+        <SectionTitle title={`${articles.length} ${articles.length === 1 ? "story" : "stories"}`} />
+        <div className="grid grid-cols-1 gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
           {articles.map((article) => (
-            <div key={article._id} className="py-8 first:pt-0">
-              <ArticleCard article={article} variant="standard" />
-            </div>
+            <ArticleCard key={article._id} article={article} variant="feature" />
           ))}
         </div>
       </section>

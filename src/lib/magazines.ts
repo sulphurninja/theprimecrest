@@ -25,6 +25,14 @@ export function issueMonth(issue: string) {
   return issue.replace(/^The /, "").replace(/ Issue$/, "");
 }
 
+/**
+ * Public label for an edition, e.g. "October issue". Volume numbers restart
+ * each month, so the site never uses them to identify or order issues.
+ */
+export function issueLabel(issue: Pick<MagazineIssue, "issue">) {
+  return `${issueMonth(issue.issue)} issue`;
+}
+
 export const MAGAZINE_ISSUES: MagazineIssue[] = [
   {
     slug: "espey",
@@ -104,3 +112,16 @@ export const MAGAZINE_ISSUES: MagazineIssue[] = [
     magazineUrl: `${MAGAZINE_DOMAIN}/m/bethany`,
   },
 ];
+
+/**
+ * Newest first. Order comes from position in MAGAZINE_ISSUES (append new
+ * editions at the end), not from volume numbers, which restart monthly.
+ */
+export const ISSUES_NEWEST_FIRST: MagazineIssue[] = [...MAGAZINE_ISSUES].reverse();
+
+export const LATEST_ISSUE: MagazineIssue = ISSUES_NEWEST_FIRST[0];
+
+/** Position of an issue's article in the run (higher is newer), or -1. */
+export function issueRank(articleSlug: string) {
+  return MAGAZINE_ISSUES.findIndex((issue) => issue.articleSlug === articleSlug);
+}

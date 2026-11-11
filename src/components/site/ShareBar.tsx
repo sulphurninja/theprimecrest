@@ -88,7 +88,7 @@ export function ShareBar({
 
   return (
     <div className="flex flex-wrap items-center gap-x-4 gap-y-3">
-      <span className="font-sans text-[0.7rem] font-bold uppercase tracking-[0.14em] text-muted">
+      <span className="label text-muted">
         Share
       </span>
       <div className="flex items-center gap-1">
@@ -118,7 +118,7 @@ export function ShareBar({
           href={magazineUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="group ml-auto inline-flex items-center gap-2 border border-ink bg-ink px-3.5 py-2 font-sans text-[0.68rem] font-semibold uppercase tracking-[0.12em] text-paper no-underline transition-colors hover:bg-paper hover:text-ink"
+          className="btn-outline group ml-auto !px-4 !py-2 !text-[0.8rem]"
         >
           <svg
             className="h-3.5 w-3.5 transition-transform group-hover:-rotate-6"

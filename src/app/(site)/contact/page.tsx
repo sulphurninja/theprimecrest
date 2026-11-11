@@ -1,6 +1,7 @@
 import { getSettings } from "@/lib/queries";
 import { buildMetadata } from "@/lib/seo";
 import { ContactForm } from "@/components/site/ContactForm";
+import { PageHero } from "@/components/site/PageHero";
 import { SITE } from "@/lib/constants";
 
 export const revalidate = 3600;
@@ -16,64 +17,56 @@ export default async function ContactPage() {
   const contactEmail = settings?.contactEmail || "desk@primecrest.com";
   const advertiseEmail = settings?.advertiseEmail || "advertise@primecrest.com";
 
+  const desks = [
+    { label: "Editorial", body: "Story tips, corrections, and press inquiries.", email: contactEmail },
+    { label: "Advertising", body: "Sponsorships, native features, and display placements.", email: advertiseEmail },
+  ];
+
   return (
-    <div className="mx-auto max-w-[820px] px-5 py-16 lg:px-8">
-      <header className="border-b-2 border-ink pb-8">
-        <p className="kicker">Reach Us</p>
-        <h1 className="headline mt-2 text-[2.4rem] sm:text-[3rem]">Contact Us</h1>
-        <p className="dek mt-4">
-          Whether you have a tip, a correction, or simply want to say something — we read every
-          message.
-        </p>
-      </header>
+    <div>
+      <PageHero
+        eyebrow="Reach us"
+        title="Contact Us"
+        dek="Whether you have a tip, a correction, or simply want to say something, we read every message."
+      />
 
-      <div className="grid gap-10 py-12 sm:grid-cols-3">
-        <div>
-          <h2 className="section-title mb-3">Editorial</h2>
-          <p className="font-serif text-[0.95rem] leading-relaxed text-ink-soft">
-            For story tips, corrections, or press inquiries.
-          </p>
-          <a
-            href={`mailto:${contactEmail}`}
-            className="mt-3 inline-block font-sans text-[0.88rem] font-semibold text-accent no-underline hover:text-accent-hover"
-          >
-            {contactEmail}
-          </a>
-        </div>
-        <div>
-          <h2 className="section-title mb-3">Advertising</h2>
-          <p className="font-serif text-[0.95rem] leading-relaxed text-ink-soft">
-            Sponsorship, native features, and display placements.
-          </p>
-          <a
-            href={`mailto:${advertiseEmail}`}
-            className="mt-3 inline-block font-sans text-[0.88rem] font-semibold text-accent no-underline hover:text-accent-hover"
-          >
-            {advertiseEmail}
-          </a>
-        </div>
-        <div>
-          <h2 className="section-title mb-3">Headquarters</h2>
-          <p className="font-serif text-[0.95rem] leading-relaxed text-ink-soft">
-            {SITE.company}
-          </p>
-          <address className="mt-2 font-serif text-[0.88rem] not-italic leading-relaxed text-ink-soft">
-            {SITE.address.street}<br />
-            {SITE.address.city}, {SITE.address.state} {SITE.address.zip}
-          </address>
-          <a
-            href={`mailto:${SITE.email}`}
-            className="mt-2 inline-block font-sans text-[0.88rem] font-semibold text-accent no-underline hover:text-accent-hover"
-          >
-            {SITE.email}
-          </a>
-        </div>
+      <div className="mx-auto grid max-w-[1320px] grid-cols-1 gap-12 px-4 py-14 sm:px-6 lg:grid-cols-12 lg:gap-16">
+        <aside className="space-y-8 lg:col-span-4">
+          {desks.map((desk) => (
+            <div key={desk.label} className="border-b border-ink/10 pb-8">
+              <p className="label text-accent">{desk.label}</p>
+              <p className="mt-2 text-[0.95rem] leading-relaxed text-ink-soft">{desk.body}</p>
+              <a
+                href={`mailto:${desk.email}`}
+                className="mt-2 inline-block font-sans text-[1rem] font-semibold text-ink no-underline hover:text-accent"
+              >
+                {desk.email}
+              </a>
+            </div>
+          ))}
+          <div>
+            <p className="label text-accent">Headquarters</p>
+            <p className="mt-2 font-sans text-[1rem] font-semibold text-ink">{SITE.company}</p>
+            <address className="mt-1 text-[0.95rem] not-italic leading-relaxed text-ink-soft">
+              {SITE.address.street}
+              <br />
+              {SITE.address.city}, {SITE.address.state} {SITE.address.zip}
+            </address>
+            <a
+              href={`mailto:${SITE.email}`}
+              className="mt-2 inline-block font-sans text-[0.95rem] font-semibold text-ink no-underline hover:text-accent"
+            >
+              {SITE.email}
+            </a>
+          </div>
+        </aside>
+
+        <section className="card p-6 sm:p-10 lg:col-span-8">
+          <h2 className="statement text-[1.6rem]">Send us a message</h2>
+          <p className="mt-2 mb-8 text-[0.95rem] text-ink-soft">We usually reply within two working days.</p>
+          <ContactForm />
+        </section>
       </div>
-
-      <section className="border-t border-rule pt-10">
-        <h2 className="section-title mb-6">Send us a message</h2>
-        <ContactForm />
-      </section>
     </div>
   );
 }

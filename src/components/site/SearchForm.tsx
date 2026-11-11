@@ -2,7 +2,8 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
-import { Search, X, ArrowRight } from "lucide-react";
+import { X } from "lucide-react";
+import { ArrowIcon, SearchIcon } from "@/components/site/Icons";
 
 export function SearchForm() {
   const params = useSearchParams();
@@ -28,17 +29,16 @@ export function SearchForm() {
   return (
     <form onSubmit={handleSubmit} role="search" className="relative">
       <div
-        className={`flex items-center gap-3 rounded-lg border-2 bg-paper px-4 py-3 transition-all duration-300 ${
+        className={`flex items-center gap-3 rounded-full border bg-surface py-1.5 pl-5 pr-1.5 transition-all duration-300 ${
           focused
-            ? "border-ink shadow-lg shadow-ink/5"
-            : "border-rule hover:border-ink-soft"
+            ? "border-ink shadow-[0_0_0_4px_rgba(14,14,16,0.06)]"
+            : "border-rule hover:border-paper-3"
         }`}
       >
-        <Search
+        <SearchIcon
           className={`h-5 w-5 shrink-0 transition-colors duration-200 ${
             focused ? "text-ink" : "text-muted"
           }`}
-          strokeWidth={1.8}
         />
         <input
           ref={inputRef}
@@ -48,7 +48,7 @@ export function SearchForm() {
           onBlur={() => setFocused(false)}
           placeholder="Search stories, topics, people…"
           aria-label="Search the archive"
-          className="min-w-0 flex-1 bg-transparent font-serif text-[1.1rem] text-ink outline-none placeholder:text-muted/70"
+          className="min-w-0 flex-1 bg-transparent py-2 font-sans text-[1.05rem] text-ink outline-none placeholder:text-muted/70"
         />
         {q && (
           <button
@@ -63,17 +63,13 @@ export function SearchForm() {
         <button
           type="submit"
           disabled={!q.trim()}
-          className="flex h-9 shrink-0 items-center gap-2 rounded-md bg-ink px-4 font-sans text-[0.8rem] font-semibold text-paper transition-all hover:bg-accent disabled:cursor-not-allowed disabled:opacity-40"
+          className="flex h-11 shrink-0 items-center gap-2 rounded-full bg-ink px-5 font-sans text-[0.84rem] font-semibold text-white transition-colors hover:bg-accent disabled:cursor-not-allowed disabled:opacity-40"
         >
           <span className="hidden sm:inline">Search</span>
-          <ArrowRight className="h-4 w-4" />
+          <ArrowIcon className="h-4 w-4" />
         </button>
       </div>
       
-      {/* Keyboard hint */}
-      <p className="mt-2 text-center font-sans text-[0.72rem] text-muted">
-        Press <kbd className="rounded bg-paper-2 px-1.5 py-0.5 font-mono text-[0.68rem]">Enter</kbd> to search
-      </p>
     </form>
   );
 }

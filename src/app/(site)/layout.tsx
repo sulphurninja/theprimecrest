@@ -19,6 +19,7 @@ export default async function SiteLayout({ children }: LayoutProps<"/">) {
   }));
 
   return (
+    <div className="site-theme flex flex-1 flex-col">
     <InitialLoader>
       <SiteHeader
         siteName={name}
@@ -43,5 +44,6 @@ export default async function SiteLayout({ children }: LayoutProps<"/">) {
       />
       <WelcomeModal />
     </InitialLoader>
+    </div>
   );
 }

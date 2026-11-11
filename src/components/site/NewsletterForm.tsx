@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Check, Loader2, ArrowRight, AlertCircle } from "lucide-react";
+import { Check, Loader2, AlertCircle } from "lucide-react";
+import { ArrowIcon } from "@/components/site/Icons";
 
 export function NewsletterForm({ dark = false }: { dark?: boolean }) {
   const [email, setEmail] = useState("");
@@ -52,14 +53,14 @@ export function NewsletterForm({ dark = false }: { dark?: boolean }) {
   return (
     <form onSubmit={onSubmit} noValidate={false}>
       <div
-        className={`flex items-stretch overflow-hidden rounded-lg border transition-all duration-200 ${
+        className={`flex items-stretch gap-1 rounded-full border p-1 transition-all duration-200 ${
           dark
             ? focused
-              ? "border-paper/60 bg-paper/10"
-              : "border-paper/40 bg-paper/5 hover:border-paper/50"
+              ? "border-paper/50 bg-paper/10"
+              : "border-paper/25 bg-paper/5 hover:border-paper/40"
             : focused
-              ? "border-ink bg-paper shadow-lg shadow-ink/5"
-              : "border-rule bg-paper hover:border-ink-soft"
+              ? "border-ink bg-surface shadow-[0_0_0_4px_rgba(14,14,16,0.06)]"
+              : "border-rule bg-surface hover:border-paper-3"
         }`}
       >
         <input
@@ -71,7 +72,7 @@ export function NewsletterForm({ dark = false }: { dark?: boolean }) {
           onBlur={() => setFocused(false)}
           placeholder="Enter your email"
           aria-label="Email address"
-          className={`min-w-0 flex-1 bg-transparent px-4 py-3 font-sans text-[0.9rem] outline-none ${
+          className={`min-w-0 flex-1 bg-transparent px-4 py-2.5 font-sans text-[0.92rem] outline-none ${
             dark
               ? "text-paper placeholder:text-paper/50"
               : "text-ink placeholder:text-muted"
@@ -80,10 +81,8 @@ export function NewsletterForm({ dark = false }: { dark?: boolean }) {
         <button
           type="submit"
           disabled={status === "busy" || !email}
-          className={`group flex shrink-0 items-center gap-2 px-4 font-sans text-[0.8rem] font-semibold uppercase tracking-[0.06em] transition-all disabled:opacity-40 ${
-            dark
-              ? "text-paper hover:bg-paper hover:text-ink"
-              : "text-ink hover:bg-ink hover:text-paper"
+          className={`group flex shrink-0 items-center gap-2 rounded-full px-5 font-sans text-[0.84rem] font-semibold transition-colors disabled:opacity-50 ${
+            dark ? "bg-paper text-ink hover:bg-gold-soft" : "bg-ink text-white hover:bg-accent"
           }`}
         >
           {status === "busy" ? (
@@ -91,7 +90,7 @@ export function NewsletterForm({ dark = false }: { dark?: boolean }) {
           ) : (
             <>
               <span className="hidden sm:inline">Subscribe</span>
-              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+              <ArrowIcon className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
             </>
           )}
         </button>

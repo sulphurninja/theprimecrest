@@ -1,4 +1,5 @@
 import { InquireForm } from "@/components/site/InquireForm";
+import { PageHero } from "@/components/site/PageHero";
 import { AD_SLOTS } from "@/lib/constants";
 import { buildMetadata } from "@/lib/seo";
 
@@ -33,22 +34,23 @@ const OFFERINGS = [
 
 export default function AdvertisePage() {
   return (
-    <div className="mx-auto max-w-[1100px] px-5 lg:px-8">
-      <header className="border-b-2 border-ink py-16">
-        <p className="kicker">Advertising & Partnerships</p>
-        <h1 className="headline mt-3 max-w-3xl text-[2.6rem] sm:text-[3.6rem]">
-          Advertising, set with the same care as the journalism.
-        </h1>
-        <p className="dek mt-6 max-w-2xl text-[1.2rem]">
-          PrimeCrest is read slowly and deliberately, by people who decide things. We keep
+    <div>
+      <PageHero
+        eyebrow="Advertising & Partnerships"
+        title="Advertising, set with the same care as the journalism."
+        dek={
+          <>
+            PrimeCrest is read slowly and deliberately, by people who decide things. We keep
           inventory scarce, placements fixed, and sponsors named — because attention earned
           honestly is worth more.
-        </p>
-      </header>
+          </>
+        }
+      />
+      <div className="mx-auto max-w-[1320px] px-4 sm:px-6">
 
       <section className="grid gap-px border-b border-rule bg-rule sm:grid-cols-2 lg:grid-cols-4">
         {AUDIENCE.map((item) => (
-          <div key={item.label} className="bg-paper px-6 py-10">
+          <div key={item.label} className="bg-surface px-6 py-10">
             <p className="headline text-[2.6rem] text-accent">{item.figure}</p>
             <p className="mt-2 font-sans text-[0.85rem] leading-relaxed text-ink-soft">
               {item.label}
@@ -58,7 +60,7 @@ export default function AdvertisePage() {
       </section>
 
       <section className="border-b border-rule py-14">
-        <h2 className="section-title mb-10 text-[0.9rem]">What we offer</h2>
+        <h2 className="statement mb-10 text-[1.8rem] sm:text-[2.1rem]">What we offer</h2>
         <div className="grid gap-10 md:grid-cols-3">
           {OFFERINGS.map((item, i) => (
             <div key={item.title}>
@@ -73,7 +75,7 @@ export default function AdvertisePage() {
       </section>
 
       <section className="border-b border-rule py-14">
-        <h2 className="section-title mb-4 text-[0.9rem]">Placements & inventory</h2>
+        <h2 className="statement mb-4 text-[1.8rem] sm:text-[2.1rem]">Placements & inventory</h2>
         <p className="mb-10 max-w-2xl font-serif text-ink-soft">
           Every slot is fixed, measured, and sold directly. No programmatic exchanges, no
           third-party trackers, no surprises next to your brand.
@@ -122,6 +124,7 @@ export default function AdvertisePage() {
           <InquireForm type="advertise" />
         </div>
       </section>
+      </div>
     </div>
   );
 }

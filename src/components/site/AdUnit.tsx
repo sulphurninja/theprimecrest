@@ -64,7 +64,8 @@ export function AdUnit({
     return (
       <aside className={className} aria-label="Advertisement">
         {label}
-        <div className="border border-rule" dangerouslySetInnerHTML={{ __html: campaign.html }} />
+        {/* Third-party HTML can carry fixed widths; keep it from widening the page. */}
+        <div className="overflow-hidden border border-rule" dangerouslySetInnerHTML={{ __html: campaign.html }} />
       </aside>
     );
   }
