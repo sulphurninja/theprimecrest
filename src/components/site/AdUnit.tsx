@@ -14,6 +14,8 @@ type Campaign = {
 } | null;
 
 function track(id: string, kind: "impression" | "click") {
+  // Local demo creatives have no database record to count against.
+  if (id.startsWith("demo-")) return;
   fetch(`/api/ads/${id}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -48,13 +50,11 @@ export function AdUnit({
         {label}
         <Link
           href="/advertise"
-          className="group flex flex-col items-center justify-center gap-1.5 border border-rule bg-ad-bg px-6 py-9 text-center no-underline transition-colors hover:border-ink"
+          className="group flex flex-col items-center justify-center gap-2 border border-ink/20 bg-surface px-6 py-9 text-center no-underline transition-colors hover:border-ink"
           style={{ minHeight: Math.min(slot.height, 250) }}
         >
-          <span className="headline text-[1.3rem] text-ink">This space is reserved.</span>
-          <span className="font-sans text-[0.8rem] font-medium text-accent group-hover:text-accent-hover">
-            Advertise with PrimeCrest →
-          </span>
+          <span className="display-caps text-[1.4rem] text-ink">Advertise with PrimeCrest</span>
+          <span className="read-more text-ink">Reach decision-makers »</span>
         </Link>
       </aside>
     );

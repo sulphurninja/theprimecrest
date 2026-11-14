@@ -22,7 +22,7 @@ export const metadata = buildMetadata({
 type Props = { searchParams: Promise<{ q?: string }> };
 
 const chip =
-  "rounded-full border border-ink/15 bg-surface px-4 py-2 font-sans text-[0.84rem] font-medium text-ink no-underline transition-colors hover:border-ink hover:bg-ink hover:text-white";
+  "rounded-[2px] border border-ink/20 bg-surface px-4 py-2 font-sans text-[0.74rem] font-bold uppercase tracking-[0.1em] text-ink no-underline transition-colors hover:border-ink hover:bg-ink hover:text-white";
 
 export default async function SearchPage({ searchParams }: Props) {
   const { q = "" } = await searchParams;
@@ -37,8 +37,8 @@ export default async function SearchPage({ searchParams }: Props) {
     <div>
       <PageHero
         eyebrow="The archive"
-        title={q ? <>Results for &ldquo;{q}&rdquo;</> : "Search PrimeCrest"}
-        dek={q ? undefined : "Every story we have published: reporting, interviews, essays and analysis."}
+        title={q ? <>Results for &ldquo;{q}&rdquo;</> : "Search the archive"}
+        dek={q ? undefined : "Cover stories, interviews and analysis from every edition of PrimeCrest."}
       >
         <div className="max-w-2xl">
           <Suspense>
@@ -67,7 +67,7 @@ export default async function SearchPage({ searchParams }: Props) {
               </div>
             ) : (
               <div className="card px-6 py-20 text-center">
-                <p className="statement text-[1.6rem]">No stories matched that search</p>
+                <p className="statement text-[1.6rem]">No stories match that search</p>
                 <p className="mt-3 font-serif text-ink-soft">
                   Try a broader phrase or a name, or browse a section below.
                 </p>

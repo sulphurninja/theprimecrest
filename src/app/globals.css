@@ -25,12 +25,11 @@
 }
 
 /*
- * Public site type: Schibsted Grotesk for headlines and UI, Source Serif for
- * reading. Scoped here so the flipbook editions (/m/*), which use the same
+ * Public site type: Newsreader for headlines, Schibsted Grotesk for UI and
+ * excerpts, Source Serif for reading. Scoped here so the flipbook editions (/m/*), which use the same
  * Tailwind font classes, keep their print typography.
  */
 .site-theme {
-  --font-display: var(--font-head);
   --font-sans: var(--font-head);
   font-family: var(--font-head), system-ui, sans-serif;
   font-size: 1rem;
@@ -134,7 +133,7 @@ select:focus-visible {
 
 .headline {
   font-family: var(--font-display), Georgia, serif;
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: -0.022em;
   line-height: 1.12;
   text-wrap: balance;
@@ -142,10 +141,10 @@ select:focus-visible {
 
 /* Oversized statement type for heroes and section mastheads. */
 .statement {
-  font-family: var(--font-display), system-ui, sans-serif;
-  font-weight: 700;
-  letter-spacing: -0.032em;
-  line-height: 1.04;
+  font-family: var(--font-display), Georgia, serif;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.08;
   text-wrap: balance;
 }
 
@@ -296,12 +295,14 @@ a.kicker:hover {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-  border-radius: 999px;
-  padding: 0.72rem 1.4rem;
+  gap: 0.6rem;
+  border-radius: 2px;
+  padding: 0.8rem 1.4rem;
   font-family: var(--font-sans), system-ui, sans-serif;
-  font-size: 0.84rem;
-  font-weight: 600;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
   line-height: 1.2;
   text-decoration: none;
   cursor: pointer;
@@ -359,7 +360,7 @@ a.kicker:hover {
 
 .input {
   width: 100%;
-  border-radius: 10px;
+  border-radius: 2px;
   border: 1px solid var(--rule);
   background: var(--surface);
   padding: 0.8rem 1rem;
@@ -447,7 +448,7 @@ a.kicker:hover {
 
 /* Soft surface card. */
 .card {
-  border-radius: 14px;
+  border-radius: 2px;
   background: var(--surface);
   box-shadow: 0 1px 2px rgba(14, 14, 16, 0.04), 0 12px 32px -18px rgba(14, 14, 16, 0.18);
 }
@@ -1654,3 +1655,48 @@ a.kicker:hover {
 
 .mag-spread-photo.is-left { left: 0; }
 .mag-spread-photo.is-right { left: -100%; }
+
+/* ---------- Classic magazine details ---------- */
+
+/* Uppercase serif display title, e.g. "LEADERS IN FOCUS". */
+.display-caps {
+  font-family: var(--font-display), Georgia, serif;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  line-height: 0.98;
+}
+
+/* "READ MORE »" link with an underline that draws in. */
+.read-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding-bottom: 0.35rem;
+  font-family: var(--font-sans), system-ui, sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: inherit;
+  background-image: linear-gradient(currentColor, currentColor);
+  background-size: 100% 1px;
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  transition: background-size 0.4s var(--ease-out), color 0.2s ease;
+}
+
+.read-more:hover,
+.group:hover .read-more {
+  color: var(--accent);
+  background-size: 40% 1px;
+}
+
+/* Letter-spaced serif navigation in the black band. */
+.nav-serif {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+}

@@ -1,9 +1,9 @@
 export const SITE = {
   name: "PrimeCrest",
-  tagline: "A journal of affairs, business, and culture.",
+  tagline: "The international magazine of leadership and business.",
   slogan: "Where Vision Meets Voice",
   description:
-    "PrimeCrest is a weekly editorial on power, capital, culture, and the people who shape them. Independent reporting. Considered writing.",
+    "PrimeCrest is an international business magazine profiling the leaders, founders and innovators shaping industries worldwide, with cover stories, interviews and a digital edition every month.",
   issue: "Vol. IV · No. 33",
   company: "Fortiora Group LLC",
   address: {

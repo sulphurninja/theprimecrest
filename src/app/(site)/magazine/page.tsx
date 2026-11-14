@@ -34,9 +34,9 @@ export default function MagazinePage() {
         <div className="mx-auto grid max-w-[1320px] grid-cols-1 gap-12 px-4 py-16 sm:px-6 lg:grid-cols-12 lg:items-center lg:py-24">
           <div className="lg:col-span-7">
             <p className="label text-accent">
-              The Digital Magazine · New this month
+              The digital magazine · This month&apos;s cover
             </p>
-            <h1 className="statement mt-5 text-[3rem] sm:text-[4.2rem] lg:text-[5rem]">
+            <h1 className="display-caps mt-5 text-[3rem] sm:text-[4.2rem] lg:text-[5rem]">
               {latest.name}
             </h1>
             <p className="mt-3 text-[1rem] text-muted">

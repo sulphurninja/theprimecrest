@@ -40,3 +40,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Local demo ad logos (third-party trademarks) - never commit
+/public/demo-ads/

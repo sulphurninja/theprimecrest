@@ -14,7 +14,7 @@ const AUDIENCE = [
   { figure: "68%", label: "of readers hold director-level roles or above" },
   { figure: "11 min", label: "average time spent per feature story" },
   { figure: "42", label: "countries in our monthly readership" },
-  { figure: "1", label: "morning letter, read before the markets open" },
+  { figure: "1", label: "daily briefing, read before the markets open" },
 ];
 
 const OFFERINGS = [
@@ -24,7 +24,7 @@ const OFFERINGS = [
   },
   {
     title: "Issue sponsorship",
-    body: "Put your name beside a full edition: masthead credit, the cover story rail, and the week's Morning Letter. Exclusive, dated, and archived permanently.",
+    body: "Put your name beside a full edition: masthead credit, the cover story rail, and the week's PrimeCrest Briefing. Exclusive, dated, and archived permanently.",
   },
   {
     title: "Native features",
@@ -37,17 +37,10 @@ export default function AdvertisePage() {
     <div>
       <PageHero
         eyebrow="Advertising & Partnerships"
-        title="Advertising, set with the same care as the journalism."
-        dek={
-          <>
-            PrimeCrest is read slowly and deliberately, by people who decide things. We keep
-          inventory scarce, placements fixed, and sponsors named — because attention earned
-          honestly is worth more.
-          </>
-        }
+        title="Advertise with PrimeCrest"
+        dek="Place your brand beside cover stories read by executives, founders and investors worldwide. Every placement is fixed, measured and sold directly, and every sponsor is named."
       />
       <div className="mx-auto max-w-[1320px] px-4 sm:px-6">
-
       <section className="grid gap-px border-b border-rule bg-rule sm:grid-cols-2 lg:grid-cols-4">
         {AUDIENCE.map((item) => (
           <div key={item.label} className="bg-surface px-6 py-10">
@@ -114,7 +107,7 @@ export default function AdvertisePage() {
 
       <section className="grid gap-12 py-14 lg:grid-cols-5">
         <div className="lg:col-span-2">
-          <h2 className="headline text-[1.9rem]">Start the conversation.</h2>
+          <h2 className="statement text-[1.9rem]">Start a conversation</h2>
           <p className="mt-4 font-serif leading-relaxed text-ink-soft">
             Tell us about your brand and what you want the right readers to know. Our
             partnerships desk replies to every serious inquiry within two business days.

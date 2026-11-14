@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowIcon } from "@/components/site/Icons";
+import { SectionTitle } from "@/components/site/SectionHead";
 import { ISSUES_NEWEST_FIRST, LATEST_ISSUE, issueLabel } from "@/lib/magazines";
 
 /** The digital magazine covers, newest first, drifting slowly across an ivory band. */
@@ -10,34 +10,25 @@ export function MagazineMarquee() {
 
   return (
     <section className="bg-paper-2" aria-label="Digital magazine issues">
-      <div className="mx-auto grid max-w-[1320px] grid-cols-1 gap-8 px-4 pt-20 sm:px-6 lg:grid-cols-12 lg:items-end">
-        <div className="lg:col-span-7">
-          <p className="font-sans text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-gold">
-            The Digital Magazine
-          </p>
-          <h2 className="statement mt-3 text-[2.6rem] sm:text-[3.4rem]">
-            People worth <em>knowing</em>
-          </h2>
-          <p className="mt-4 max-w-lg font-serif text-[1.08rem] leading-relaxed text-ink-soft">
-            Each edition is a flipbook designed page by page like print, with a feature story to read
-            here.
-          </p>
-        </div>
-        <div className="flex flex-wrap items-center gap-5 lg:col-span-5 lg:justify-end">
-          <Link
-            href={`/story/${LATEST_ISSUE.articleSlug}`}
-            className="group inline-flex items-center gap-2 rounded-full bg-ink px-5 py-2.5 font-sans text-[0.82rem] font-semibold text-white no-underline transition-colors hover:bg-accent"
-          >
-            Latest issue
-            <ArrowIcon className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
-          </Link>
-          <Link href="/magazine" className="nav-link font-sans text-[0.82rem] font-semibold text-ink">
-            All editions
-          </Link>
-        </div>
+      <div className="mx-auto max-w-[1320px] px-4 pt-20 sm:px-6">
+        <SectionTitle
+          eyebrow="The digital magazine"
+          title="Latest editions"
+          dek={
+            <>
+              Every PrimeCrest edition is designed page by page and published as a digital flipbook. This month&apos;s cover:{" "}
+              <Link href={`/story/${LATEST_ISSUE.articleSlug}`} className="font-semibold text-ink underline decoration-accent underline-offset-4">
+                {LATEST_ISSUE.name}, {issueLabel(LATEST_ISSUE)}
+              </Link>
+              .
+            </>
+          }
+          href="/magazine"
+          linkLabel="All editions"
+        />
       </div>
 
-      <div className="mag-reel mt-8 pb-20">
+      <div className="mag-reel pb-20">
         <div className="mag-reel-track">
           {reel.map((issue, i) => {
             const copy = i >= count;

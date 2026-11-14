@@ -76,7 +76,7 @@ export function ArticleCard({
           <Byline article={article} className="mt-1.5" />
         </div>
         {article.coverImage ? (
-          <Link href={href} className="img-hover relative block aspect-square overflow-hidden rounded-[4px] bg-paper-2">
+          <Link href={href} className="img-hover relative block aspect-square overflow-hidden bg-paper-2">
             <Image src={article.coverImage} alt="" fill className="object-cover" sizes="96px" />
           </Link>
         ) : null}
@@ -89,7 +89,7 @@ export function ArticleCard({
     return (
       <article className="animate-in">
         {article.coverImage ? (
-          <Link href={href} className="img-hover relative overflow-hidden rounded-[4px] block aspect-[16/9] bg-paper-2">
+          <Link href={href} className="img-hover relative overflow-hidden block aspect-[16/9] bg-paper-2">
             <Image
               src={article.coverImage}
               alt={article.title}
@@ -124,7 +124,7 @@ export function ArticleCard({
         {article.coverImage ? (
           <Link
             href={href}
-            className="img-hover relative overflow-hidden rounded-[4px] block aspect-[4/3] bg-paper-2 lg:col-span-3"
+            className="img-hover relative overflow-hidden block aspect-[4/3] bg-paper-2 lg:col-span-3"
           >
             <Image
               src={article.coverImage}
@@ -157,7 +157,7 @@ export function ArticleCard({
     return (
       <article className="group">
         {article.coverImage ? (
-          <Link href={href} className="img-hover relative overflow-hidden rounded-[4px] mb-5 block aspect-[3/2] bg-paper-2">
+          <Link href={href} className="img-hover relative overflow-hidden mb-5 block aspect-[3/2] bg-paper-2">
             <Image
               src={article.coverImage}
               alt={article.title}
@@ -168,7 +168,7 @@ export function ArticleCard({
           </Link>
         ) : null}
         <Kicker article={article} />
-        <h3 className="headline mt-2 text-[1.15rem] leading-[1.2]">
+        <h3 className="headline mt-2 text-[1.25rem] leading-[1.22]">
           <Link href={href}>{article.title}</Link>
         </h3>
         {article.excerpt ? (
@@ -177,6 +177,9 @@ export function ArticleCard({
           </p>
         ) : null}
         <Byline article={article} className="mt-3" />
+        <Link href={href} className="read-more mt-4 text-ink">
+          Read more »
+        </Link>
       </article>
     );
   }
@@ -185,7 +188,7 @@ export function ArticleCard({
   return (
     <article className="group grid grid-cols-1 gap-6 sm:grid-cols-[5fr_4fr] sm:items-center">
       {article.coverImage ? (
-        <Link href={href} className="img-hover relative overflow-hidden rounded-[4px] block aspect-[3/2] bg-paper-2">
+        <Link href={href} className="img-hover relative overflow-hidden block aspect-[3/2] bg-paper-2">
           <Image
             src={article.coverImage}
             alt={article.title}

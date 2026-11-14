@@ -37,7 +37,7 @@ export default async function SiteLayout({ children }: LayoutProps<"/">) {
         siteName={name}
         blurb={
           settings?.footerBlurb ||
-          "PrimeCrest publishes considered journalism on power, capital, culture, and the people who shape them."
+          "PrimeCrest profiles the leaders, founders and innovators shaping business worldwide, in cover stories, interviews and a monthly digital edition."
         }
         copyright={settings?.copyright || "Fortiora Group LLC."}
         categories={cats}

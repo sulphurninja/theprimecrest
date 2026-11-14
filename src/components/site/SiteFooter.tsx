@@ -36,14 +36,14 @@ export function SiteFooter({
     <footer className="grain mt-20 overflow-hidden bg-night text-paper">
       {/* Newsletter Band */}
       <div className="border-b border-paper/10">
-        <div className="mx-auto flex max-w-[1280px] flex-col items-start gap-8 px-5 py-16 lg:flex-row lg:items-end lg:justify-between">
+        <div className="mx-auto flex max-w-[1320px] flex-col items-start gap-8 px-4 py-16 sm:px-6 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <p className="eyebrow text-gold-soft">Stay informed</p>
-            <h3 className="statement mt-4 text-[2rem] text-paper sm:text-[2.6rem]">
-              Get the briefing <em className="text-gold-soft">in your inbox.</em>
+            <p className="label !tracking-[0.28em] text-gold-soft">The PrimeCrest Briefing</p>
+            <h3 className="display-caps mt-4 text-[2.2rem] text-white sm:text-[2.8rem]">
+              Business intelligence, every morning
             </h3>
-            <p className="mt-3 font-serif text-[0.98rem] text-paper/60">
-              One letter, each morning. The stories that matter.
+            <p className="mt-3 max-w-lg text-[0.98rem] leading-relaxed text-paper/60">
+              The leaders, companies and decisions shaping global business, in one concise email.
             </p>
           </div>
           <div className="w-full max-w-md">
@@ -57,7 +57,7 @@ export function SiteFooter({
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-12">
           <div className="lg:col-span-4">
             <Wordmark name={siteName} className="text-[1.8rem] text-paper" showTagline />
-            <p className="mt-5 max-w-sm font-serif text-[0.95rem] leading-relaxed text-paper/60">
+            <p className="mt-5 max-w-sm text-[0.95rem] leading-relaxed text-paper/60">
               {blurb}
             </p>
             <div className="mt-6 border-t border-paper/10 pt-5">
@@ -87,15 +87,14 @@ export function SiteFooter({
 
           <div className="grid grid-cols-2 gap-10 sm:grid-cols-3 lg:col-span-8">
             <div>
-              <p className="font-sans text-[0.64rem] font-bold uppercase tracking-[0.2em] text-gold-soft/70">
-                Sections
-              </p>
-              <ul className="mt-4 space-y-2">
+              <p className="font-display text-[1.3rem] font-semibold text-white">Sections</p>
+              <span className="mt-3 block h-[2px] w-10 bg-accent" aria-hidden />
+              <ul className="mt-5 space-y-2.5">
                 {categories.filter((c) => c.slug !== "magazine").map((c) => (
                   <li key={c.slug}>
                     <Link
                       href={c.slug === "home" ? "/" : `/c/${c.slug}`}
-                      className="group inline-flex items-center gap-1 font-sans text-[0.875rem] text-paper/70 no-underline transition-colors hover:text-paper"
+                      className="group inline-flex items-center gap-1 font-sans text-[0.9rem] text-paper/65 no-underline transition-colors hover:text-white"
                     >
                       {c.name}
                     </Link>
@@ -104,15 +103,14 @@ export function SiteFooter({
               </ul>
             </div>
             <div>
-              <p className="font-sans text-[0.64rem] font-bold uppercase tracking-[0.2em] text-gold-soft/70">
-                The Journal
-              </p>
-              <ul className="mt-4 space-y-2">
+              <p className="font-display text-[1.3rem] font-semibold text-white">The Journal</p>
+              <span className="mt-3 block h-[2px] w-10 bg-accent" aria-hidden />
+              <ul className="mt-5 space-y-2.5">
                 {JOURNAL_LINKS.map((l) => (
                   <li key={l.href}>
                     <Link
                       href={l.href}
-                      className="font-sans text-[0.875rem] text-paper/70 no-underline transition-colors hover:text-paper"
+                      className="font-sans text-[0.9rem] text-paper/65 no-underline transition-colors hover:text-white"
                     >
                       {l.label}
                     </Link>
@@ -121,15 +119,14 @@ export function SiteFooter({
               </ul>
             </div>
             <div>
-              <p className="font-sans text-[0.64rem] font-bold uppercase tracking-[0.2em] text-gold-soft/70">
-                Legal & More
-              </p>
-              <ul className="mt-4 space-y-2">
+              <p className="font-display text-[1.3rem] font-semibold text-white">Legal &amp; More</p>
+              <span className="mt-3 block h-[2px] w-10 bg-accent" aria-hidden />
+              <ul className="mt-5 space-y-2.5">
                 {LEGAL_LINKS.map((l) => (
                   <li key={l.href}>
                     <Link
                       href={l.href}
-                      className="group inline-flex items-center gap-1 font-sans text-[0.875rem] text-paper/70 no-underline transition-colors hover:text-paper"
+                      className="group inline-flex items-center gap-1 font-sans text-[0.9rem] text-paper/65 no-underline transition-colors hover:text-white"
                       {...("external" in l && l.external
                         ? { target: "_blank", rel: "noopener noreferrer" }
                         : {})}
@@ -153,7 +150,7 @@ export function SiteFooter({
           </p>
           <div className="flex items-center gap-4">
             <p className="font-serif text-[0.8rem] italic text-paper/40">
-              Written by people. Edited by people.
+              Independent. International. Edited by people.
             </p>
             <BackToTop />
           </div>

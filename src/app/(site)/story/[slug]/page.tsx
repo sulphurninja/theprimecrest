@@ -147,7 +147,7 @@ export default async function StoryPage({ params }: Props) {
       {/* Cover art */}
       {article.coverImage ? (
         <figure className="mx-auto mt-12 max-w-[1320px] px-4 sm:px-6">
-          <div className="relative aspect-[16/9] w-full overflow-hidden rounded-md bg-paper-2 lg:aspect-[2/1]">
+          <div className="relative aspect-[16/9] w-full overflow-hidden bg-paper-2 lg:aspect-[2/1]">
             <Image
               src={article.coverImage}
               alt={article.coverCaption || article.title}
@@ -196,7 +196,7 @@ export default async function StoryPage({ params }: Props) {
               <Link
                 key={tag}
                 href={`/search?q=${encodeURIComponent(tag)}`}
-                className="rounded-full border border-ink/15 px-3.5 py-1.5 font-sans text-[0.8rem] text-ink-soft no-underline transition-colors hover:border-ink hover:text-ink"
+                className="rounded-[2px] border border-ink/20 px-3.5 py-1.5 font-sans text-[0.72rem] font-bold uppercase tracking-[0.1em] text-ink-soft no-underline transition-colors hover:border-ink hover:text-ink"
               >
                 {tag}
               </Link>
@@ -268,7 +268,7 @@ export default async function StoryPage({ params }: Props) {
 
         {sidebarAd ? (
           <div className="mt-12">
-            <AdUnit slot={sidebarAd.slot} campaign={sidebarAd.campaign} />
+            <AdUnit slot={sidebarAd.slot} campaign={sidebarAd.campaign} className="mx-auto max-w-[300px]" />
           </div>
         ) : null}
       </div>

@@ -1,4 +1,6 @@
 import { dbConnect } from "@/lib/db";
+import { demoAdsEnabled, demoCampaign, demoReplaces } from "@/lib/demo-ads";
+import { AD_SLOTS } from "@/lib/constants";
 import { ISSUES_NEWEST_FIRST, MAGAZINE_ISSUES, issueRank } from "@/lib/magazines";
 import { serialize } from "@/lib/utils";
 import {
@@ -154,7 +156,9 @@ export async function getNavCategories() {
 
 export async function getActiveAd(slotKey: string) {
   await dbConnect();
-  const slot = await AdSlot.findOne({ key: slotKey, enabled: true }).lean();
+  const stored = await AdSlot.findOne({ key: slotKey, enabled: true }).lean();
+  // Demo mode also fills slots that were never created in the admin.
+  const slot = stored || (demoAdsEnabled() ? AD_SLOTS.find((s) => s.key === slotKey) : null);
   if (!slot) return null;
   const now = new Date();
   const campaign = await AdCampaign.findOne({
@@ -167,6 +171,11 @@ export async function getActiveAd(slotKey: string) {
   })
     .sort({ priority: -1, createdAt: -1 })
     .lean();
+  // Local demo mode swaps campaigns for mock creatives (see lib/demo-ads).
+  if (demoAdsEnabled() && demoReplaces(slotKey, campaign)) {
+    const demo = demoCampaign(slotKey, { width: slot.width ?? 728, height: slot.height ?? 90 });
+    if (demo) return serialize({ slot, campaign: demo });
+  }
   if (!campaign) {
     return serialize({ slot, campaign: null });
   }

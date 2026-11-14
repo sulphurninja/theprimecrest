@@ -53,7 +53,7 @@ export function NewsletterForm({ dark = false }: { dark?: boolean }) {
   return (
     <form onSubmit={onSubmit} noValidate={false}>
       <div
-        className={`flex items-stretch gap-1 rounded-full border p-1 transition-all duration-200 ${
+        className={`flex items-stretch gap-1 rounded-[2px] border p-1 transition-all duration-200 ${
           dark
             ? focused
               ? "border-paper/50 bg-paper/10"
@@ -81,7 +81,7 @@ export function NewsletterForm({ dark = false }: { dark?: boolean }) {
         <button
           type="submit"
           disabled={status === "busy" || !email}
-          className={`group flex shrink-0 items-center gap-2 rounded-full px-5 font-sans text-[0.84rem] font-semibold transition-colors disabled:opacity-50 ${
+          className={`group flex shrink-0 items-center gap-2 rounded-[2px] px-5 font-sans text-[0.72rem] font-bold uppercase tracking-[0.12em] transition-colors disabled:opacity-50 ${
             dark ? "bg-paper text-ink hover:bg-gold-soft" : "bg-ink text-white hover:bg-accent"
           }`}
         >

@@ -34,7 +34,7 @@ export default async function AuthorPage({ params }: Props) {
 
   return (
     <div>
-      <header className="border-b border-ink/10">
+      <header className="border-b border-ink">
         <div className="mx-auto flex max-w-[1320px] flex-col items-start gap-8 px-4 pb-12 pt-14 sm:flex-row sm:items-center sm:px-6 lg:pt-20">
           {author.avatar ? (
             <Image
@@ -46,8 +46,8 @@ export default async function AuthorPage({ params }: Props) {
             />
           ) : null}
           <div>
-            <p className="label text-accent">{author.title || "Contributor"}</p>
-            <h1 className="statement mt-3 text-[2.6rem] sm:text-[3.6rem]">{author.name}</h1>
+            <p className="label !tracking-[0.28em] text-ink">{author.title || "Contributor"}</p>
+            <h1 className="display-caps mt-4 text-[2.6rem] sm:text-[3.6rem]">{author.name}</h1>
             {author.bio ? (
               <p className="mt-4 max-w-2xl font-serif text-[1.1rem] leading-relaxed text-ink-soft">{author.bio}</p>
             ) : null}

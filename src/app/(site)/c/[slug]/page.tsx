@@ -61,16 +61,16 @@ export default async function CategoryPage({ params, searchParams }: Props) {
   return (
     <div className="mx-auto max-w-[1320px] px-4 sm:px-6">
       {/* Section masthead */}
-      <header className="border-b border-ink/10 pb-12 pt-14 lg:pt-20">
+      <header className="border-b border-ink pb-12 pt-14 lg:pt-20">
         {category.kicker ? (
-          <p className="label text-accent">{category.kicker}</p>
+          <p className="label !tracking-[0.28em] text-ink">{category.kicker}</p>
         ) : null}
-        <h1 className="statement mt-3 text-[2.8rem] sm:text-[3.8rem] lg:text-[4.6rem]">
+        <h1 className="display-caps mt-4 text-[2.8rem] sm:text-[3.8rem] lg:text-[4.6rem]">
           {category.name}
         </h1>
         <div className="mt-6 flex flex-wrap items-end justify-between gap-6">
           {category.description ? (
-            <p className="max-w-2xl font-serif text-[1.15rem] leading-relaxed text-ink-soft">{category.description}</p>
+            <p className="max-w-2xl text-[1.08rem] leading-[1.75] text-ink-soft">{category.description}</p>
           ) : (
             <span />
           )}
@@ -91,9 +91,9 @@ export default async function CategoryPage({ params, searchParams }: Props) {
 
       {articles.length === 0 && shelf.length === 0 ? (
         <div className="py-24 text-center">
-          <p className="statement text-[2rem]">Nothing here yet</p>
+          <p className="statement text-[2rem]">No stories in this section yet</p>
           <p className="mt-3 font-serif text-ink-soft">
-            The desk hasn&apos;t filed anything in this section. Check back soon.
+            New reporting will appear here as it is published.
           </p>
         </div>
       ) : articles.length > 0 ? (

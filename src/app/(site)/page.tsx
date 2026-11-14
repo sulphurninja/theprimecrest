@@ -8,18 +8,12 @@ import { Reveal } from "@/components/site/Reveal";
 import { MagazineMarquee } from "@/components/site/MagazineMarquee";
 import { NewsDesk } from "@/components/site/NewsDesk";
 import { SectionTitle } from "@/components/site/SectionHead";
-import { ArrowIcon } from "@/components/site/Icons";
-import {
-  MagazineCoverGrid,
-  magazineShelfMeta,
-  type MagazineShelfItem,
-} from "@/components/site/MagazineCoverGrid";
-import { MAGAZINE_ISSUES } from "@/lib/magazines";
+import { MAGAZINE_ISSUES, issueLabel } from "@/lib/magazines";
 import { NEWS_TOPICS, getNews, newsCredit } from "@/lib/news";
-import { getActiveAd, getHomePayload, getSectionMagazines } from "@/lib/queries";
+import { getActiveAd, getHomePayload, getTrendingArticles } from "@/lib/queries";
 import { buildMetadata } from "@/lib/seo";
 import { SITE } from "@/lib/constants";
-import { formatDate, timeAgo } from "@/lib/utils";
+import { formatDate } from "@/lib/utils";
 
 export const revalidate = 60;
 
@@ -30,14 +24,14 @@ export const metadata = buildMetadata({
 });
 
 const container = "mx-auto max-w-[1320px] px-4 sm:px-6";
-const magazineSlugs = new Set(MAGAZINE_ISSUES.map((issue) => issue.articleSlug));
+const issueBySlug = new Map(MAGAZINE_ISSUES.map((issue) => [issue.articleSlug, issue]));
 
 /** Live news band. Renders nothing until the news API returns headlines. */
 async function NewsSection() {
   const items = await getNews("business", 10);
   if (items.length < 3) return null;
   return (
-    <section className="border-y border-ink/10 bg-surface" aria-label="Live news">
+    <section className="border-y border-ink/10 bg-surface" aria-label="World news">
       <div className={`${container} py-20`}>
         <NewsDesk topics={NEWS_TOPICS} initial={items} credit={newsCredit()} />
       </div>
@@ -45,66 +39,90 @@ async function NewsSection() {
   );
 }
 
-/** "3h ago" for fresh posts, a short date for older ones. */
-function when(date?: string) {
-  if (!date) return "";
-  const hours = (Date.now() - new Date(date).getTime()) / 3_600_000;
-  return hours < 48 ? timeAgo(date) : formatDate(date, { month: "short", year: undefined });
+/** Cover profiles: one tall portrait card, then three standard ones. */
+function LeadersInFocus({ articles }: { articles: CardArticle[] }) {
+  const [first, ...rest] = articles;
+  if (!first) return null;
+  return (
+    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-[1.3fr_1fr_1fr_1fr] lg:items-start">
+      <Link href={`/story/${first.slug}`} className="group relative block overflow-hidden bg-ink no-underline shadow-[0_24px_48px_-24px_rgba(14,14,16,0.6)]">
+        <span className="relative block aspect-[4/5]">
+          {first.coverImage ? (
+            <Image
+              src={first.coverImage}
+              alt={first.title}
+              fill
+              className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+              sizes="(min-width: 1024px) 420px, 100vw"
+            />
+          ) : null}
+        </span>
+        <span className="block bg-ink px-6 py-5">
+          <span className="label block !text-[0.62rem] text-gold-soft">
+            {issueBySlug.get(first.slug) ? issueLabel(issueBySlug.get(first.slug)!) : first.category?.name}
+          </span>
+          <span className="mt-2 block font-display text-[1.35rem] font-semibold leading-snug text-white">
+            {first.title}
+          </span>
+        </span>
+      </Link>
+      {rest.map((article) => {
+        const issue = issueBySlug.get(article.slug);
+        return (
+          <article key={article._id} className="group bg-surface shadow-[0_18px_40px_-28px_rgba(14,14,16,0.5)] lg:mt-4">
+            <Link href={`/story/${article.slug}`} className="img-hover relative block aspect-square overflow-hidden bg-paper-2">
+              {article.coverImage ? (
+                <Image src={article.coverImage} alt={article.title} fill className="object-cover" sizes="320px" />
+              ) : null}
+            </Link>
+            <div className="p-5">
+              {issue ? <p className="label !text-[0.6rem] text-accent">{issueLabel(issue)}</p> : null}
+              <h3 className="headline mt-2 text-[1.15rem] leading-snug">
+                <Link href={`/story/${article.slug}`}>{article.title}</Link>
+              </h3>
+              <Link href={`/story/${article.slug}`} className="read-more mt-4 text-ink">
+                Read more »
+              </Link>
+            </div>
+          </article>
+        );
+      })}
+    </div>
+  );
 }
 
-function LeadStory({ article }: { article: CardArticle }) {
+/** Dark text panel beside a large photograph, for the top non-magazine story. */
+function FeaturePanel({ article }: { article: CardArticle }) {
   return (
-    <article className="group">
+    <article className="group grid grid-cols-1 bg-ink text-white lg:grid-cols-12">
+      <div className="flex flex-col justify-between p-8 sm:p-12 lg:col-span-7">
+        <div>
+          <p className="label !tracking-[0.28em] text-white/70">{article.category?.name || "Top story"}</p>
+          <h2 className="statement mt-5 text-[2.1rem] text-white sm:text-[2.8rem]">
+            <Link href={`/story/${article.slug}`}>{article.title}</Link>
+          </h2>
+          <p className="label mt-5 !tracking-[0.24em] text-white/60">{formatDate(article.publishedAt)}</p>
+          {article.dek || article.excerpt ? (
+            <p className="mt-5 max-w-xl text-[1.02rem] leading-relaxed text-white/65">
+              {article.dek || article.excerpt}
+            </p>
+          ) : null}
+        </div>
+        <Link href={`/story/${article.slug}`} className="read-more mt-10 self-start text-white">
+          Read more »
+        </Link>
+      </div>
       {article.coverImage ? (
-        <Link
-          href={`/story/${article.slug}`}
-          className="img-hover relative block aspect-[3/2] overflow-hidden rounded-md bg-paper-2"
-        >
+        <Link href={`/story/${article.slug}`} className="relative block min-h-[320px] overflow-hidden lg:col-span-5">
           <Image
             src={article.coverImage}
             alt={article.title}
             fill
-            className="object-cover"
-            sizes="(min-width: 1024px) 640px, 100vw"
+            className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+            sizes="(min-width: 1024px) 540px, 100vw"
           />
         </Link>
       ) : null}
-      {article.category?.name ? (
-        <Link href={`/c/${article.category.slug}`} className="label mt-6 block text-accent no-underline">
-          {article.category.name}
-        </Link>
-      ) : null}
-      <h3 className="statement mt-2 text-[1.9rem] sm:text-[2.3rem]">
-        <Link href={`/story/${article.slug}`}>{article.title}</Link>
-      </h3>
-      {article.dek || article.excerpt ? (
-        <p className="mt-3 font-serif text-[1.06rem] leading-relaxed text-ink-soft line-clamp-3">
-          {article.dek || article.excerpt}
-        </p>
-      ) : null}
-      <p className="meta mt-4">
-        {article.author?.name ? <span className="font-semibold text-ink">{article.author.name}</span> : null}
-        {article.readTime ? ` · ${article.readTime} min read` : ""}
-      </p>
-    </article>
-  );
-}
-
-function SecondaryStory({ article }: { article: CardArticle }) {
-  return (
-    <article className="group border-b border-ink/10 pb-6 last:border-b-0 last:pb-0">
-      {article.coverImage ? (
-        <Link
-          href={`/story/${article.slug}`}
-          className="img-hover relative mb-4 block aspect-[16/10] overflow-hidden rounded-md bg-paper-2"
-        >
-          <Image src={article.coverImage} alt="" fill className="object-cover" sizes="320px" />
-        </Link>
-      ) : null}
-      {article.category?.name ? <p className="label !text-[0.62rem] text-accent">{article.category.name}</p> : null}
-      <h3 className="headline mt-1.5 text-[1.08rem] leading-snug">
-        <Link href={`/story/${article.slug}`}>{article.title}</Link>
-      </h3>
     </article>
   );
 }
@@ -136,26 +154,21 @@ export default async function HomePage() {
     payload.showAds ? getActiveAd("footer-strip") : null,
   ]);
 
+  const heroArticles = payload.heroArticles as CardArticle[];
   const allBriefing = payload.briefing.filter(Boolean) as CardArticle[];
-  const wibArticles = allBriefing.filter((a) => a.category?.slug === "women-in-business");
 
-  // Today's briefing: the editors' picks first, topped up with the latest non-magazine posts.
+  // Reporting outside the magazine: the editors' picks first, topped up with the latest posts.
   const seen = new Set<string>();
-  const topStories = [...allBriefing, ...(payload.latest as CardArticle[])].filter((a) => {
-    if (seen.has(a._id) || magazineSlugs.has(a.slug) || a.category?.slug === "women-in-business") {
+  const stories = [...allBriefing, ...(payload.latest as CardArticle[])].filter((a) => {
+    if (seen.has(a._id) || issueBySlug.has(a.slug) || a.category?.slug === "women-in-business") {
       return false;
     }
     seen.add(a._id);
     return true;
   });
-  const [lead, ...others] = topStories;
-  const latest = (payload.latest as CardArticle[]).slice(0, 6);
+  const [topStory, ...latestStories] = stories;
 
-  const wibMagazines = (await getSectionMagazines("women-in-business").catch(
-    () => [],
-  )) as MagazineShelfItem[];
-  const [wibLead, ...wibRest] = wibMagazines;
-  const wibLeadMeta = wibLead ? magazineShelfMeta(wibLead) : null;
+  const trending = (await getTrendingArticles(6).catch(() => [])) as CardArticle[];
 
   const rails = payload.rails.filter(
     (rail) =>
@@ -166,119 +179,72 @@ export default async function HomePage() {
 
   return (
     <div>
-      {/* Cover stories */}
-      <div className={`${container} pb-16 pt-10 lg:pt-12`}>
-        <HeroCarousel articles={payload.heroArticles as CardArticle[]} />
+      {/* Lead + Must Read */}
+      <div className={`${container} pt-8`}>
+        <HeroCarousel articles={heroArticles} mustRead={trending} />
       </div>
 
-      {/* Today's briefing */}
-      {lead ? (
-        <section className="border-t border-ink/10 bg-surface">
-          <div className={`${container} py-16`}>
-            <SectionTitle title="Today's briefing" href="/search" linkLabel="All stories" />
-            <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-12">
-              <div className="md:col-span-2 lg:col-span-6">
-                <LeadStory article={lead} />
-              </div>
-              {others.length ? (
-                <div className="space-y-6 lg:col-span-3">
-                  {others.slice(0, 2).map((article) => (
-                    <SecondaryStory key={article._id} article={article} />
-                  ))}
-                </div>
-              ) : null}
-              <aside className="lg:col-span-3 lg:border-l lg:border-ink/10 lg:pl-8">
-                <p className="label flex items-center gap-2 text-accent">
-                  <span className="wire-pulse !h-1.5 !w-1.5" aria-hidden /> Latest
-                </p>
-                <ol className="mt-4">
-                  {latest.map((article) => (
-                    <li key={article._id} className="group relative border-l border-ink/10 pb-5 pl-5 last:pb-0">
-                      <span className="absolute -left-[4px] top-1.5 h-[7px] w-[7px] rounded-full border border-ink/25 bg-surface transition-colors group-hover:border-accent group-hover:bg-accent" />
-                      <p className="font-sans text-[0.72rem] font-semibold text-muted">
-                        {when(article.publishedAt)}
-                        {article.category?.name ? ` · ${article.category.name}` : ""}
-                      </p>
-                      <h3 className="headline mt-1 text-[0.96rem] leading-snug">
-                        <Link href={`/story/${article.slug}`}>{article.title}</Link>
-                      </h3>
-                    </li>
-                  ))}
-                </ol>
-                {mpu ? (
-                  <div className="mt-8">
-                    <AdUnit slot={mpu.slot} campaign={mpu.campaign} />
-                  </div>
-                ) : null}
-              </aside>
-            </div>
-          </div>
+      {/* Cover profiles */}
+      {heroArticles.length > 1 ? (
+        <section className={`${container} py-20`}>
+          <SectionTitle
+            eyebrow="Cover profiles"
+            title="Leaders in focus"
+            dek={
+              <>
+                <strong className="font-semibold text-ink">PrimeCrest</strong> profiles the leaders,
+                founders and educators redefining their industries, each with a magazine cover, an
+                in-depth feature and a complete digital edition.
+              </>
+            }
+            href="/magazine"
+          />
+          <LeadersInFocus articles={heroArticles.slice(1, 5)} />
         </section>
       ) : null}
 
+      {/* Leaderboard sits between the profiles and the top story, away from the box ad below. */}
       {leaderboard ? (
-        <div className={`${container} py-12`}>
+        <div className={`${container} pb-20`}>
           <AdUnit slot={leaderboard.slot} campaign={leaderboard.campaign} className="mx-auto max-w-[970px]" />
         </div>
       ) : null}
 
-      {/* Live news */}
+      {/* Top story */}
+      {topStory ? (
+        <section className={`${container} pb-20`}>
+          <FeaturePanel article={topStory} />
+          {latestStories.length ? (
+            <div className="mt-12 grid grid-cols-1 gap-10 border-t border-ink pt-10 lg:grid-cols-12">
+              {/* Stories fill the row; the box ad, when there is one, takes a ruled column on the right. */}
+              <div
+                className={`grid grid-cols-1 gap-8 sm:grid-cols-2 ${
+                  mpu ? "lg:col-span-9" : "lg:col-span-12"
+                } ${latestStories.length >= (mpu ? 3 : 4) ? (mpu ? "lg:grid-cols-3" : "lg:grid-cols-4") : ""}`}
+              >
+                {latestStories.slice(0, mpu ? 3 : 4).map((article) => (
+                  <ArticleCard key={article._id} article={article} variant="feature" />
+                ))}
+              </div>
+              {mpu ? (
+                <aside className="lg:col-span-3 lg:border-l lg:border-ink/15 lg:pl-8">
+                  <div className="mx-auto max-w-[300px] lg:sticky lg:top-24">
+                    <AdUnit slot={mpu.slot} campaign={mpu.campaign} />
+                  </div>
+                </aside>
+              ) : null}
+            </div>
+          ) : null}
+        </section>
+      ) : null}
+
+      {/* World news */}
       <Suspense fallback={null}>
         <NewsSection />
       </Suspense>
 
       {/* Digital magazines */}
       <MagazineMarquee />
-
-      {/* Women in Business */}
-      {wibLead && wibLeadMeta ? (
-        <section className={`${container} py-20`}>
-          <SectionTitle
-            eyebrow="A PrimeCrest series"
-            title="Women in Business"
-            href="/c/women-in-business"
-            linkLabel="The full series"
-          />
-          <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-14">
-            <article className="issue-card group grid grid-cols-1 content-start gap-6 sm:grid-cols-[minmax(0,240px)_1fr] lg:col-span-5 lg:grid-cols-1">
-              <Link
-                href={`/story/${wibLead.slug}`}
-                className="issue-cover max-w-[340px]"
-                aria-label={`${wibLeadMeta.name}: read the feature`}
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={wibLeadMeta.cover} alt={`PrimeCrest ${wibLeadMeta.label}: ${wibLeadMeta.name}`} />
-              </Link>
-              <div>
-                <p className="label text-accent">
-                  Latest in the series{wibLeadMeta.label ? ` · ${wibLeadMeta.label}` : ""}
-                </p>
-                <h3 className="statement mt-2 text-[1.9rem]">
-                  <Link href={`/story/${wibLead.slug}`}>{wibLeadMeta.name}</Link>
-                </h3>
-                {wibLeadMeta.role ? <p className="mt-1 text-[0.88rem] text-muted">{wibLeadMeta.role}</p> : null}
-                {wibLeadMeta.title ? (
-                  <p className="mt-3 font-serif text-[1.15rem] italic text-ink-soft">{wibLeadMeta.title}</p>
-                ) : null}
-              </div>
-            </article>
-            {wibRest.length ? (
-              <div className="lg:col-span-7">
-                <MagazineCoverGrid items={wibRest} columns={3} />
-              </div>
-            ) : null}
-          </div>
-        </section>
-      ) : wibArticles.length > 0 ? (
-        <section className={`${container} py-20`}>
-          <SectionTitle eyebrow="A PrimeCrest series" title="Women in Business" href="/c/women-in-business" />
-          <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3">
-            {wibArticles.slice(0, 3).map((article) => (
-              <ArticleCard key={article._id} article={article} variant="feature" />
-            ))}
-          </div>
-        </section>
-      ) : null}
 
       {mid ? (
         <div className={`${container} pb-16`}>
@@ -289,57 +255,41 @@ export default async function HomePage() {
       {/* The Interview */}
       {payload.interview ? (
         <section className="border-y border-ink/10 bg-surface">
-          <div className={`${container} py-16`}>
+          <div className={`${container} py-20`}>
             <Reveal>
-              <SectionTitle eyebrow="In conversation" title="The Interview" />
+              <SectionTitle eyebrow="In conversation" title="The interview" />
               <ArticleCard article={payload.interview as CardArticle} variant="standard" />
             </Reveal>
           </div>
         </section>
       ) : null}
 
-      {/* Sections: title column beside its latest stories */}
-      {rails.length ? (
-        <div className={`${container} py-6`}>
-          {rails.map((rail) => (
-            <section
-              key={rail.category.slug}
-              className="grid grid-cols-1 gap-8 border-b border-ink/10 py-14 last:border-b-0 lg:grid-cols-12 lg:gap-12"
-            >
-              <Reveal className="lg:col-span-3">
-                <p className="label text-accent">{rail.category.kicker || "Section"}</p>
-                <h2 className="statement mt-2 text-[2rem] sm:text-[2.4rem]">{rail.category.name}</h2>
-                {rail.category.description ? (
-                  <p className="mt-3 font-serif text-[1rem] leading-relaxed text-ink-soft line-clamp-4">
-                    {rail.category.description}
-                  </p>
-                ) : null}
-                <Link href={`/c/${rail.category.slug}`} className="btn-outline group mt-6 !py-2">
-                  All {rail.category.name}
-                  <ArrowIcon className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
-                </Link>
-              </Reveal>
-              <Reveal className="lg:col-span-9">
-                <div className="grid grid-cols-1 gap-x-8 gap-y-10 sm:grid-cols-3">
-                  {rail.articles.slice(0, 3).map((article) => (
-                    <ArticleCard key={article._id} article={article as CardArticle} variant="feature" />
-                  ))}
-                </div>
-              </Reveal>
-            </section>
-          ))}
-        </div>
-      ) : null}
-
-      {payload.more.length > 0 ? (
-        <section className="border-t border-ink/10 bg-surface">
-          <div className={`${container} py-16`}>
-            <SectionTitle title="More to read" />
-            <div className="grid grid-cols-1 gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-4">
-              {payload.more.map((article) => (
+      {/* Sections */}
+      {rails.map((rail) => (
+        <section key={rail.category.slug} className={`${container} pt-20`}>
+          <Reveal>
+            <SectionTitle
+              eyebrow={rail.category.kicker || "Section"}
+              title={rail.category.name}
+              dek={rail.category.description || undefined}
+              href={`/c/${rail.category.slug}`}
+            />
+            <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
+              {rail.articles.slice(0, 4).map((article) => (
                 <ArticleCard key={article._id} article={article as CardArticle} variant="feature" />
               ))}
             </div>
+          </Reveal>
+        </section>
+      ))}
+
+      {payload.more.length > 0 ? (
+        <section className={`${container} pt-20`}>
+          <SectionTitle eyebrow="Editor's selection" title="More from PrimeCrest" href="/search" />
+          <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
+            {payload.more.map((article) => (
+              <ArticleCard key={article._id} article={article as CardArticle} variant="feature" />
+            ))}
           </div>
         </section>
       ) : null}
@@ -352,15 +302,14 @@ export default async function HomePage() {
 
       {/* Advertise — the newsletter signup lives in the site footer */}
       {payload.showAdvertiseBand ? (
-        <section className={`${container} pt-16`}>
-          <div className="flex flex-col gap-4 rounded-lg bg-paper-2 px-6 py-8 sm:flex-row sm:items-center sm:justify-between sm:px-10">
+        <section className={`${container} pt-20`}>
+          <div className="flex flex-col gap-5 border-y border-ink py-8 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <p className="label text-accent">Partnerships</p>
-              <p className="statement mt-1.5 text-[1.5rem]">Reach the people who still read</p>
+              <p className="label !tracking-[0.28em] text-ink">Partnerships</p>
+              <p className="display-caps mt-2 text-[1.8rem]">Place your brand before decision-makers</p>
             </div>
-            <Link href="/advertise" className="btn-primary group self-start sm:self-auto">
+            <Link href="/advertise" className="btn-primary self-start sm:self-auto">
               Advertise with us
-              <ArrowIcon className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
             </Link>
           </div>
         </section>

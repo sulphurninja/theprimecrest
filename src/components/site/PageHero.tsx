@@ -20,26 +20,26 @@ export function PageHero({
   children?: React.ReactNode;
 }) {
   return (
-    <header className="border-b border-ink/10">
+    <header className="border-b border-ink">
       <div
         className={cn(
           "mx-auto px-4 pb-12 pt-14 sm:px-6 lg:pb-14 lg:pt-20",
           narrow ? "max-w-[808px]" : "max-w-[1320px]",
         )}
       >
-        {eyebrow ? <p className="label text-accent">{eyebrow}</p> : null}
+        {eyebrow ? <p className="label !tracking-[0.28em] text-ink">{eyebrow}</p> : null}
         <h1
           className={cn(
-            "statement mt-3",
+            "display-caps mt-4",
             narrow
-              ? "text-[2.5rem] sm:text-[3.2rem]"
-              : "max-w-4xl text-[2.6rem] sm:text-[3.6rem] lg:text-[4.4rem]",
+              ? "text-[2.6rem] sm:text-[3.4rem]"
+              : "max-w-5xl text-[2.8rem] sm:text-[3.8rem] lg:text-[4.6rem]",
           )}
         >
           {title}
         </h1>
         {dek ? (
-          <p className="mt-5 max-w-2xl font-serif text-[1.15rem] leading-relaxed text-ink-soft">{dek}</p>
+          <p className="mt-6 max-w-2xl text-[1.08rem] leading-[1.75] text-ink-soft">{dek}</p>
         ) : null}
         {meta ? <p className="mt-4 font-sans text-[0.8rem] text-muted">{meta}</p> : null}
         {children ? <div className="mt-8">{children}</div> : null}

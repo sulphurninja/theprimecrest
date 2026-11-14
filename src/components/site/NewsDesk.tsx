@@ -74,9 +74,9 @@ export function NewsDesk({
           <p className="flex items-center gap-2 font-sans text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-accent">
             <span className="wire-pulse" aria-hidden /> Live
           </p>
-          <h2 className="statement mt-3 text-[2.2rem] text-ink sm:text-[2.8rem]">Around the world</h2>
+          <h2 className="display-caps mt-3 text-[2.3rem] text-ink sm:text-[3rem]">World business news</h2>
           <p className="mt-2 max-w-md text-[0.98rem] text-ink-soft">
-            What the world&apos;s newsrooms are reporting right now, refreshed through the day.
+            Markets, companies and policy from leading newsrooms worldwide, updated throughout the day.
           </p>
         </div>
         <div className="scrollbar-none -mx-1 flex max-w-full gap-6 overflow-x-auto border-b border-ink/10 px-1" role="tablist">
@@ -101,13 +101,13 @@ export function NewsDesk({
 
       <div className={`mt-10 transition-opacity duration-300 ${loading ? "opacity-40" : ""}`} role="tabpanel">
         {!lead ? (
-          <p className="rounded-md bg-paper-2 px-6 py-16 text-center text-ink-soft">
-            {loading ? "Loading headlines…" : "No headlines came through for this topic just now."}
+          <p className="bg-paper-2 px-6 py-16 text-center text-ink-soft">
+            {loading ? "Loading headlines…" : "No headlines are available for this topic right now."}
           </p>
         ) : (
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
             <a href={lead.url} {...outbound} className="group block no-underline lg:col-span-6">
-              <Art item={lead} className="aspect-[16/10] rounded-md" />
+              <Art item={lead} className="aspect-[16/10]" />
               <div className="mt-4">
                 <Meta item={lead} />
                 <h3 className="statement mt-2 text-[1.7rem] text-ink transition-colors group-hover:text-accent sm:text-[2rem]">
@@ -124,7 +124,7 @@ export function NewsDesk({
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:col-span-3 lg:grid-cols-1">
               {rest.slice(0, 2).map((item) => (
                 <a key={item.id} href={item.url} {...outbound} className="group block no-underline">
-                  <Art item={item} className="aspect-[16/10] rounded-md" />
+                  <Art item={item} className="aspect-[16/10]" />
                   <div className="mt-3">
                     <Meta item={item} />
                     <h3 className="headline mt-1.5 text-[1.05rem] leading-snug text-ink transition-colors group-hover:text-accent">

@@ -18,7 +18,7 @@ export default function PrivacyPage() {
         title="Privacy Policy"
         dek={
           <>
-            What we collect when you read PrimeCrest, write to the desk, or join the Morning Letter.
+            What we collect when you read PrimeCrest, write to the desk, or join the PrimeCrest Briefing.
           </>
         }
         meta="Effective 16 October 2026"
@@ -38,7 +38,7 @@ export default function PrivacyPage() {
           <h2 className="mb-3 font-sans text-[1.25rem] font-bold tracking-[-0.02em] text-ink">What you send us</h2>
           <p>
             If you join the newsletter, we store the email address you submit so
-            we can send the Morning Letter. If you use the contact or advertising
+            we can send the PrimeCrest Briefing. If you use the contact or advertising
             forms, we store your name, email, and the message so the desk can
             reply. We do not sell that list.
           </p>

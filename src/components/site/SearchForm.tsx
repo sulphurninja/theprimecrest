@@ -29,7 +29,7 @@ export function SearchForm() {
   return (
     <form onSubmit={handleSubmit} role="search" className="relative">
       <div
-        className={`flex items-center gap-3 rounded-full border bg-surface py-1.5 pl-5 pr-1.5 transition-all duration-300 ${
+        className={`flex items-center gap-3 rounded-[2px] border bg-surface py-1.5 pl-5 pr-1.5 transition-all duration-300 ${
           focused
             ? "border-ink shadow-[0_0_0_4px_rgba(14,14,16,0.06)]"
             : "border-rule hover:border-paper-3"
@@ -63,7 +63,7 @@ export function SearchForm() {
         <button
           type="submit"
           disabled={!q.trim()}
-          className="flex h-11 shrink-0 items-center gap-2 rounded-full bg-ink px-5 font-sans text-[0.84rem] font-semibold text-white transition-colors hover:bg-accent disabled:cursor-not-allowed disabled:opacity-40"
+          className="flex h-11 shrink-0 items-center gap-2 rounded-[2px] bg-ink px-5 font-sans text-[0.72rem] font-bold uppercase tracking-[0.12em] text-white transition-colors hover:bg-accent disabled:cursor-not-allowed disabled:opacity-40"
         >
           <span className="hidden sm:inline">Search</span>
           <ArrowIcon className="h-4 w-4" />

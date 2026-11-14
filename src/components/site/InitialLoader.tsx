@@ -52,7 +52,7 @@ export function InitialLoader({ children }: { children: React.ReactNode }) {
         </div>
         
         <p className="mt-6 animate-loader-fade-in font-serif text-[0.85rem] italic text-muted [animation-delay:400ms]">
-          Setting the type…
+          Where vision meets voice
         </p>
       </div>
     </>

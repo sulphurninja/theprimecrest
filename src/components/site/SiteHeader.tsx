@@ -146,50 +146,68 @@ export function SiteHeader({
         </div>
       </div>
 
-      {/* Main bar */}
-      <header className="sticky top-0 z-40 border-b border-ink/10 bg-paper/85 text-ink backdrop-blur-xl backdrop-saturate-150">
-        <div className="mx-auto flex h-16 max-w-[1320px] items-center justify-between gap-6 px-4 sm:px-6 lg:h-[76px]">
-          <div className="flex items-center gap-3">
-            <div className="xl:hidden">
+      {/* Masthead — sticky on small screens, where it carries the menu */}
+      <header className="sticky top-0 z-40 border-b border-ink/10 bg-surface/95 backdrop-blur-xl lg:static lg:bg-surface">
+        <div className="mx-auto grid h-16 max-w-[1320px] grid-cols-[1fr_auto_1fr] items-center gap-4 px-4 sm:px-6 lg:h-[108px]">
+          <div className="flex items-center gap-2">
+            <div className="lg:hidden">
               <MobileNav items={allItems} siteName={siteName} tagline={tagline} />
             </div>
-            <Wordmark name={siteName} className="text-[1.6rem] text-ink lg:text-[1.95rem]" />
-          </div>
-
-          <nav className="hidden items-center gap-1 xl:flex" aria-label="Sections">
-            {visibleItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="rounded-full px-3.5 py-2 font-sans text-[0.9rem] font-medium text-ink-soft no-underline transition-colors hover:bg-ink/[0.05] hover:text-ink"
-              >
-                {item.label}
-              </Link>
-            ))}
-            {hasMore && (
-              <Link
-                href="/search"
-                className="rounded-full px-3.5 py-2 font-sans text-[0.9rem] font-medium text-muted no-underline transition-colors hover:bg-ink/[0.05] hover:text-ink"
-              >
-                More
-              </Link>
-            )}
-          </nav>
-
-          <div className="flex items-center gap-2">
             <Link
               href="/search"
               aria-label="Search"
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-ink/15 text-ink transition-colors hover:border-ink hover:bg-ink hover:text-white"
+              className="hidden h-11 w-11 items-center justify-center rounded-[2px] bg-ink text-white transition-colors hover:bg-accent lg:flex"
             >
-              <SearchIcon className="h-[16px] w-[16px]" />
+              <SearchIcon className="h-[18px] w-[18px]" />
             </Link>
-            <Link href="/newsletter" className="btn-primary hidden !py-2.5 md:inline-flex">
+          </div>
+
+          <div className="flex justify-center">
+            <span className="lg:hidden">
+              <Wordmark name={siteName} className="text-[1.6rem] text-ink sm:text-[1.8rem]" />
+            </span>
+            <span className="hidden lg:block">
+              <Wordmark name={siteName} className="items-center text-[2.9rem] text-ink" showTagline />
+            </span>
+          </div>
+
+          <div className="flex items-center justify-end gap-2">
+            <Link
+              href="/search"
+              aria-label="Search"
+              className="flex h-10 w-10 items-center justify-center text-ink lg:hidden"
+            >
+              <SearchIcon className="h-[18px] w-[18px]" />
+            </Link>
+            <Link href="/newsletter" className="btn-primary hidden md:inline-flex">
               Subscribe
             </Link>
           </div>
         </div>
       </header>
+
+      {/* Section bar — sticky on desktop */}
+      <nav className="sticky top-0 z-40 hidden bg-ink lg:block" aria-label="Sections">
+        <div className="mx-auto flex h-[54px] max-w-[1320px] items-center justify-center gap-9 px-6">
+          {visibleItems.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="nav-serif relative whitespace-nowrap py-4 text-white/85 no-underline transition-colors after:absolute after:inset-x-0 after:bottom-0 after:h-[3px] after:origin-left after:scale-x-0 after:bg-accent after:transition-transform hover:text-white hover:after:scale-x-100"
+            >
+              {item.label}
+            </Link>
+          ))}
+          {hasMore && (
+            <Link
+              href="/search"
+              className="nav-serif whitespace-nowrap py-4 text-white/60 no-underline transition-colors hover:text-white"
+            >
+              More
+            </Link>
+          )}
+        </div>
+      </nav>
     </>
   );
 }

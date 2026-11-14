@@ -27,7 +27,7 @@ export default async function ContactPage() {
       <PageHero
         eyebrow="Reach us"
         title="Contact Us"
-        dek="Whether you have a tip, a correction, or simply want to say something, we read every message."
+        dek="Story tips, corrections, partnership enquiries or a letter to the editors: every message is read, and we reply within two working days."
       />
 
       <div className="mx-auto grid max-w-[1320px] grid-cols-1 gap-12 px-4 py-14 sm:px-6 lg:grid-cols-12 lg:gap-16">
