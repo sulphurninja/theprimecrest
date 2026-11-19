@@ -1,10 +1,24 @@
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import {
+  CREST_LOWER,
+  CREST_UPPER,
+  CREST_VIEWBOX,
+  FULL_STOP,
+  LETTERS,
+  LOGO_VIEWBOX,
+} from "@/components/site/logo-paths";
 
 /**
- * PrimeCrest wordmark with integrated crest mark above the P.
+ * The PrimeCrest masthead, as printed on the magazine covers: the double
+ * chevron crest beside PRIMECREST in tracked Cinzel capitals, with a red
+ * full stop. Letters and the upper chevron take the current text colour, so
+ * the logo reads in ink on light pages and cream on dark ones. Size it with
+ * font-size; the logo's cap height is 0.62em.
  */
 export const TAGLINE = "Where Vision Meets Voice";
+
+const GOLD = "#c39a4b";
 
 export function Wordmark({
   name = "PrimeCrest",
@@ -19,15 +33,20 @@ export function Wordmark({
 }) {
   const mark = (
     <span className={cn("inline-flex flex-col", className)}>
-      <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
-        <CrestIcon className="h-[0.85em] w-auto" />
-        <span className="wordmark">
-          {name}
-          <span className="text-accent">.</span>
-        </span>
-      </span>
+      <svg
+        viewBox={LOGO_VIEWBOX}
+        role="img"
+        aria-label={name}
+        className="block h-[0.66em] w-auto"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path d={CREST_UPPER} fill="currentColor" />
+        <path d={CREST_LOWER} fill={GOLD} />
+        <path d={LETTERS} fill="currentColor" />
+        <path d={FULL_STOP} fill="var(--accent)" />
+      </svg>
       {showTagline && (
-        <span className="mt-[0.1em] whitespace-nowrap font-sans text-[0.36em] font-semibold uppercase tracking-[0.32em] opacity-45">
+        <span className="mt-[0.42em] whitespace-nowrap text-center font-sans text-[0.26em] font-semibold uppercase tracking-[0.42em] opacity-55">
           {TAGLINE}
         </span>
       )}
@@ -35,46 +54,33 @@ export function Wordmark({
   );
   if (!href) return mark;
   return (
-    <Link href={href} className="no-underline">
+    <Link href={href} className="no-underline" aria-label={`${name} home`}>
       {mark}
     </Link>
   );
 }
 
-/** Crest icon — angular peak/chevron mark */
-function CrestIcon({ className = "" }: { className?: string }) {
+/** The crest on its own: two chevrons, the lower one in gold. */
+export function CrestIcon({ className = "" }: { className?: string }) {
   return (
-    <svg
-      viewBox="0 0 32 28"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      className={className}
-      aria-hidden
-    >
-      <path
-        d="M16 2L28 16H22L16 8.5L10 16H4L16 2Z"
-        fill="currentColor"
-      />
-      <path
-        d="M16 12L24 22H20L16 16.5L12 22H8L16 12Z"
-        fill="currentColor"
-        opacity="0.5"
-      />
+    <svg viewBox={CREST_VIEWBOX} className={className} aria-hidden xmlns="http://www.w3.org/2000/svg">
+      <path d={CREST_UPPER} fill="currentColor" />
+      <path d={CREST_LOWER} fill={GOLD} />
     </svg>
   );
 }
 
-/** Compact "P." monogram used for avatars, favicons, and tight spaces. */
+/** Square crest monogram for avatars, favicons and tight spaces. */
 export function Monogram({ className = "h-9 w-9" }: { className?: string }) {
   return (
     <span
       className={cn(
-        "inline-flex select-none items-center justify-center bg-ink text-paper",
+        "inline-flex select-none items-center justify-center bg-brand text-[#f7f2e8]",
         className,
       )}
       aria-hidden
     >
-      <CrestIcon className="h-[0.5em] w-auto" />
+      <CrestIcon className="h-[52%] w-auto" />
     </span>
   );
 }

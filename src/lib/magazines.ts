@@ -19,6 +19,8 @@ export type MagazineIssue = {
   title: string;
   cover: string;
   magazineUrl: string;
+  /** When the feature was published; sorts admin-added issues among these. */
+  publishedAt?: string;
 };
 
 export function issueMonth(issue: string) {

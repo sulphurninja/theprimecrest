@@ -57,6 +57,8 @@ export async function PUT(request: Request, ctx: Ctx) {
   normalizeSections(body);
   if ("magazineUrl" in body) body.magazineUrl = String(body.magazineUrl ?? "").trim();
   if ("magazineEnabled" in body) body.magazineEnabled = Boolean(body.magazineEnabled);
+  if ("magazineIssue" in body) body.magazineIssue = String(body.magazineIssue ?? "").trim();
+  if ("magazineRole" in body) body.magazineRole = String(body.magazineRole ?? "").trim();
 
   const item = await Article.findByIdAndUpdate(id, body, { new: true });
   revalidatePath("/");

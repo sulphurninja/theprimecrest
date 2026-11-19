@@ -11,6 +11,12 @@ const HomepageSchema = new Schema(
     showAds: { type: Boolean, default: true },
     showNewsletter: { type: Boolean, default: true },
     showAdvertiseBand: { type: Boolean, default: true },
+    // Stories pinned to each section row, keyed by category id, in display order.
+    railArticles: { type: Map, of: [{ type: Schema.Types.ObjectId, ref: "Article" }], default: {} },
+    // Stories pinned to "More from PrimeCrest", in display order.
+    moreArticles: [{ type: Schema.Types.ObjectId, ref: "Article" }],
+    // Article slugs of magazine issues in display order; the first is featured.
+    magazineOrder: { type: [String], default: [] },
   },
   { timestamps: true },
 );

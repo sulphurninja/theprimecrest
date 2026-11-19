@@ -10,7 +10,7 @@ export async function GET() {
   let homepage = await Homepage.findOne().lean();
   if (!homepage) homepage = (await Homepage.create({})).toObject();
   const [articles, categories] = await Promise.all([
-    Article.find({ status: "published" }).sort({ publishedAt: -1 }).select("title slug format").lean(),
+    Article.find({ status: "published" }).sort({ publishedAt: -1 }).select("title slug format category categories").lean(),
     Category.find().sort({ order: 1 }).select("name slug").lean(),
   ]);
   return jsonOk({ homepage, articles, categories });

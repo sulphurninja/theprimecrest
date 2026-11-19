@@ -43,6 +43,8 @@ export async function POST(request: Request) {
   }
   if ("magazineUrl" in body) body.magazineUrl = String(body.magazineUrl ?? "").trim();
   if ("magazineEnabled" in body) body.magazineEnabled = Boolean(body.magazineEnabled);
+  if ("magazineIssue" in body) body.magazineIssue = String(body.magazineIssue ?? "").trim();
+  if ("magazineRole" in body) body.magazineRole = String(body.magazineRole ?? "").trim();
   await dbConnect();
   const slug = body.slug ? slugify(body.slug) : slugify(body.title);
   const exists = await Article.findOne({ slug });

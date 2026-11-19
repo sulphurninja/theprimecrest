@@ -82,7 +82,7 @@ export function NewsletterForm({ dark = false }: { dark?: boolean }) {
           type="submit"
           disabled={status === "busy" || !email}
           className={`group flex shrink-0 items-center gap-2 rounded-[2px] px-5 font-sans text-[0.72rem] font-bold uppercase tracking-[0.12em] transition-colors disabled:opacity-50 ${
-            dark ? "bg-paper text-ink hover:bg-gold-soft" : "bg-ink text-white hover:bg-accent"
+            dark ? "bg-paper text-ink hover:bg-gold-soft" : "bg-brand text-white hover:bg-brand-dark"
           }`}
         >
           {status === "busy" ? (

@@ -8,9 +8,8 @@ import { Reveal } from "@/components/site/Reveal";
 import { MagazineMarquee } from "@/components/site/MagazineMarquee";
 import { NewsDesk } from "@/components/site/NewsDesk";
 import { SectionTitle } from "@/components/site/SectionHead";
-import { MAGAZINE_ISSUES, issueLabel } from "@/lib/magazines";
 import { NEWS_TOPICS, getNews, newsCredit } from "@/lib/news";
-import { getActiveAd, getHomePayload, getTrendingArticles } from "@/lib/queries";
+import { getActiveAd, getHomePayload, getMagazineIssues, getTrendingArticles } from "@/lib/queries";
 import { buildMetadata } from "@/lib/seo";
 import { SITE } from "@/lib/constants";
 import { formatDate } from "@/lib/utils";
@@ -24,7 +23,6 @@ export const metadata = buildMetadata({
 });
 
 const container = "mx-auto max-w-[1320px] px-4 sm:px-6";
-const issueBySlug = new Map(MAGAZINE_ISSUES.map((issue) => [issue.articleSlug, issue]));
 
 /** Live news band. Renders nothing until the news API returns headlines. */
 async function NewsSection() {
@@ -39,54 +37,38 @@ async function NewsSection() {
   );
 }
 
-/** Cover profiles: one tall portrait card, then three standard ones. */
+/**
+ * Cover profiles: four identical portrait tiles with the issue and headline
+ * set over a soft fade, so the row always lines up whatever the title length.
+ */
 function LeadersInFocus({ articles }: { articles: CardArticle[] }) {
-  const [first, ...rest] = articles;
-  if (!first) return null;
+  if (!articles.length) return null;
   return (
-    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-[1.3fr_1fr_1fr_1fr] lg:items-start">
-      <Link href={`/story/${first.slug}`} className="group relative block overflow-hidden bg-ink no-underline shadow-[0_24px_48px_-24px_rgba(14,14,16,0.6)]">
-        <span className="relative block aspect-[4/5]">
-          {first.coverImage ? (
-            <Image
-              src={first.coverImage}
-              alt={first.title}
-              fill
-              className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
-              sizes="(min-width: 1024px) 420px, 100vw"
-            />
-          ) : null}
-        </span>
-        <span className="block bg-ink px-6 py-5">
-          <span className="label block !text-[0.62rem] text-gold-soft">
-            {issueBySlug.get(first.slug) ? issueLabel(issueBySlug.get(first.slug)!) : first.category?.name}
-          </span>
-          <span className="mt-2 block font-display text-[1.35rem] font-semibold leading-snug text-white">
-            {first.title}
-          </span>
-        </span>
-      </Link>
-      {rest.map((article) => {
-        const issue = issueBySlug.get(article.slug);
-        return (
-          <article key={article._id} className="group bg-surface shadow-[0_18px_40px_-28px_rgba(14,14,16,0.5)] lg:mt-4">
-            <Link href={`/story/${article.slug}`} className="img-hover relative block aspect-square overflow-hidden bg-paper-2">
-              {article.coverImage ? (
-                <Image src={article.coverImage} alt={article.title} fill className="object-cover" sizes="320px" />
-              ) : null}
-            </Link>
-            <div className="p-5">
-              {issue ? <p className="label !text-[0.6rem] text-accent">{issueLabel(issue)}</p> : null}
-              <h3 className="headline mt-2 text-[1.15rem] leading-snug">
-                <Link href={`/story/${article.slug}`}>{article.title}</Link>
-              </h3>
-              <Link href={`/story/${article.slug}`} className="read-more mt-4 text-ink">
-                Read more »
-              </Link>
-            </div>
-          </article>
-        );
-      })}
+    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      {articles.map((article) => (
+          <Link
+            key={article._id}
+            href={`/story/${article.slug}`}
+            className="group relative block aspect-[3/4] overflow-hidden bg-brand-dark no-underline"
+          >
+            {article.coverImage ? (
+              <Image
+                src={article.coverImage}
+                alt={article.title}
+                fill
+                className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
+                sizes="(min-width: 1024px) 320px, (min-width: 640px) 50vw, 100vw"
+              />
+            ) : null}
+            <span className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent" />
+            <span className="absolute inset-x-0 bottom-0 p-5">
+              <span className="block font-display text-[1.2rem] font-semibold leading-snug text-white line-clamp-3">
+                {article.title}
+              </span>
+              <span className="mt-4 block h-[2px] w-10 bg-gold-soft transition-all duration-500 group-hover:w-20" />
+            </span>
+          </Link>
+      ))}
     </div>
   );
 }
@@ -94,7 +76,7 @@ function LeadersInFocus({ articles }: { articles: CardArticle[] }) {
 /** Dark text panel beside a large photograph, for the top non-magazine story. */
 function FeaturePanel({ article }: { article: CardArticle }) {
   return (
-    <article className="group grid grid-cols-1 bg-ink text-white lg:grid-cols-12">
+    <article className="group grid grid-cols-1 bg-brand text-white lg:grid-cols-12">
       <div className="flex flex-col justify-between p-8 sm:p-12 lg:col-span-7">
         <div>
           <p className="label !tracking-[0.28em] text-white/70">{article.category?.name || "Top story"}</p>
@@ -154,21 +136,39 @@ export default async function HomePage() {
     payload.showAds ? getActiveAd("footer-strip") : null,
   ]);
 
+  const issues = await getMagazineIssues();
+  const issueBySlug = new Map(issues.map((issue) => [issue.articleSlug, issue]));
   const heroArticles = payload.heroArticles as CardArticle[];
-  const allBriefing = payload.briefing.filter(Boolean) as CardArticle[];
-
-  // Reporting outside the magazine: the editors' picks first, topped up with the latest posts.
-  const seen = new Set<string>();
-  const stories = [...allBriefing, ...(payload.latest as CardArticle[])].filter((a) => {
+  // Top story & latest: the editors' picks exactly as chosen (Admin -> Front Page),
+  // topped up with the newest reporting outside the magazine and Women in Business.
+  const storyPicks = payload.briefingPicks as CardArticle[];
+  const seen = new Set<string>(storyPicks.map((a) => a._id));
+  const automatic = [
+    ...(storyPicks.length ? [] : (payload.briefing as CardArticle[])),
+    ...(payload.latest as CardArticle[]),
+  ].filter((a) => {
     if (seen.has(a._id) || issueBySlug.has(a.slug) || a.category?.slug === "women-in-business") {
       return false;
     }
     seen.add(a._id);
     return true;
   });
+  const stories = [...storyPicks, ...automatic];
   const [topStory, ...latestStories] = stories;
 
-  const trending = (await getTrendingArticles(6).catch(() => [])) as CardArticle[];
+  const trending = (await getTrendingArticles(10).catch(() => [])) as CardArticle[];
+  // Must Read: the editors' picks in their order (Admin -> Front Page), topped up
+  // with the most-read stories that aren't already in the cover carousel.
+  const mustReadSeen = new Set<string>(heroArticles.map((a) => a._id));
+  const mustReadPicks = payload.mustReadPicks.filter(Boolean) as CardArticle[];
+  const mustRead = [
+    ...mustReadPicks,
+    ...trending.filter((a) => {
+      if (mustReadSeen.has(a._id) || mustReadPicks.some((p) => p._id === a._id)) return false;
+      mustReadSeen.add(a._id);
+      return true;
+    }),
+  ].slice(0, 4);
 
   const rails = payload.rails.filter(
     (rail) =>
@@ -181,7 +181,7 @@ export default async function HomePage() {
     <div>
       {/* Lead + Must Read */}
       <div className={`${container} pt-8`}>
-        <HeroCarousel articles={heroArticles} mustRead={trending} />
+        <HeroCarousel articles={heroArticles} mustRead={mustRead} issues={issues} />
       </div>
 
       {/* Cover profiles */}

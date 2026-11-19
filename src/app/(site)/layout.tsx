@@ -4,7 +4,7 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 import { InitialLoader } from "@/components/site/InitialLoader";
 import { MarketStrip } from "@/components/site/MarketStrip";
 import { WelcomeModal } from "@/components/site/WelcomeModal";
-import { getNavCategories, getSettings } from "@/lib/queries";
+import { getMagazineIssues, getNavCategories, getSettings } from "@/lib/queries";
 
 export default async function SiteLayout({ children }: LayoutProps<"/">) {
   const [settings, categories] = await Promise.all([getSettings(), getNavCategories()]).catch(
@@ -42,7 +42,7 @@ export default async function SiteLayout({ children }: LayoutProps<"/">) {
         copyright={settings?.copyright || "Fortiora Group LLC."}
         categories={cats}
       />
-      <WelcomeModal />
+      <WelcomeModal latest={(await getMagazineIssues())[0]} />
     </InitialLoader>
     </div>
   );

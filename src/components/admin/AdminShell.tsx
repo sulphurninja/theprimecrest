@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import {
   LayoutDashboard,
   FileText,
+  BookOpen,
   FolderOpen,
   Image as ImageIcon,
   Megaphone,
@@ -25,6 +26,7 @@ import { cn } from "@/lib/utils";
 const NAV = [
   { label: "Dashboard", href: "/admin", icon: LayoutDashboard },
   { label: "Articles", href: "/admin/articles", icon: FileText },
+  { label: "Magazines", href: "/admin/magazines", icon: BookOpen },
   { label: "Categories", href: "/admin/categories", icon: FolderOpen },
   { label: "Media Library", href: "/admin/media", icon: ImageIcon },
   { label: "Advertising", href: "/admin/ads", icon: Megaphone },

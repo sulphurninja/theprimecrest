@@ -76,7 +76,7 @@ export function MobileNav({
 
       {/* Drawer */}
       <div
-        className={`fixed inset-y-0 left-0 z-40 w-full max-w-[340px] bg-ink text-white shadow-2xl transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] ${
+        className={`fixed inset-y-0 left-0 z-40 w-full max-w-[340px] bg-brand text-white shadow-2xl transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] ${
           open ? "translate-x-0" : "-translate-x-full"
         }`}
       >

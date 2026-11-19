@@ -5,7 +5,7 @@ import { AdUnit } from "@/components/site/AdUnit";
 import { ArticleCard, type CardArticle } from "@/components/site/ArticleCard";
 import { MagazineCoverGrid, type MagazineShelfItem } from "@/components/site/MagazineCoverGrid";
 import { SectionTitle } from "@/components/site/SectionHead";
-import { getActiveAd, getCategoryArticles, getCategoryBySlug, getSectionMagazines } from "@/lib/queries";
+import { getActiveAd, getCategoryArticles, getCategoryBySlug, getMagazineIssues, getSectionMagazines } from "@/lib/queries";
 import { buildMetadata } from "@/lib/seo";
 
 export const revalidate = 120;
@@ -84,7 +84,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
         <section className="relative left-1/2 right-1/2 -mx-[50vw] w-screen bg-paper-2">
           <div className="mx-auto max-w-[1320px] px-4 py-16 sm:px-6">
             <SectionTitle eyebrow="The covers · Newest first" title="On the magazine stand" href="/magazine" linkLabel="Every issue" />
-            <MagazineCoverGrid items={shelf} />
+            <MagazineCoverGrid items={shelf} issues={await getMagazineIssues()} />
           </div>
         </section>
       ) : null}

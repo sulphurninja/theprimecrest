@@ -1,11 +1,12 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { api } from "@/components/admin/api";
 import { AdminLoader, useToast } from "@/components/admin/ui";
 import { cn } from "@/lib/utils";
 
-type ArticleOpt = { _id: string; title: string; format?: string };
+type ArticleOpt = { _id: string; title: string; format?: string; category?: string; categories?: string[] };
 type CategoryOpt = { _id: string; name: string };
 
 type HomepageConfig = {
@@ -15,6 +16,9 @@ type HomepageConfig = {
   briefingArticles: string[];
   interviewArticle: string | null;
   categoryRails: string[];
+  /** Stories pinned to each section row, keyed by category id. */
+  railArticles: Record<string, string[]>;
+  moreArticles: string[];
   showAds: boolean;
   showNewsletter: boolean;
   showAdvertiseBand: boolean;
@@ -31,6 +35,10 @@ function normalize(raw: Record<string, unknown>): HomepageConfig {
     briefingArticles: ids(raw.briefingArticles),
     interviewArticle: id(raw.interviewArticle),
     categoryRails: ids(raw.categoryRails),
+    railArticles: Object.fromEntries(
+      Object.entries((raw.railArticles as Record<string, unknown>) || {}).map(([key, value]) => [key, ids(value)]),
+    ),
+    moreArticles: ids(raw.moreArticles),
     showAds: raw.showAds !== false,
     showNewsletter: raw.showNewsletter !== false,
     showAdvertiseBand: raw.showAdvertiseBand !== false,
@@ -121,6 +129,47 @@ function MultiPick({
           );
         })}
       </div>
+      {values.length > 1 ? (
+        <div className="mt-3">
+          <p className="mb-1.5 font-sans text-[0.72rem] font-semibold uppercase tracking-[0.08em] text-muted">
+            Order on the page
+          </p>
+          <ol className="space-y-1">
+            {values.map((id, index) => {
+              const opt = options.find((o) => o._id === id);
+              const move = (to: number) => {
+                const next = [...values];
+                next.splice(to, 0, next.splice(index, 1)[0]);
+                onChange(next);
+              };
+              return (
+                <li key={id} className="flex items-center gap-2 border border-rule bg-paper-2 px-2 py-1.5 font-sans text-[0.8rem]">
+                  <span className="w-5 shrink-0 text-center tabular-nums text-muted">{index + 1}</span>
+                  <span className="min-w-0 flex-1 truncate">{opt?.title || opt?.name || "Unpublished story"}</span>
+                  <button
+                    type="button"
+                    onClick={() => move(index - 1)}
+                    disabled={index === 0}
+                    aria-label="Move up"
+                    className="flex h-6 w-6 items-center justify-center border border-rule bg-white hover:border-ink disabled:opacity-30"
+                  >
+                    ↑
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => move(index + 1)}
+                    disabled={index === values.length - 1}
+                    aria-label="Move down"
+                    className="flex h-6 w-6 items-center justify-center border border-rule bg-white hover:border-ink disabled:opacity-30"
+                  >
+                    ↓
+                  </button>
+                </li>
+              );
+            })}
+          </ol>
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -177,20 +226,14 @@ export default function HomepageAdminPage() {
       <div className="grid gap-6 lg:grid-cols-2">
         <div className="space-y-5 border border-rule bg-white p-6">
           <h2 className="section-title">Lead & anchors</h2>
-          <ArticleSelect
-            label="Lead story"
-            hint="The story at the top of the front page."
-            value={config.heroArticle}
-            onChange={(v) => set("heroArticle", v)}
-            articles={articles}
-          />
-          <ArticleSelect
-            label="Cover story"
-            hint="The wide band mid-page."
-            value={config.coverStory}
-            onChange={(v) => set("coverStory", v)}
-            articles={articles}
-          />
+          <p className="border border-rule bg-paper-2 p-3 font-sans text-[0.8rem] text-ink-soft">
+            The lead carousel and &ldquo;Leaders in focus&rdquo; show the magazine issues. Set their
+            order in{" "}
+            <Link href="/admin/magazines" className="font-semibold text-ink underline">
+              Magazines
+            </Link>
+            .
+          </p>
           <ArticleSelect
             label="The Interview"
             value={config.interviewArticle}
@@ -239,8 +282,8 @@ export default function HomepageAdminPage() {
 
         <div className="border border-rule bg-white p-6">
           <MultiPick
-            label="The Latest"
-            hint="The rail beside the lead story. Order follows your selection."
+            label="Must Read"
+            hint="The panel beside the lead carousel. Leave empty to show the most-read stories."
             values={config.featuredArticles}
             onChange={(v) => set("featuredArticles", v)}
             options={articles}
@@ -250,8 +293,8 @@ export default function HomepageAdminPage() {
 
         <div className="border border-rule bg-white p-6">
           <MultiPick
-            label="The Briefing"
-            hint="The four-story grid below the lead well."
+            label="Top story & latest"
+            hint="The first is the Top Story panel; the rest fill the row beneath it. Leave empty for the newest stories."
             values={config.briefingArticles}
             onChange={(v) => set("briefingArticles", v)}
             options={articles}
@@ -262,11 +305,42 @@ export default function HomepageAdminPage() {
         <div className="border border-rule bg-white p-6 lg:col-span-2">
           <MultiPick
             label="Section rails"
-            hint="Which sections get a row on the front page, in order."
+            hint="Which sections get a row on the front page."
             values={config.categoryRails}
             onChange={(v) => set("categoryRails", v)}
             options={categories}
             max={6}
+          />
+        </div>
+
+        {config.categoryRails.map((categoryId) => {
+          const section = categories.find((c) => c._id === categoryId);
+          if (!section) return null;
+          const inSection = articles.filter(
+            (a) => a.category === categoryId || (a.categories || []).includes(categoryId),
+          );
+          return (
+            <div key={categoryId} className="border border-rule bg-white p-6">
+              <MultiPick
+                label={`${section.name} row`}
+                hint="Stories for this row, in order. Empty places fill with the section's newest stories."
+                values={config.railArticles[categoryId] || []}
+                onChange={(v) => set("railArticles", { ...config.railArticles, [categoryId]: v })}
+                options={inSection}
+                max={4}
+              />
+            </div>
+          );
+        })}
+
+        <div className="border border-rule bg-white p-6">
+          <MultiPick
+            label="More from PrimeCrest"
+            hint="The last row of stories. Empty places fill with the newest stories not shown above."
+            values={config.moreArticles}
+            onChange={(v) => set("moreArticles", v)}
+            options={articles}
+            max={4}
           />
         </div>
       </div>

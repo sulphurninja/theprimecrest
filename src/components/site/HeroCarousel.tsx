@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowBackIcon, ArrowIcon } from "@/components/site/Icons";
-import { MAGAZINE_ISSUES, issueLabel } from "@/lib/magazines";
+import type { MagazineIssue } from "@/lib/magazines";
 import { formatDate } from "@/lib/utils";
 import type { CardArticle } from "./ArticleCard";
 
@@ -13,10 +13,10 @@ interface HeroCarouselProps {
   articles: CardArticle[];
   /** Stories for the "Must Read" panel beside the lead. */
   mustRead?: CardArticle[];
+  /** Magazine issues, to label cover stories with their edition. */
+  issues?: MagazineIssue[];
   interval?: number;
 }
-
-const issueBySlug = new Map(MAGAZINE_ISSUES.map((issue) => [issue.articleSlug, issue]));
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
@@ -24,7 +24,8 @@ const ease = [0.16, 1, 0.3, 1] as const;
  * Front-page lead: a full-height photograph with the headline set over it,
  * rotating through the cover stories, joined to a "Must Read" panel.
  */
-export function HeroCarousel({ articles, mustRead = [], interval = 7000 }: HeroCarouselProps) {
+export function HeroCarousel({ articles, mustRead = [], issues = [], interval = 7000 }: HeroCarouselProps) {
+  const issueBySlug = useMemo(() => new Map(issues.map((issue) => [issue.articleSlug, issue])), [issues]);
   const [current, setCurrent] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const touchX = useRef<number | null>(null);
@@ -46,7 +47,7 @@ export function HeroCarousel({ articles, mustRead = [], interval = 7000 }: HeroC
 
   const article = articles[current];
   const issue = issueBySlug.get(article.slug);
-  const panel = mustRead.filter((a) => a._id !== article._id).slice(0, 4);
+  const panel = mustRead.slice(0, 4);
 
   return (
     <section className="grid grid-cols-1 lg:grid-cols-12" aria-label="Cover stories">
@@ -112,9 +113,11 @@ export function HeroCarousel({ articles, mustRead = [], interval = 7000 }: HeroC
                 <span className="bg-accent px-2.5 py-1 font-sans text-[0.68rem] font-bold uppercase tracking-[0.14em] text-white">
                   {issue ? "Cover story" : article.category?.name || "Featured"}
                 </span>
-                <span className="font-sans text-[0.78rem] font-semibold uppercase tracking-[0.16em] text-white/80">
-                  {issue ? issueLabel(issue) : formatDate(article.publishedAt)}
-                </span>
+                {issue ? null : (
+                  <span className="font-sans text-[0.78rem] font-semibold uppercase tracking-[0.16em] text-white/80">
+                    {formatDate(article.publishedAt)}
+                  </span>
+                )}
               </p>
               <h1 className="statement mt-5 text-[2.2rem] text-white sm:text-[2.9rem] lg:text-[3.5rem]">
                 <Link href={`/story/${article.slug}`}>{article.title}</Link>
@@ -186,17 +189,17 @@ export function HeroCarousel({ articles, mustRead = [], interval = 7000 }: HeroC
 
       {/* Must Read */}
       {panel.length ? (
-        <aside className="bg-night px-6 py-8 text-white sm:px-8 lg:col-span-4">
+        <aside className="bg-brand px-6 py-8 text-white sm:px-8 lg:col-span-4">
           <h2 className="font-display text-[1.9rem] font-semibold leading-none">Must Read</h2>
-          <span className="mt-4 block h-[3px] w-24 bg-accent" aria-hidden />
+          <span className="mt-4 block h-[3px] w-24 bg-white" aria-hidden />
           <ul className="mt-7 space-y-4">
             {panel.map((a) => (
               <li key={a._id}>
                 <Link
                   href={`/story/${a.slug}`}
-                  className="group grid grid-cols-[112px_1fr] items-center gap-4 border border-white/15 p-3 no-underline transition-colors hover:border-white/40 hover:bg-white/[0.04]"
+                  className="group grid grid-cols-[112px_1fr] items-center gap-4 border border-white/25 p-3 no-underline transition-colors hover:border-white/60 hover:bg-white/[0.06]"
                 >
-                  <span className="relative block aspect-square overflow-hidden bg-night-3">
+                  <span className="relative block aspect-square overflow-hidden bg-brand-dark">
                     {a.coverImage ? (
                       <Image
                         src={a.coverImage}

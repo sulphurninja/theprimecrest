@@ -35,6 +35,7 @@ export function SectionTitle({
         >
           {title}
         </h2>
+        <span className={cn("mt-4 block h-[4px] w-16", dark ? "bg-gold-soft" : "bg-brand")} aria-hidden />
       </div>
       {dek ? (
         <p

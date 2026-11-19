@@ -63,7 +63,7 @@ export function SearchForm() {
         <button
           type="submit"
           disabled={!q.trim()}
-          className="flex h-11 shrink-0 items-center gap-2 rounded-[2px] bg-ink px-5 font-sans text-[0.72rem] font-bold uppercase tracking-[0.12em] text-white transition-colors hover:bg-accent disabled:cursor-not-allowed disabled:opacity-40"
+          className="flex h-11 shrink-0 items-center gap-2 rounded-[2px] bg-brand px-5 font-sans text-[0.72rem] font-bold uppercase tracking-[0.12em] text-white transition-colors hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-40"
         >
           <span className="hidden sm:inline">Search</span>
           <ArrowIcon className="h-4 w-4" />

@@ -38,6 +38,8 @@ function toFormValue(item: Loaded): ArticleFormValue {
       typeof item.magazineEnabled === "boolean"
         ? item.magazineEnabled
         : Boolean(typeof item.magazineUrl === "string" && item.magazineUrl.trim()),
+    magazineIssue: typeof item.magazineIssue === "string" ? item.magazineIssue : "",
+    magazineRole: typeof item.magazineRole === "string" ? item.magazineRole : "",
   } as ArticleFormValue;
 }
 

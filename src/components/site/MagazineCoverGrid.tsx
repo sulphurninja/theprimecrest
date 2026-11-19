@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { LATEST_ISSUE, MAGAZINE_ISSUES, issueLabel } from "@/lib/magazines";
+import { MAGAZINE_ISSUES, type MagazineIssue } from "@/lib/magazines";
 
 export type MagazineShelfItem = {
   _id: string;
@@ -10,17 +10,17 @@ export type MagazineShelfItem = {
   coverImage?: string;
 };
 
-export function magazineShelfMeta(item: MagazineShelfItem) {
-  const issue = MAGAZINE_ISSUES.find((entry) => entry.articleSlug === item.slug);
+/** Display details for a shelf item; `issues` is the newest-first issue list. */
+export function magazineShelfMeta(item: MagazineShelfItem, issues: MagazineIssue[] = MAGAZINE_ISSUES) {
+  const issue = issues.find((entry) => entry.articleSlug === item.slug);
   const cover = item.magazineCover || issue?.cover || item.ogImage || item.coverImage || "";
   const name = issue?.name || item.title.split(":")[0]?.trim() || item.title;
   return {
     cover,
     name,
-    label: issue ? issueLabel(issue) : "",
     role: issue?.role || "",
     title: issue?.title || "",
-    latest: issue?.slug === LATEST_ISSUE.slug,
+    latest: Boolean(issue) && issue === issues[0],
   };
 }
 
@@ -29,10 +29,12 @@ export function MagazineCoverGrid({
   items,
   dark = false,
   columns = 4,
+  issues,
 }: {
   items: MagazineShelfItem[];
   dark?: boolean;
   columns?: 3 | 4;
+  issues?: MagazineIssue[];
 }) {
   return (
     <div
@@ -41,7 +43,7 @@ export function MagazineCoverGrid({
       }`}
     >
       {items.map((item) => {
-        const meta = magazineShelfMeta(item);
+        const meta = magazineShelfMeta(item, issues);
         return (
           <article key={item._id} className="issue-card group flex flex-col">
             <Link
@@ -50,7 +52,7 @@ export function MagazineCoverGrid({
               aria-label={`${meta.name}: read the feature`}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={meta.cover} alt={`PrimeCrest ${meta.label}: ${meta.name}`} loading="lazy" />
+              <img src={meta.cover} alt={`PrimeCrest magazine cover: ${meta.name}`} loading="lazy" />
               {meta.latest ? (
                 <span className="absolute left-2.5 top-2.5 z-[1] rounded-full bg-accent px-2.5 py-1 font-sans text-[0.6rem] font-black uppercase tracking-[0.1em] text-white">
                   New
@@ -60,11 +62,6 @@ export function MagazineCoverGrid({
             <h3 className={`headline mt-5 text-[1.15rem] leading-snug ${dark ? "text-paper" : ""}`}>
               <Link href={`/story/${item.slug}`}>{meta.name}</Link>
             </h3>
-            {meta.label ? (
-              <p className={`mt-0.5 font-sans text-[0.74rem] font-bold ${dark ? "text-gold" : "text-accent"}`}>
-                {meta.label}
-              </p>
-            ) : null}
             {meta.role ? (
               <p className={`mt-1 font-sans text-[0.8rem] leading-snug ${dark ? "text-paper/55" : "text-muted"}`}>
                 {meta.role}

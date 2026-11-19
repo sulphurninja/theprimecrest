@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Wordmark } from "@/components/site/Logo";
+import { CREST_LOWER, CREST_UPPER, FULL_STOP, LETTERS, LOGO_VIEWBOX } from "@/components/site/logo-paths";
 import { NewsletterForm } from "@/components/site/NewsletterForm";
 import { BackToTop } from "@/components/site/BackToTop";
 import { ExternalIcon } from "@/components/site/Icons";
@@ -33,7 +34,7 @@ export function SiteFooter({
   categories: Cat[];
 }) {
   return (
-    <footer className="grain mt-20 overflow-hidden bg-night text-paper">
+    <footer className="grain mt-20 overflow-hidden bg-brand-dark text-paper">
       {/* Newsletter Band */}
       <div className="border-b border-paper/10">
         <div className="mx-auto flex max-w-[1320px] flex-col items-start gap-8 px-4 py-16 sm:px-6 lg:flex-row lg:items-end lg:justify-between">
@@ -88,7 +89,7 @@ export function SiteFooter({
           <div className="grid grid-cols-2 gap-10 sm:grid-cols-3 lg:col-span-8">
             <div>
               <p className="font-display text-[1.3rem] font-semibold text-white">Sections</p>
-              <span className="mt-3 block h-[2px] w-10 bg-accent" aria-hidden />
+              <span className="mt-3 block h-[2px] w-10 bg-gold-soft" aria-hidden />
               <ul className="mt-5 space-y-2.5">
                 {categories.filter((c) => c.slug !== "magazine").map((c) => (
                   <li key={c.slug}>
@@ -104,7 +105,7 @@ export function SiteFooter({
             </div>
             <div>
               <p className="font-display text-[1.3rem] font-semibold text-white">The Journal</p>
-              <span className="mt-3 block h-[2px] w-10 bg-accent" aria-hidden />
+              <span className="mt-3 block h-[2px] w-10 bg-gold-soft" aria-hidden />
               <ul className="mt-5 space-y-2.5">
                 {JOURNAL_LINKS.map((l) => (
                   <li key={l.href}>
@@ -120,7 +121,7 @@ export function SiteFooter({
             </div>
             <div>
               <p className="font-display text-[1.3rem] font-semibold text-white">Legal &amp; More</p>
-              <span className="mt-3 block h-[2px] w-10 bg-accent" aria-hidden />
+              <span className="mt-3 block h-[2px] w-10 bg-gold-soft" aria-hidden />
               <ul className="mt-5 space-y-2.5">
                 {LEGAL_LINKS.map((l) => (
                   <li key={l.href}>
@@ -157,12 +158,17 @@ export function SiteFooter({
         </div>
       </div>
 
-      <p
-        className="wordmark pointer-events-none -mb-[0.2em] select-none text-center text-[21vw] leading-none text-transparent [-webkit-text-stroke:1px_rgba(228,201,143,0.18)] lg:text-[17rem]"
-        aria-hidden
-      >
-        {siteName}.
-      </p>
+      {/* The masthead in outline, bleeding off the bottom of the page. */}
+      <div className="mx-auto max-w-[1320px] px-4 pb-0 pt-4 sm:px-6" aria-hidden>
+        <svg viewBox={LOGO_VIEWBOX} className="-mb-[1.5%] block w-full select-none">
+          <g fill="none" stroke="rgba(228,201,143,0.2)" strokeWidth="2.5" vectorEffect="non-scaling-stroke">
+            <path d={CREST_UPPER} vectorEffect="non-scaling-stroke" />
+            <path d={CREST_LOWER} vectorEffect="non-scaling-stroke" />
+            <path d={LETTERS} vectorEffect="non-scaling-stroke" />
+            <path d={FULL_STOP} vectorEffect="non-scaling-stroke" />
+          </g>
+        </svg>
+      </div>
     </footer>
   );
 }

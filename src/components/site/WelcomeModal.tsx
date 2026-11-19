@@ -4,11 +4,11 @@ import { useEffect, useState } from "react";
 import { X } from "lucide-react";
 import { Wordmark } from "@/components/site/Logo";
 import { NewsletterForm } from "@/components/site/NewsletterForm";
-import { LATEST_ISSUE, issueLabel } from "@/lib/magazines";
+import type { MagazineIssue } from "@/lib/magazines";
 
 const SHOW_AFTER_MS = 7000;
 
-export function WelcomeModal() {
+export function WelcomeModal({ latest }: { latest?: MagazineIssue }) {
   const [open, setOpen] = useState(false);
   const [leaving, setLeaving] = useState(false);
 
@@ -60,7 +60,7 @@ export function WelcomeModal() {
 
       {/* Card */}
       <div
-        className={`relative grid w-full max-w-[760px] grid-cols-1 overflow-hidden bg-surface shadow-2xl transition-all duration-300 sm:grid-cols-[250px_1fr] ${
+        className={`relative grid w-full max-w-[760px] grid-cols-1 overflow-hidden bg-surface shadow-2xl transition-all duration-300 ${latest ? "sm:grid-cols-[250px_1fr]" : "max-w-[480px]"} ${
           leaving ? "translate-y-3 opacity-0" : "animate-scale"
         }`}
       >
@@ -74,16 +74,18 @@ export function WelcomeModal() {
         </button>
 
         {/* This month's cover */}
-        <div className="hidden flex-col items-center justify-center gap-4 bg-ink px-8 py-10 sm:flex">
-          <p className="label !tracking-[0.24em] text-gold-soft">{issueLabel(LATEST_ISSUE)}</p>
+        {latest ? (
+        <div className="hidden flex-col items-center justify-center gap-4 bg-brand px-8 py-10 sm:flex">
+          <p className="label !tracking-[0.24em] text-gold-soft">This month&apos;s cover</p>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={LATEST_ISSUE.cover}
-            alt={`PrimeCrest ${issueLabel(LATEST_ISSUE)}: ${LATEST_ISSUE.name}`}
+            src={latest.cover}
+            alt={`PrimeCrest magazine cover: ${latest.name}`}
             className="w-full max-w-[170px] shadow-[0_24px_48px_-16px_rgba(0,0,0,0.8)]"
           />
-          <p className="text-center font-display text-[1rem] font-semibold text-white">{LATEST_ISSUE.name}</p>
+          <p className="text-center font-display text-[1rem] font-semibold text-white">{latest.name}</p>
         </div>
+        ) : null}
 
         <div className="px-7 py-9 sm:px-9">
           <Wordmark name="PrimeCrest" className="text-[1.4rem]" href={null} />

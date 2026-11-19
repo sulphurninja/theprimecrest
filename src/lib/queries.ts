@@ -1,7 +1,8 @@
 import { dbConnect } from "@/lib/db";
 import { demoAdsEnabled, demoCampaign, demoReplaces } from "@/lib/demo-ads";
 import { AD_SLOTS } from "@/lib/constants";
-import { ISSUES_NEWEST_FIRST, MAGAZINE_ISSUES, issueRank } from "@/lib/magazines";
+import { cache } from "react";
+import { MAGAZINE_ISSUES, issueRank, type MagazineIssue } from "@/lib/magazines";
 import { serialize } from "@/lib/utils";
 import {
   Article,
@@ -51,6 +52,108 @@ function inSection(categoryId: string) {
   return { $or: [{ category: categoryId }, { categories: categoryId }] };
 }
 
+type IssueArticle = {
+  slug: string;
+  title: string;
+  dek?: string;
+  publishedAt?: string;
+  coverImage?: string;
+  magazineCover?: string;
+  magazineUrl?: string;
+  magazineIssue?: string;
+  magazineRole?: string;
+};
+
+const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+/** "INDIA'S TOP AESTHETIC DOCTOR" -> "India's top aesthetic doctor"; mixed case is left alone. */
+function coverLine(text: string) {
+  const t = text.trim();
+  if (!t || t !== t.toUpperCase()) return t;
+  const lower = t.toLowerCase();
+  return lower.charAt(0).toUpperCase() + lower.slice(1);
+}
+
+/** An admin-marked magazine article, shaped like a hand-written issue. */
+function issueFromArticle(a: IssueArticle): MagazineIssue {
+  const [name, ...rest] = a.title.split(":");
+  const month = a.publishedAt ? MONTHS[new Date(a.publishedAt).getUTCMonth()] : "";
+  return {
+    slug: a.slug,
+    articleSlug: a.slug,
+    name: name.trim(),
+    role: a.magazineRole || "",
+    volume: "",
+    issue: a.magazineIssue || (month ? `The ${month} Issue` : "The Digital Issue"),
+    title: coverLine(rest.join(":")) || a.dek || "",
+    cover: a.magazineCover || a.coverImage || "",
+    magazineUrl: a.magazineUrl || "",
+    publishedAt: a.publishedAt,
+  };
+}
+
+/** Months since year 0 for an issue's edition, e.g. "The November Issue" of 2026. */
+function editionKey(issue: MagazineIssue) {
+  const published = issue.publishedAt ? new Date(issue.publishedAt) : null;
+  const year = published ? published.getUTCFullYear() : 0;
+  const named = MONTHS.findIndex((month) => issue.issue.includes(month));
+  const month = named >= 0 ? named : published ? published.getUTCMonth() : 0;
+  return year * 12 + month;
+}
+
+/**
+ * Latest edition first. Within a month, hand-written issues keep their volume
+ * order (several shared a publish date) and other issues go newest first.
+ */
+function latestIssueFirst(a: MagazineIssue, b: MagazineIssue) {
+  const byEdition = editionKey(b) - editionKey(a);
+  if (byEdition) return byEdition;
+  const ra = issueRank(a.articleSlug);
+  const rb = issueRank(b.articleSlug);
+  if (ra !== -1 && rb !== -1) return rb - ra;
+  return new Date(b.publishedAt || 0).getTime() - new Date(a.publishedAt || 0).getTime();
+}
+
+/**
+ * Every published magazine issue, in display order: the hand-written issues
+ * in lib/magazines plus any article an editor marks "Digital magazine" with a
+ * cover in the admin. Hand-written issues keep their own details.
+ *
+ * The order is the one saved in Admin -> Magazines (the first issue is the
+ * featured one). Issues published since it was saved go first, newest first,
+ * until an editor places them; with no saved order, everything is newest first.
+ */
+export const getMagazineIssues = cache(async (): Promise<MagazineIssue[]> => {
+  const legacy = new Map(MAGAZINE_ISSUES.map((issue) => [issue.articleSlug, issue]));
+  try {
+    await dbConnect();
+    const docs = await Article.find({
+      status: "published",
+      $or: [
+        { magazineEnabled: true, magazineCover: { $nin: ["", null] } },
+        { slug: { $in: [...legacy.keys()] } },
+      ],
+    })
+      .select("slug title dek publishedAt coverImage magazineCover magazineUrl magazineIssue magazineRole")
+      .lean();
+    const issues = serialize<IssueArticle[]>(docs)
+      .map((doc) => {
+        const known = legacy.get(doc.slug);
+        return known ? { ...known, publishedAt: doc.publishedAt } : issueFromArticle(doc);
+      })
+      .sort(latestIssueFirst);
+    const saved = (await Homepage.findOne().select("magazineOrder").lean())?.magazineOrder ?? [];
+    const position = new Map(saved.map((slug, index) => [slug, index]));
+    const unplaced = issues.filter((issue) => !position.has(issue.articleSlug));
+    const placed = issues
+      .filter((issue) => position.has(issue.articleSlug))
+      .sort((a, b) => position.get(a.articleSlug)! - position.get(b.articleSlug)!);
+    return [...unplaced, ...placed];
+  } catch {
+    return [...MAGAZINE_ISSUES].reverse();
+  }
+});
+
 export async function getSettings() {
   await dbConnect();
   let settings = await Settings.findOne().lean();
@@ -88,9 +191,18 @@ export async function getSectionMagazines(slug: string) {
   const ids = (category?.magazines || []).map(String);
   if (!ids.length) return [];
   const items = await Article.find({ _id: { $in: ids }, status: "published" })
-    .select("title slug magazineCover ogImage coverImage magazineEnabled")
+    .select("title slug magazineCover ogImage coverImage magazineEnabled publishedAt")
     .lean();
-  return serialize(items).sort(newestFirst);
+  // Same order as everywhere else (Admin -> Magazines); anything else after, newest first.
+  const position = new Map((await getMagazineIssues()).map((issue, index) => [issue.articleSlug, index]));
+  return serialize<Dated[]>(items).sort((a, b) => {
+    const pa = position.get(a.slug ?? "");
+    const pb = position.get(b.slug ?? "");
+    if (pa !== undefined && pb !== undefined) return pa - pb;
+    if (pa !== undefined) return -1;
+    if (pb !== undefined) return 1;
+    return newestFirst(a, b);
+  });
 }
 
 type Dated = { slug?: string; publishedAt?: string | Date | null };
@@ -251,11 +363,12 @@ export async function getHomePayload() {
 
   const pick = (id: unknown) => (id ? byId.get(String(id)) : undefined);
   const pickMany = (ids: unknown[] | undefined) =>
-    (ids || []).map(pick).filter(Boolean);
+    (ids || []).map(pick).filter((a): a is HydratedArticle => Boolean(a));
 
   // Hero carousel is the published magazine features, newest issue first.
+  const issues = await getMagazineIssues();
   const bySlug = new Map(all.map((a) => [a.slug, a]));
-  let heroArticles = ISSUES_NEWEST_FIRST.map((issue) => bySlug.get(issue.articleSlug)).filter(
+  let heroArticles = issues.map((issue) => bySlug.get(issue.articleSlug)).filter(
     (a): a is HydratedArticle => Boolean(a),
   );
   if (heroArticles.length === 0) {
@@ -263,21 +376,21 @@ export async function getHomePayload() {
   }
   const hero = heroArticles[0];
 
-  let featured = homepage ? pickMany(homepage.featuredArticles as unknown[]) : [];
+  const mustReadPicks = homepage ? pickMany(homepage.featuredArticles as unknown[]) : [];
+  let featured = mustReadPicks;
   if (!featured.length) {
     featured = all.filter((a) => a.featured && String(a._id) !== asId(hero?._id)).slice(0, 4);
   }
-  featured = featured.sort((a, b) => newestFirst(a!, b!));
 
   let cover = homepage ? pick(homepage.coverStory) : undefined;
   if (!cover) cover = all.find((a) => a.isCoverStory && String(a._id) !== asId(hero?._id));
 
-  let briefing = homepage ? pickMany(homepage.briefingArticles as unknown[]) : [];
+  const briefingPicks = homepage ? pickMany(homepage.briefingArticles as unknown[]) : [];
+  let briefing = briefingPicks;
   if (!briefing.length) {
     const used = new Set([asId(hero?._id), ...featured.map((a) => asId(a?._id)), asId(cover?._id)]);
     briefing = all.filter((a) => !used.has(String(a._id))).slice(0, 5);
   }
-  briefing = briefing.sort((a, b) => newestFirst(a!, b!));
 
   const interview =
     (homepage ? pick(homepage.interviewArticle) : undefined) ||
@@ -289,25 +402,37 @@ export async function getHomePayload() {
       .map((a) => String(a!._id)),
   );
 
-  const magazineSlugs = new Set(MAGAZINE_ISSUES.map((issue) => issue.articleSlug));
+  const magazineSlugs = new Set(issues.map((issue) => issue.articleSlug));
 
+  const railPicks = (homepage?.railArticles ?? {}) as unknown as Record<string, unknown[]>;
   const rails = (homepage?.categoryRails?.length
     ? homepage.categoryRails.map((id) => String(id))
     : categories.slice(0, 6).map((c) => String(c._id))
   )
     .map((id) => categories.find((c) => String(c._id) === id))
     .filter(Boolean)
-    .map((cat) => ({
-      category: serialize(cat),
-      articles: all
-        .filter(
-          (a) =>
-            articleSectionIds(a).has(String(cat!._id)) &&
-            !usedIds.has(String(a._id)) &&
-            !magazineSlugs.has(a.slug),
-        )
-        .slice(0, 4),
-    }));
+    .map((cat) => {
+      const pinned = pickMany(railPicks[String(cat!._id)]);
+      const pinnedIds = new Set(pinned.map((a) => String(a!._id)));
+      const automatic = all.filter(
+        (a) =>
+          articleSectionIds(a).has(String(cat!._id)) &&
+          !usedIds.has(String(a._id)) &&
+          !pinnedIds.has(String(a._id)) &&
+          !magazineSlugs.has(a.slug),
+      );
+      return { category: serialize(cat), articles: [...pinned, ...automatic].slice(0, 4) };
+    });
+
+  // More from PrimeCrest: pinned stories first, then the newest not shown above.
+  const morePicks = homepage ? pickMany(homepage.moreArticles as unknown[]) : [];
+  const moreIds = new Set(morePicks.map((a) => String(a!._id)));
+  const more = [
+    ...morePicks,
+    ...all.filter(
+      (a) => !magazineSlugs.has(a.slug) && !usedIds.has(String(a._id)) && !moreIds.has(String(a._id)),
+    ),
+  ].slice(0, 4);
 
   return {
     settings,
@@ -320,9 +445,9 @@ export async function getHomePayload() {
     rails,
     categories: serialize(categories),
     latest: all.slice(0, 8),
-    more: all
-      .filter((a) => !magazineSlugs.has(a.slug) && !usedIds.has(String(a._id)))
-      .slice(0, 4),
+    more,
+    mustReadPicks,
+    briefingPicks,
     showAds: homepage?.showAds !== false,
     showNewsletter: homepage?.showNewsletter !== false,
     showAdvertiseBand: homepage?.showAdvertiseBand !== false,

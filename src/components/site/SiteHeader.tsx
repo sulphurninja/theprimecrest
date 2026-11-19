@@ -156,7 +156,7 @@ export function SiteHeader({
             <Link
               href="/search"
               aria-label="Search"
-              className="hidden h-11 w-11 items-center justify-center rounded-[2px] bg-ink text-white transition-colors hover:bg-accent lg:flex"
+              className="hidden h-11 w-11 items-center justify-center rounded-[2px] bg-brand text-white transition-colors hover:bg-brand-dark lg:flex"
             >
               <SearchIcon className="h-[18px] w-[18px]" />
             </Link>
@@ -187,13 +187,13 @@ export function SiteHeader({
       </header>
 
       {/* Section bar — sticky on desktop */}
-      <nav className="sticky top-0 z-40 hidden bg-ink lg:block" aria-label="Sections">
+      <nav className="sticky top-0 z-40 hidden bg-brand lg:block" aria-label="Sections">
         <div className="mx-auto flex h-[54px] max-w-[1320px] items-center justify-center gap-9 px-6">
           {visibleItems.map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              className="nav-serif relative whitespace-nowrap py-4 text-white/85 no-underline transition-colors after:absolute after:inset-x-0 after:bottom-0 after:h-[3px] after:origin-left after:scale-x-0 after:bg-accent after:transition-transform hover:text-white hover:after:scale-x-100"
+              className="nav-serif relative whitespace-nowrap py-4 text-white/85 no-underline transition-colors after:absolute after:inset-x-0 after:bottom-0 after:h-[3px] after:origin-left after:scale-x-0 after:bg-gold-soft after:transition-transform hover:text-white hover:after:scale-x-100"
             >
               {item.label}
             </Link>

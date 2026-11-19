@@ -35,6 +35,8 @@ export type ArticleFormValue = {
   magazineEnabled: boolean;
   magazineUrl: string;
   magazineCover: string;
+  magazineIssue: string;
+  magazineRole: string;
   seoTitle: string;
   seoDescription: string;
   noIndex: boolean;
@@ -65,6 +67,8 @@ export const EMPTY_ARTICLE: ArticleFormValue = {
   magazineEnabled: false,
   magazineUrl: "",
   magazineCover: "",
+  magazineIssue: "",
+  magazineRole: "",
   seoTitle: "",
   seoDescription: "",
   noIndex: false,
@@ -408,7 +412,7 @@ export function ArticleForm({ initial }: { initial: ArticleFormValue }) {
               />
               <Toggle
                 label="Digital magazine"
-                hint="Show the read button on this story."
+                hint="Lists this story as a magazine issue (with its cover) and shows the read button."
                 checked={value.magazineEnabled}
                 onChange={(v) => set("magazineEnabled", v)}
               />
@@ -430,6 +434,26 @@ export function ArticleForm({ initial }: { initial: ArticleFormValue }) {
                     value={value.magazineCover}
                     onChange={(url) => set("magazineCover", url)}
                   />
+                </div>
+                <div className="mt-3">
+                  <Field label="Issue" hint="Leave blank to use the publish month.">
+                    <input
+                      value={value.magazineIssue}
+                      onChange={(e) => set("magazineIssue", e.target.value)}
+                      placeholder="The November Issue"
+                      className="admin-input"
+                    />
+                  </Field>
+                </div>
+                <div className="mt-3">
+                  <Field label="Cover subject's role" hint="Shown under their name on the magazine pages.">
+                    <input
+                      value={value.magazineRole}
+                      onChange={(e) => set("magazineRole", e.target.value)}
+                      placeholder="Founder, Grewal Aesthetics"
+                      className="admin-input"
+                    />
+                  </Field>
                 </div>
               </div>
             </div>

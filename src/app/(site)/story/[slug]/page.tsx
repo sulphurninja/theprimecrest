@@ -8,8 +8,7 @@ import { ArrowIcon, ExternalIcon, IssueIcon } from "@/components/site/Icons";
 import { ReadingProgress } from "@/components/site/ReadingProgress";
 import { SectionTitle } from "@/components/site/SectionHead";
 import { ShareBar } from "@/components/site/ShareBar";
-import { getActiveAd, getPublishedArticle, getRelatedArticles } from "@/lib/queries";
-import { MAGAZINE_ISSUES, issueLabel } from "@/lib/magazines";
+import { getActiveAd, getMagazineIssues, getPublishedArticle, getRelatedArticles } from "@/lib/queries";
 import { buildMetadata, newsArticleJsonLd } from "@/lib/seo";
 import { formatDate, siteUrl } from "@/lib/utils";
 
@@ -54,7 +53,7 @@ export default async function StoryPage({ params }: Props) {
 
   const magazineHref =
     article.magazineEnabled === false ? "" : String(article.magazineUrl || "").trim();
-  const issue = MAGAZINE_ISSUES.find((entry) => entry.articleSlug === article.slug);
+  const issue = (await getMagazineIssues()).find((entry) => entry.articleSlug === article.slug);
 
   const jsonLd = newsArticleJsonLd({
     headline: article.title,
@@ -83,12 +82,6 @@ export default async function StoryPage({ params }: Props) {
             <Link href={`/c/${article.category.slug}`} className="label text-accent no-underline hover:text-accent-hover">
               {article.category.name}
             </Link>
-          ) : null}
-          {issue ? (
-            <>
-              <span className="h-1 w-1 rounded-full bg-ink/25" aria-hidden />
-              <span className="label text-muted">{issueLabel(issue)}</span>
-            </>
           ) : null}
         </div>
         <h1 className="statement mt-5 text-[2.3rem] sm:text-[3.2rem] lg:text-[3.9rem]">{article.title}</h1>
@@ -218,10 +211,10 @@ export default async function StoryPage({ params }: Props) {
               className="block overflow-hidden rounded-[3px] shadow-[0_16px_32px_-16px_rgba(14,14,16,0.6)]"
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={issue.cover} alt={`PrimeCrest ${issueLabel(issue)}: ${issue.name}`} className="aspect-[3/4] w-full object-cover" />
+              <img src={issue.cover} alt={`PrimeCrest magazine cover: ${issue.name}`} className="aspect-[3/4] w-full object-cover" />
             </a>
             <div>
-              <p className="label text-accent">From the {issueLabel(issue)}</p>
+              <p className="label text-accent">From the magazine</p>
               <p className="statement mt-2 text-[1.35rem]">Read the full edition, page by page</p>
               <p className="mt-2 text-[0.92rem] text-ink-soft">
                 {issue.name}&apos;s story as it runs in the flipbook, designed like print.

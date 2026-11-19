@@ -12,6 +12,10 @@
   --rule-dark: #0e0e10;
   --accent: #c8102e;
   --accent-hover: #a10d25;
+  /* Primary brand colour: deep emerald, paired with the crest's gold. */
+  --brand: #0f4c3a;
+  --brand-dark: #0a3629;
+  --brand-soft: #e5eee8;
   --gold: #b8925a;
   --gold-soft: #d9be8c;
   --rose: #f3e3dd;
@@ -48,6 +52,9 @@
   --color-rule: var(--rule);
   --color-accent: var(--accent);
   --color-accent-hover: var(--accent-hover);
+  --color-brand: var(--brand);
+  --color-brand-dark: var(--brand-dark);
+  --color-brand-soft: var(--brand-soft);
   --color-gold: var(--gold);
   --color-gold-soft: var(--gold-soft);
   --color-rose: var(--rose);
@@ -310,14 +317,14 @@ a.kicker:hover {
 }
 
 .btn-primary {
-  background: var(--ink);
+  background: var(--brand);
   color: #fff;
-  border: 1px solid var(--ink);
+  border: 1px solid var(--brand);
 }
 
 .btn-primary:hover {
-  background: var(--accent);
-  border-color: var(--accent);
+  background: var(--brand-dark);
+  border-color: var(--brand-dark);
 }
 
 .btn-outline {
@@ -327,8 +334,8 @@ a.kicker:hover {
 }
 
 .btn-outline:hover {
-  border-color: var(--ink);
-  background: var(--ink);
+  border-color: var(--brand);
+  background: var(--brand);
   color: #fff;
 }
 

@@ -59,6 +59,10 @@ const ArticleSchema = new Schema(
     magazineUrl: { type: String, default: "" },
     magazineEnabled: { type: Boolean, default: false },
     magazineCover: { type: String, default: "" },
+    // Shown on the magazine pages, e.g. "The November Issue". Blank uses the publish month.
+    magazineIssue: { type: String, default: "" },
+    // The cover subject's role, e.g. "Founder, Grewal Aesthetics".
+    magazineRole: { type: String, default: "" },
     views: { type: Number, default: 0 },
     gallery: { type: [GallerySchema], default: [] },
     pullQuote: {
