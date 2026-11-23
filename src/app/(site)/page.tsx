@@ -158,7 +158,7 @@ export default async function HomePage() {
         {issues.length ? (
           <div className={leaders.length ? "lg:col-span-5 lg:pl-10" : "lg:col-span-12"}>
             <SectionTitle title="The Digital Magazine" href="/magazine" linkLabel="Latest editions" />
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-3 items-end gap-4">
               {issues.slice(0, 3).map((issue) => (
                 <Link
                   key={issue.articleSlug}
@@ -166,13 +166,13 @@ export default async function HomePage() {
                   className="group block no-underline"
                   aria-label={`${issue.name}: read the feature`}
                 >
-                  <span className="relative block aspect-[3/4] overflow-hidden bg-paper-3 shadow-[0_16px_32px_-18px_rgba(14,14,16,0.6)] transition-transform duration-500 group-hover:-translate-y-1">
+                  <span className="relative block overflow-hidden bg-paper-3 shadow-[0_16px_32px_-18px_rgba(14,14,16,0.6)] transition-transform duration-500 group-hover:-translate-y-1">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={issue.cover}
                       alt={`PrimeCrest magazine cover: ${issue.name}`}
                       loading="lazy"
-                      className="absolute inset-0 h-full w-full object-cover"
+                      className="block h-auto w-full"
                     />
                   </span>
                 </Link>

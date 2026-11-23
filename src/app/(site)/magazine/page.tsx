@@ -21,7 +21,7 @@ export default async function MagazinePage() {
       <PageHero eyebrow="The digital magazine" title="Magazines" />
 
       <div className="mx-auto max-w-[1320px] px-4 py-14 sm:px-6">
-        <div className="grid grid-cols-1 gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 items-start gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-4">
           {issues.map((issue) => {
             const title = [issue.name, issue.title].filter(Boolean).join(": ");
             return (
@@ -30,13 +30,13 @@ export default async function MagazinePage() {
                 href={`/story/${issue.articleSlug}`}
                 className="group flex flex-col no-underline"
               >
-                <span className="relative block aspect-[3/4] overflow-hidden bg-paper-2 shadow-[0_14px_30px_-18px_rgba(14,14,16,0.55)]">
+                <span className="relative block overflow-hidden bg-paper-2 shadow-[0_14px_30px_-18px_rgba(14,14,16,0.55)]">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={issue.cover}
                     alt={`PrimeCrest magazine cover: ${issue.name}`}
                     loading="lazy"
-                    className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+                    className="block h-auto w-full transition-transform duration-500 group-hover:scale-[1.02]"
                   />
                 </span>
                 <span className="mt-4 block text-center font-display text-[1.15rem] font-semibold leading-snug text-ink transition-colors group-hover:text-gold-deep">

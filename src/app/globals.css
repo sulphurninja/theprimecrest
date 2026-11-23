@@ -975,10 +975,10 @@ a.kicker:hover {
 
 /* ---------- Issue covers (magazine page, Women in Business) ---------- */
 
+/* Covers keep their own proportions (3:4 or A4) so nothing is cropped. */
 .issue-card .issue-cover {
   position: relative;
   display: block;
-  aspect-ratio: 3 / 4;
   overflow: hidden;
   border-radius: 3px;
   background: var(--paper-2);
@@ -987,11 +987,9 @@ a.kicker:hover {
 }
 
 .issue-card .issue-cover img {
-  position: absolute;
-  inset: 0;
+  display: block;
   width: 100%;
-  height: 100%;
-  object-fit: cover;
+  height: auto;
 }
 
 .issue-card:hover .issue-cover {
