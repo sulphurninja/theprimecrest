@@ -82,7 +82,13 @@ export default async function HomePage() {
     seen.add(a._id);
     return true;
   });
-  const stories = [...storyPicks, ...automatic];
+  // If that leaves the grid short, fill it with the newest of everything else.
+  const fallback = (payload.latest as CardArticle[]).filter((a) => {
+    if (seen.has(a._id)) return false;
+    seen.add(a._id);
+    return true;
+  });
+  const stories = [...storyPicks, ...automatic, ...fallback];
 
   const trending = (await getTrendingArticles(10).catch(() => [])) as CardArticle[];
   // Must Read: the editors' picks in their order (Admin -> Front Page), topped up
@@ -192,8 +198,8 @@ export default async function HomePage() {
       <section className={`${container} grid grid-cols-1 gap-10 pt-16 lg:grid-cols-12`}>
         <div className="lg:col-span-8">
           <SectionTitle title="Latest Articles" href="/search" linkLabel="View all articles" />
-          <div className="grid grid-cols-1 gap-7 sm:grid-cols-3">
-            {stories.slice(0, 3).map((article) => (
+          <div className="grid grid-cols-1 gap-x-7 gap-y-10 sm:grid-cols-3">
+            {stories.slice(0, 6).map((article) => (
               <article key={article._id} className="group">
                 <Link href={`/story/${article.slug}`} className="img-hover relative block aspect-[16/10] overflow-hidden bg-paper-2">
                   {article.coverImage ? (
