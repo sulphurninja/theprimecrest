@@ -1,9 +1,10 @@
 import Link from "next/link";
+import { ArrowIcon } from "@/components/site/Icons";
 import { cn } from "@/lib/utils";
 
 /**
- * Magazine section header: a spaced label over an uppercase serif title,
- * an optional description beside it, and "View all" behind a rule.
+ * Section header: a serif title, a thin gold rule running across, and an
+ * optional gold "View all" link. An optional line of description sits below.
  */
 export function SectionTitle({
   title,
@@ -21,43 +22,37 @@ export function SectionTitle({
   dark?: boolean;
 }) {
   return (
-    <div className="mb-10 grid grid-cols-1 items-center gap-x-10 gap-y-5 lg:grid-cols-12">
-      <div className={cn(dek ? "lg:col-span-5" : href ? "lg:col-span-10" : "lg:col-span-12")}>
-        {eyebrow ? (
-          <p className={cn("label !tracking-[0.28em]", dark ? "text-white/70" : "text-ink")}>{eyebrow}</p>
-        ) : null}
+    <div className="mb-7">
+      {eyebrow ? (
+        <p className={cn("label mb-1.5", dark ? "text-gold-soft" : "text-gold-deep")}>{eyebrow}</p>
+      ) : null}
+      <div className="flex items-center gap-5">
         <h2
           className={cn(
-            "display-caps text-[2.3rem] sm:text-[3rem]",
-            eyebrow && "mt-3",
+            "shrink-0 font-display text-[1.75rem] font-semibold leading-tight tracking-[-0.01em] sm:text-[2rem]",
             dark ? "text-white" : "text-ink",
           )}
         >
           {title}
         </h2>
-        <span className={cn("mt-4 block h-[4px] w-16", dark ? "bg-gold-soft" : "bg-brand")} aria-hidden />
+        <span className={cn("h-px flex-1", dark ? "bg-gold-soft/50" : "bg-gold/60")} aria-hidden />
+        {href ? (
+          <Link
+            href={href}
+            className={cn(
+              "group inline-flex shrink-0 items-center gap-1.5 font-sans text-[0.84rem] font-semibold no-underline transition-colors",
+              dark ? "text-gold-soft hover:text-white" : "text-gold-deep hover:text-ink",
+            )}
+          >
+            {linkLabel}
+            <ArrowIcon className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+          </Link>
+        ) : null}
       </div>
       {dek ? (
-        <p
-          className={cn(
-            "text-[1rem] leading-[1.75] lg:col-span-5",
-            dark ? "text-white/70" : "text-ink-soft",
-          )}
-        >
+        <p className={cn("mt-3 max-w-2xl text-[0.98rem] leading-relaxed", dark ? "text-white/70" : "text-ink-soft")}>
           {dek}
         </p>
-      ) : null}
-      {href ? (
-        <div
-          className={cn(
-            "flex lg:col-span-2 lg:h-full lg:items-center lg:justify-center lg:border-l",
-            dark ? "lg:border-white/40" : "lg:border-ink",
-          )}
-        >
-          <Link href={href} className={cn("read-more", dark ? "text-white" : "text-ink")}>
-            {linkLabel} »
-          </Link>
-        </div>
       ) : null}
     </div>
   );

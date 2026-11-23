@@ -1,17 +1,27 @@
 import Link from "next/link";
 import { Wordmark } from "@/components/site/Logo";
-import { CREST_LOWER, CREST_UPPER, FULL_STOP, LETTERS, LOGO_VIEWBOX } from "@/components/site/logo-paths";
-import { NewsletterForm } from "@/components/site/NewsletterForm";
 import { BackToTop } from "@/components/site/BackToTop";
-import { ExternalIcon } from "@/components/site/Icons";
+import {
+  FacebookIcon,
+  InstagramIcon,
+  LinkedInIcon,
+  TwitterIcon,
+  YouTubeIcon,
+} from "@/components/site/SiteHeader";
 import { SITE } from "@/lib/constants";
 
 type Cat = { name: string; slug: string };
+type Socials = {
+  twitter?: string;
+  instagram?: string;
+  linkedin?: string;
+  facebook?: string;
+  youtube?: string;
+};
 
-const JOURNAL_LINKS = [
-  { label: "Magazine", href: "/magazine" },
-  { label: "About", href: "/about" },
-  { label: "Advertise", href: "/advertise" },
+const ABOUT_LINKS = [
+  { label: "About PrimeCrest", href: "/about" },
+  { label: "Advertise with us", href: "/advertise" },
   { label: "Newsletter", href: "/newsletter" },
   { label: "Contact", href: "/contact" },
 ];
@@ -19,155 +29,122 @@ const JOURNAL_LINKS = [
 const LEGAL_LINKS = [
   { label: "Privacy Policy", href: "/privacy" },
   { label: "Terms of Use", href: "/terms" },
-  { label: "RSS Feed", href: "/feed.xml", external: true },
+  { label: "RSS Feed", href: "/feed.xml" },
 ];
+
+function Column({ title, links }: { title: string; links: { label: string; href: string }[] }) {
+  return (
+    <div>
+      <p className="font-display text-[1.05rem] font-semibold text-white">{title}</p>
+      <ul className="mt-3 space-y-1.5">
+        {links.map((link) => (
+          <li key={link.href + link.label}>
+            <Link
+              href={link.href}
+              className="font-sans text-[0.86rem] text-white/70 no-underline transition-colors hover:text-gold-soft"
+            >
+              {link.label}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
 
 export function SiteFooter({
   siteName,
   blurb,
   copyright,
   categories,
+  socials,
 }: {
   siteName: string;
   blurb: string;
   copyright: string;
   categories: Cat[];
+  socials?: Socials;
 }) {
+  const navigate = [
+    { label: "Home", href: "/" },
+    { label: "Magazine", href: "/magazine" },
+    ...categories
+      .filter((c) => c.slug !== "home" && c.slug !== "magazine")
+      .map((c) => ({ label: c.name, href: `/c/${c.slug}` })),
+  ];
+
+  const socialLinks = [
+    { url: socials?.linkedin, icon: <LinkedInIcon />, label: "LinkedIn" },
+    { url: socials?.instagram, icon: <InstagramIcon />, label: "Instagram" },
+    { url: socials?.twitter, icon: <TwitterIcon />, label: "X" },
+    { url: socials?.facebook, icon: <FacebookIcon />, label: "Facebook" },
+    { url: socials?.youtube, icon: <YouTubeIcon />, label: "YouTube" },
+  ].filter((s) => s.url);
+
   return (
-    <footer className="grain mt-20 overflow-hidden bg-brand-dark text-paper">
-      {/* Newsletter Band */}
-      <div className="border-b border-paper/10">
-        <div className="mx-auto flex max-w-[1320px] flex-col items-start gap-8 px-4 py-16 sm:px-6 lg:flex-row lg:items-end lg:justify-between">
-          <div>
-            <p className="label !tracking-[0.28em] text-gold-soft">The PrimeCrest Briefing</p>
-            <h3 className="display-caps mt-4 text-[2.2rem] text-white sm:text-[2.8rem]">
-              Business intelligence, every morning
-            </h3>
-            <p className="mt-3 max-w-lg text-[0.98rem] leading-relaxed text-paper/60">
-              The leaders, companies and decisions shaping global business, in one concise email.
+    <footer className="mt-20 bg-brand text-white">
+      <div className="mx-auto max-w-[1320px] px-4 py-14 sm:px-6">
+        <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-8">
+          <div className="lg:col-span-4 lg:border-r lg:border-white/20 lg:pr-8">
+            <Wordmark name={siteName} className="text-[2.1rem] text-white" />
+            <p className="mt-4 font-sans text-[0.7rem] font-medium uppercase leading-[1.8] tracking-[0.22em] text-white/70">
+              The international magazine
+              <br />
+              of leadership &amp; business
             </p>
-          </div>
-          <div className="w-full max-w-md">
-            <NewsletterForm dark />
-          </div>
-        </div>
-      </div>
-
-      {/* Main Footer */}
-      <div className="mx-auto max-w-[1320px] px-4 sm:px-6 py-14">
-        <div className="grid grid-cols-1 gap-12 lg:grid-cols-12">
-          <div className="lg:col-span-4">
-            <Wordmark name={siteName} className="text-[1.8rem] text-paper" showTagline />
-            <p className="mt-5 max-w-sm text-[0.95rem] leading-relaxed text-paper/60">
-              {blurb}
-            </p>
-            <div className="mt-6 border-t border-paper/10 pt-5">
-              <p className="font-sans text-[0.72rem] text-paper/50">
-                {siteName} is a product of{" "}
-                <a
-                  href="https://thefortiora.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="font-semibold text-paper/80 no-underline transition-colors hover:text-paper"
-                >
-                  {SITE.company}
-                </a>
-              </p>
-              <address className="mt-2 font-sans text-[0.72rem] not-italic leading-relaxed text-paper/40">
-                {SITE.address.street}, {SITE.address.city}, {SITE.address.state} {SITE.address.zip}
-                <br />
-                <a
-                  href={`mailto:${SITE.email}`}
-                  className="text-paper/40 no-underline transition-colors hover:text-paper/70"
-                >
-                  {SITE.email}
-                </a>
-              </address>
-            </div>
+            <p className="mt-5 max-w-sm text-[0.9rem] leading-relaxed text-white/65">{blurb}</p>
           </div>
 
-          <div className="grid grid-cols-2 gap-10 sm:grid-cols-3 lg:col-span-8">
-            <div>
-              <p className="font-display text-[1.3rem] font-semibold text-white">Sections</p>
-              <span className="mt-3 block h-[2px] w-10 bg-gold-soft" aria-hidden />
-              <ul className="mt-5 space-y-2.5">
-                {categories.filter((c) => c.slug !== "magazine").map((c) => (
-                  <li key={c.slug}>
-                    <Link
-                      href={c.slug === "home" ? "/" : `/c/${c.slug}`}
-                      className="group inline-flex items-center gap-1 font-sans text-[0.9rem] text-paper/65 no-underline transition-colors hover:text-white"
-                    >
-                      {c.name}
-                    </Link>
-                  </li>
+          <div className="grid grid-cols-2 gap-8 sm:grid-cols-3 lg:col-span-5">
+            <Column title="Navigate" links={navigate} />
+            <Column title="About" links={ABOUT_LINKS} />
+            <Column title="Legal" links={LEGAL_LINKS} />
+          </div>
+
+          <div className="lg:col-span-3 lg:border-l lg:border-white/20 lg:pl-8">
+            <p className="font-display text-[1.05rem] font-semibold text-white">Connect with {siteName}</p>
+            {socialLinks.length ? (
+              <div className="mt-4 flex flex-wrap gap-2">
+                {socialLinks.map((s) => (
+                  <a
+                    key={s.label}
+                    href={s.url!}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={s.label}
+                    className="flex h-10 w-10 items-center justify-center border border-white/25 text-white/85 transition-colors hover:border-gold-soft hover:text-gold-soft [&_svg]:h-4 [&_svg]:w-4"
+                  >
+                    {s.icon}
+                  </a>
                 ))}
-              </ul>
-            </div>
-            <div>
-              <p className="font-display text-[1.3rem] font-semibold text-white">The Journal</p>
-              <span className="mt-3 block h-[2px] w-10 bg-gold-soft" aria-hidden />
-              <ul className="mt-5 space-y-2.5">
-                {JOURNAL_LINKS.map((l) => (
-                  <li key={l.href}>
-                    <Link
-                      href={l.href}
-                      className="font-sans text-[0.9rem] text-paper/65 no-underline transition-colors hover:text-white"
-                    >
-                      {l.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div>
-              <p className="font-display text-[1.3rem] font-semibold text-white">Legal &amp; More</p>
-              <span className="mt-3 block h-[2px] w-10 bg-gold-soft" aria-hidden />
-              <ul className="mt-5 space-y-2.5">
-                {LEGAL_LINKS.map((l) => (
-                  <li key={l.href}>
-                    <Link
-                      href={l.href}
-                      className="group inline-flex items-center gap-1 font-sans text-[0.9rem] text-paper/65 no-underline transition-colors hover:text-white"
-                      {...("external" in l && l.external
-                        ? { target: "_blank", rel: "noopener noreferrer" }
-                        : {})}
-                    >
-                      {l.label}
-                      {"external" in l && l.external && (
-                        <ExternalIcon className="h-3 w-3 opacity-50 transition-opacity group-hover:opacity-100" />
-                      )}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
+              </div>
+            ) : null}
+            <address className="mt-5 font-sans text-[0.78rem] not-italic leading-relaxed text-white/55">
+              {SITE.address.street}, {SITE.address.city}, {SITE.address.state} {SITE.address.zip}
+              <br />
+              <a href={`mailto:${SITE.email}`} className="text-white/55 no-underline hover:text-gold-soft">
+                {SITE.email}
+              </a>
+            </address>
           </div>
         </div>
 
-        {/* Bottom bar */}
-        <div className="mt-14 flex flex-col gap-4 border-t border-paper/10 pt-8 sm:flex-row sm:items-center sm:justify-between">
-          <p className="font-sans text-[0.75rem] text-paper/40">
+        <div className="mt-12 flex flex-col gap-3 border-t border-white/15 pt-6 sm:flex-row sm:items-center sm:justify-between">
+          <p className="font-sans text-[0.8rem] text-white/60">
             © {new Date().getFullYear()} {copyright} All rights reserved.
           </p>
           <div className="flex items-center gap-4">
-            <p className="font-serif text-[0.8rem] italic text-paper/40">
-              Independent. International. Edited by people.
-            </p>
+            <a
+              href="https://thefortiora.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-sans text-[0.8rem] text-white/60 no-underline hover:text-gold-soft"
+            >
+              A {SITE.company.replace(/ LLC$/, "")} publication
+            </a>
             <BackToTop />
           </div>
         </div>
-      </div>
-
-      {/* The masthead in outline, bleeding off the bottom of the page. */}
-      <div className="mx-auto max-w-[1320px] px-4 pb-0 pt-4 sm:px-6" aria-hidden>
-        <svg viewBox={LOGO_VIEWBOX} className="-mb-[1.5%] block w-full select-none">
-          <g fill="none" stroke="rgba(228,201,143,0.2)" strokeWidth="2.5" vectorEffect="non-scaling-stroke">
-            <path d={CREST_UPPER} vectorEffect="non-scaling-stroke" />
-            <path d={CREST_LOWER} vectorEffect="non-scaling-stroke" />
-            <path d={LETTERS} vectorEffect="non-scaling-stroke" />
-            <path d={FULL_STOP} vectorEffect="non-scaling-stroke" />
-          </g>
-        </svg>
       </div>
     </footer>
   );

@@ -4,11 +4,11 @@ import { notFound } from "next/navigation";
 import { AdUnit } from "@/components/site/AdUnit";
 import { ArticleBody } from "@/components/site/ArticleBody";
 import { ArticleCard, type CardArticle } from "@/components/site/ArticleCard";
-import { ArrowIcon, ExternalIcon, IssueIcon } from "@/components/site/Icons";
+import { ExternalIcon, IssueIcon } from "@/components/site/Icons";
 import { ReadingProgress } from "@/components/site/ReadingProgress";
 import { SectionTitle } from "@/components/site/SectionHead";
 import { ShareBar } from "@/components/site/ShareBar";
-import { getActiveAd, getMagazineIssues, getPublishedArticle, getRelatedArticles } from "@/lib/queries";
+import { getActiveAd, getPublishedArticle, getRelatedArticles } from "@/lib/queries";
 import { buildMetadata, newsArticleJsonLd } from "@/lib/seo";
 import { formatDate, siteUrl } from "@/lib/utils";
 
@@ -53,7 +53,6 @@ export default async function StoryPage({ params }: Props) {
 
   const magazineHref =
     article.magazineEnabled === false ? "" : String(article.magazineUrl || "").trim();
-  const issue = (await getMagazineIssues()).find((entry) => entry.articleSlug === article.slug);
 
   const jsonLd = newsArticleJsonLd({
     headline: article.title,
@@ -92,31 +91,6 @@ export default async function StoryPage({ params }: Props) {
         ) : null}
 
         <div className="mt-8 flex flex-wrap items-center justify-center gap-x-4 gap-y-3">
-          {article.author?.name ? (
-            <Link
-              href={`/author/${article.author.slug}`}
-              className="flex items-center gap-3 text-left no-underline"
-            >
-              {article.author.avatar ? (
-                <Image
-                  src={article.author.avatar}
-                  alt=""
-                  width={40}
-                  height={40}
-                  className="h-10 w-10 rounded-full object-cover"
-                />
-              ) : null}
-              <span>
-                <span className="block font-sans text-[0.9rem] font-semibold text-ink hover:text-accent">
-                  {article.author.name}
-                </span>
-                {article.author.title ? (
-                  <span className="block font-sans text-[0.76rem] text-muted">{article.author.title}</span>
-                ) : null}
-              </span>
-            </Link>
-          ) : null}
-          <span className="hidden h-8 w-px bg-ink/15 sm:block" aria-hidden />
           <p className="font-sans text-[0.84rem] text-muted">
             {formatDate(article.publishedAt)}
             {article.readTime ? ` · ${article.readTime} min read` : ""}
@@ -162,7 +136,7 @@ export default async function StoryPage({ params }: Props) {
       {/* Body */}
       <div className="mx-auto max-w-[768px] px-4 pb-6 pt-12 sm:px-6 lg:pt-16">
         <div className="mb-10 border-b border-ink/10 pb-6">
-          <ShareBar title={article.title} slug={article.slug} magazineUrl={magazineHref || undefined} />
+          <ShareBar title={article.title} slug={article.slug} />
         </div>
 
         <ArticleBody html={article.content} />
@@ -198,39 +172,8 @@ export default async function StoryPage({ params }: Props) {
         ) : null}
 
         <div className="mt-10 border-t border-ink/10 pt-6">
-          <ShareBar title={article.title} slug={article.slug} magazineUrl={magazineHref || undefined} />
+          <ShareBar title={article.title} slug={article.slug} />
         </div>
-
-        {/* From the magazine */}
-        {issue ? (
-          <aside className="card mt-12 grid grid-cols-[96px_1fr] items-center gap-6 p-5 sm:grid-cols-[120px_1fr] sm:p-6">
-            <a
-              href={issue.magazineUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block overflow-hidden rounded-[3px] shadow-[0_16px_32px_-16px_rgba(14,14,16,0.6)]"
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={issue.cover} alt={`PrimeCrest magazine cover: ${issue.name}`} className="aspect-[3/4] w-full object-cover" />
-            </a>
-            <div>
-              <p className="label text-accent">From the magazine</p>
-              <p className="statement mt-2 text-[1.35rem]">Read the full edition, page by page</p>
-              <p className="mt-2 text-[0.92rem] text-ink-soft">
-                {issue.name}&apos;s story as it runs in the flipbook, designed like print.
-              </p>
-              <a
-                href={issue.magazineUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn-primary group mt-4 !py-2"
-              >
-                Open the flipbook
-                <ArrowIcon className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
-              </a>
-            </div>
-          </aside>
-        ) : null}
 
         {/* Author */}
         {article.author?.name ? (

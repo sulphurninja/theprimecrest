@@ -10,7 +10,7 @@ function formatPrice(q: Quote) {
 
 function QuoteItem({ q }: { q: Quote }) {
   const up = q.change >= 0;
-  const color = up ? "text-[#0f7a45]" : "text-accent";
+  const color = up ? "text-[#0f7a45]" : "text-[var(--red)]";
   return (
     <span className="inline-flex items-baseline gap-2.5 whitespace-nowrap border-r border-ink/10 px-6">
       <span className="font-sans text-[0.66rem] font-bold uppercase tracking-[0.12em] text-ink">

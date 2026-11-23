@@ -6,14 +6,13 @@ import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowBackIcon, ArrowIcon } from "@/components/site/Icons";
 import type { MagazineIssue } from "@/lib/magazines";
-import { formatDate } from "@/lib/utils";
 import type { CardArticle } from "./ArticleCard";
 
 interface HeroCarouselProps {
   articles: CardArticle[];
-  /** Stories for the "Must Read" panel beside the lead. */
+  /** Stories for the "Must Read" list beside the lead. */
   mustRead?: CardArticle[];
-  /** Magazine issues, to label cover stories with their edition. */
+  /** Magazine issues, to tag cover stories. */
   issues?: MagazineIssue[];
   interval?: number;
 }
@@ -21,8 +20,8 @@ interface HeroCarouselProps {
 const ease = [0.16, 1, 0.3, 1] as const;
 
 /**
- * Front-page lead: a full-height photograph with the headline set over it,
- * rotating through the cover stories, joined to a "Must Read" panel.
+ * Front-page lead: the cover story photograph with its headline set over it,
+ * rotating through the cover stories, beside a "Must Read" list.
  */
 export function HeroCarousel({ articles, mustRead = [], issues = [], interval = 7000 }: HeroCarouselProps) {
   const issueBySlug = useMemo(() => new Map(issues.map((issue) => [issue.articleSlug, issue])), [issues]);
@@ -46,14 +45,14 @@ export function HeroCarousel({ articles, mustRead = [], issues = [], interval = 
   if (!articles.length) return null;
 
   const article = articles[current];
-  const issue = issueBySlug.get(article.slug);
+  const isCover = issueBySlug.has(article.slug);
   const panel = mustRead.slice(0, 4);
 
   return (
-    <section className="grid grid-cols-1 lg:grid-cols-12" aria-label="Cover stories">
+    <section className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-10" aria-label="Cover stories">
       {/* Lead */}
       <div
-        className="relative min-h-[520px] overflow-hidden bg-ink text-white sm:min-h-[560px] lg:col-span-8 lg:min-h-[640px]"
+        className="relative min-h-[460px] overflow-hidden bg-brand-dark text-white sm:min-h-[500px] lg:col-span-8 lg:min-h-[540px]"
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}
         onTouchStart={(e) => {
@@ -75,7 +74,7 @@ export function HeroCarousel({ articles, mustRead = [], issues = [], interval = 
           <motion.div
             key={article._id}
             className="absolute inset-0"
-            initial={{ opacity: 0, scale: 1.05 }}
+            initial={{ opacity: 0, scale: 1.04 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0 }}
             transition={{
@@ -95,40 +94,35 @@ export function HeroCarousel({ articles, mustRead = [], issues = [], interval = 
             ) : null}
           </motion.div>
         </AnimatePresence>
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/80 via-black/55 to-black/20" />
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#0f1f17]/90 via-[#0f1f17]/55 to-transparent" />
         <Link href={`/story/${article.slug}`} className="absolute inset-0" aria-label={article.title} />
 
-        <div className="pointer-events-none relative flex h-full min-h-[inherit] flex-col justify-end p-6 pb-24 sm:p-10 sm:pb-24 lg:p-14 lg:pb-28">
+        <div className="pointer-events-none relative flex h-full min-h-[inherit] flex-col justify-center p-7 sm:p-10 lg:p-12">
           <AnimatePresence mode="wait" initial={false}>
             <motion.div
               key={article._id}
-              initial={{ opacity: 0, y: 22 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -12 }}
+              exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.5, ease }}
-              className="pointer-events-auto max-w-[720px]"
+              className="pointer-events-auto max-w-[540px]"
             >
-              <p className="flex flex-wrap items-center gap-3">
-                <span className="bg-accent px-2.5 py-1 font-sans text-[0.68rem] font-bold uppercase tracking-[0.14em] text-white">
-                  {issue ? "Cover story" : article.category?.name || "Featured"}
-                </span>
-                {issue ? null : (
-                  <span className="font-sans text-[0.78rem] font-semibold uppercase tracking-[0.16em] text-white/80">
-                    {formatDate(article.publishedAt)}
-                  </span>
-                )}
-              </p>
-              <h1 className="statement mt-5 text-[2.2rem] text-white sm:text-[2.9rem] lg:text-[3.5rem]">
-                <Link href={`/story/${article.slug}`}>{article.title}</Link>
+              <span className="inline-block bg-gold px-3 py-1 font-sans text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-white">
+                {isCover ? "Cover story" : article.category?.name || "Featured"}
+              </span>
+              <h1 className="mt-5 font-display text-[2.3rem] font-semibold leading-[1.08] tracking-[-0.015em] text-white sm:text-[2.9rem] lg:text-[3.2rem]">
+                <Link href={`/story/${article.slug}`} className="hover:text-gold-soft">
+                  {article.title}
+                </Link>
               </h1>
               {article.dek ? (
-                <p className="mt-5 max-w-[620px] text-[1.05rem] leading-relaxed text-white/80 line-clamp-3">
+                <p className="mt-4 max-w-[480px] text-[1.02rem] leading-relaxed text-white/85 line-clamp-3">
                   {article.dek}
                 </p>
               ) : null}
-              <Link href={`/story/${article.slug}`} className="read-more mt-7 text-white">
-                Read the story »
+              <Link href={`/story/${article.slug}`} className="btn-primary group mt-7">
+                {isCover ? "Read the cover story" : "Read the story"}
+                <ArrowIcon className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
               </Link>
             </motion.div>
           </AnimatePresence>
@@ -136,86 +130,69 @@ export function HeroCarousel({ articles, mustRead = [], issues = [], interval = 
 
         {/* Controls */}
         {articles.length > 1 ? (
-          <div className="absolute inset-x-0 bottom-0 flex items-center gap-5 px-6 pb-7 sm:px-10 lg:px-14">
-            <div className="flex flex-1 gap-1.5">
+          <div className="absolute bottom-5 right-5 flex items-center gap-3">
+            <div className="hidden gap-1.5 sm:flex">
               {articles.map((a, i) => (
                 <button
                   key={a._id}
                   type="button"
                   onClick={() => go(i)}
-                  className="group/seg flex-1 py-2"
                   aria-label={`Story ${i + 1}: ${a.title}`}
                   aria-current={i === current ? "true" : undefined}
-                >
-                  <span className="block h-[3px] overflow-hidden bg-white/25 transition-colors group-hover/seg:bg-white/50">
-                    {i === current ? (
-                      isPaused ? (
-                        <span className="block h-full w-full bg-white" />
-                      ) : (
-                        <motion.span
-                          key={`progress-${current}`}
-                          className="block h-full bg-white"
-                          initial={{ width: "0%" }}
-                          animate={{ width: "100%" }}
-                          transition={{ duration: interval / 1000, ease: "linear" }}
-                        />
-                      )
-                    ) : null}
-                  </span>
-                </button>
+                  className={`h-2 rounded-full transition-all ${
+                    i === current ? "w-6 bg-gold-soft" : "w-2 bg-white/45 hover:bg-white/80"
+                  }`}
+                />
               ))}
             </div>
-            <div className="flex gap-1.5">
-              <button
-                type="button"
-                onClick={prev}
-                className="flex h-10 w-10 items-center justify-center border border-white/40 text-white transition-colors hover:border-white hover:bg-white hover:text-ink"
-                aria-label="Previous story"
-              >
-                <ArrowBackIcon className="h-4 w-4" />
-              </button>
-              <button
-                type="button"
-                onClick={next}
-                className="flex h-10 w-10 items-center justify-center border border-white/40 text-white transition-colors hover:border-white hover:bg-white hover:text-ink"
-                aria-label="Next story"
-              >
-                <ArrowIcon className="h-4 w-4" />
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={prev}
+              className="flex h-9 w-9 items-center justify-center border border-white/40 text-white transition-colors hover:border-white hover:bg-white hover:text-ink"
+              aria-label="Previous story"
+            >
+              <ArrowBackIcon className="h-3.5 w-3.5" />
+            </button>
+            <button
+              type="button"
+              onClick={next}
+              className="flex h-9 w-9 items-center justify-center border border-white/40 text-white transition-colors hover:border-white hover:bg-white hover:text-ink"
+              aria-label="Next story"
+            >
+              <ArrowIcon className="h-3.5 w-3.5" />
+            </button>
           </div>
         ) : null}
       </div>
 
       {/* Must Read */}
       {panel.length ? (
-        <aside className="bg-brand px-6 py-8 text-white sm:px-8 lg:col-span-4">
-          <h2 className="font-display text-[1.9rem] font-semibold leading-none">Must Read</h2>
-          <span className="mt-4 block h-[3px] w-24 bg-white" aria-hidden />
-          <ul className="mt-7 space-y-4">
+        <aside className="lg:col-span-4">
+          <div className="mb-5 flex items-center gap-4">
+            <h2 className="shrink-0 font-display text-[1.75rem] font-semibold leading-tight text-ink">Must Read</h2>
+            <span className="h-px flex-1 bg-gold/60" aria-hidden />
+          </div>
+          <ul className="divide-y divide-ink/10">
             {panel.map((a) => (
-              <li key={a._id}>
-                <Link
-                  href={`/story/${a.slug}`}
-                  className="group grid grid-cols-[112px_1fr] items-center gap-4 border border-white/25 p-3 no-underline transition-colors hover:border-white/60 hover:bg-white/[0.06]"
-                >
-                  <span className="relative block aspect-square overflow-hidden bg-brand-dark">
+              <li key={a._id} className="py-3.5 first:pt-0">
+                <Link href={`/story/${a.slug}`} className="group grid grid-cols-[120px_1fr] items-center gap-4 no-underline">
+                  <span className="relative block aspect-[3/2] overflow-hidden bg-paper-2">
                     {a.coverImage ? (
                       <Image
                         src={a.coverImage}
                         alt=""
                         fill
                         className="object-cover transition-transform duration-700 group-hover:scale-105"
-                        sizes="112px"
+                        sizes="120px"
                       />
                     ) : null}
                   </span>
                   <span className="min-w-0">
-                    {a.category?.name ? (
-                      <span className="label block !text-[0.6rem] text-gold-soft">{a.category.name}</span>
-                    ) : null}
-                    <span className="mt-1.5 block font-display text-[1.08rem] font-semibold leading-snug text-white line-clamp-3">
+                    <span className="block font-display text-[1.02rem] font-semibold leading-snug text-ink transition-colors line-clamp-2 group-hover:text-gold-deep">
                       {a.title}
+                    </span>
+                    <span className="mt-1.5 block font-sans text-[0.68rem] font-semibold uppercase tracking-[0.1em] text-gold-deep">
+                      {[a.category?.name, a.readTime ? `${a.readTime} min read` : ""].filter(Boolean).join(" · ")}
                     </span>
                   </span>
                 </Link>

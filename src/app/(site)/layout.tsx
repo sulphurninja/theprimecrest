@@ -41,6 +41,7 @@ export default async function SiteLayout({ children }: LayoutProps<"/">) {
         }
         copyright={settings?.copyright || "Fortiora Group LLC."}
         categories={cats}
+        socials={settings?.socials}
       />
       <WelcomeModal latest={(await getMagazineIssues())[0]} />
     </InitialLoader>

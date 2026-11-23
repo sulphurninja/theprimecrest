@@ -5,15 +5,17 @@ import {
   CREST_UPPER,
   CREST_VIEWBOX,
   FULL_STOP,
-  LETTERS,
+  LETTERS_CREST,
+  LETTERS_PRIME,
   LOGO_VIEWBOX,
 } from "@/components/site/logo-paths";
 
 /**
  * The PrimeCrest masthead, as printed on the magazine covers: the double
  * chevron crest beside PRIMECREST in tracked Cinzel capitals, with a red
- * full stop. Letters and the upper chevron take the current text colour, so
- * the logo reads in ink on light pages and cream on dark ones. Size it with
+ * full stop. "PRIME" and the upper chevron take the current text colour, so
+ * the logo reads in ink on light pages and white on dark ones; "CREST" and
+ * the lower chevron are gold. Size it with
  * font-size; the logo's cap height is 0.62em.
  */
 export const TAGLINE = "Where Vision Meets Voice";
@@ -42,8 +44,9 @@ export function Wordmark({
       >
         <path d={CREST_UPPER} fill="currentColor" />
         <path d={CREST_LOWER} fill={GOLD} />
-        <path d={LETTERS} fill="currentColor" />
-        <path d={FULL_STOP} fill="var(--accent)" />
+        <path d={LETTERS_PRIME} fill="currentColor" />
+        <path d={LETTERS_CREST} fill={GOLD} />
+        <path d={FULL_STOP} fill="var(--red)" />
       </svg>
       {showTagline && (
         <span className="mt-[0.42em] whitespace-nowrap text-center font-sans text-[0.26em] font-semibold uppercase tracking-[0.42em] opacity-55">
