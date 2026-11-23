@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Newsreader, Source_Serif_4, Inter, Schibsted_Grotesk } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import { SITE } from "@/lib/constants";
 import { siteUrl } from "@/lib/utils";
@@ -45,30 +45,35 @@ function OrganizationSchema() {
   );
 }
 
-const display = Newsreader({
+// Fonts are self-hosted (variable woff2, latin) so builds never fetch from Google.
+const display = localFont({
   variable: "--font-display",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  style: ["normal", "italic"],
+  src: [
+    { path: "./fonts/newsreader.woff2", weight: "200 800", style: "normal" },
+    { path: "./fonts/newsreader-italic.woff2", weight: "200 800", style: "italic" },
+  ],
+  display: "swap",
 });
 
-const serif = Source_Serif_4({
+const serif = localFont({
   variable: "--font-serif",
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  style: ["normal", "italic"],
+  src: [
+    { path: "./fonts/source-serif-4.woff2", weight: "200 900", style: "normal" },
+    { path: "./fonts/source-serif-4-italic.woff2", weight: "200 900", style: "italic" },
+  ],
+  display: "swap",
 });
 
-const head = Schibsted_Grotesk({
+const head = localFont({
   variable: "--font-head",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800", "900"],
+  src: [{ path: "./fonts/schibsted-grotesk.woff2", weight: "400 900", style: "normal" }],
+  display: "swap",
 });
 
-const sans = Inter({
+const sans = localFont({
   variable: "--font-sans",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  src: [{ path: "./fonts/inter.woff2", weight: "100 900", style: "normal" }],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
