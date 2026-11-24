@@ -448,6 +448,7 @@ export async function getHomePayload() {
     more,
     mustReadPicks,
     briefingPicks,
+    leaderPicks: homepage ? pickMany(homepage.leaderArticles as unknown[]).map((a) => a.slug) : [],
     showAds: homepage?.showAds !== false,
     showNewsletter: homepage?.showNewsletter !== false,
     showAdvertiseBand: homepage?.showAdvertiseBand !== false,

@@ -13,6 +13,8 @@ const HomepageSchema = new Schema(
     showAdvertiseBand: { type: Boolean, default: true },
     // Stories pinned to each section row, keyed by category id, in display order.
     railArticles: { type: Map, of: [{ type: Schema.Types.ObjectId, ref: "Article" }], default: {} },
+    // Magazine features for "Leaders in Focus", in display order.
+    leaderArticles: [{ type: Schema.Types.ObjectId, ref: "Article" }],
     // Stories pinned to "More from PrimeCrest", in display order.
     moreArticles: [{ type: Schema.Types.ObjectId, ref: "Article" }],
     // Article slugs of magazine issues in display order; the first is featured.

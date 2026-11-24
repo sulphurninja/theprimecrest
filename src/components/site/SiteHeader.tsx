@@ -2,6 +2,7 @@ import Link from "next/link";
 import { SearchIcon } from "@/components/site/Icons";
 import { Wordmark } from "@/components/site/Logo";
 import { MobileNav } from "@/components/site/MobileNav";
+import { SITE } from "@/lib/constants";
 
 type NavItem = { name: string; slug: string };
 type Socials = {
@@ -13,8 +14,6 @@ type Socials = {
 };
 
 const MAX_VISIBLE_CATEGORIES = 5;
-
-
 
 export function TwitterIcon() {
   return (
@@ -87,38 +86,34 @@ export function SiteHeader({
 
   return (
     <>
-      {/* Masthead — sticky on small screens, where it carries the menu */}
-      <header className="sticky top-0 z-40 border-b border-white/10 bg-brand text-white lg:static">
-        <div className="mx-auto grid h-16 max-w-[1320px] grid-cols-[1fr_auto_1fr] items-center gap-4 px-4 sm:px-6 lg:flex lg:h-[112px] lg:justify-center lg:gap-8">
-          <div className="lg:hidden">
-            <MobileNav items={allItems} siteName={siteName} tagline={tagline} dark />
-          </div>
-
-          <span className="justify-self-center lg:hidden">
+      {/* Masthead: centred logo, the slogan beneath it; sticky on small screens, where it carries the menu */}
+      <header className="sticky top-0 z-40 bg-brand text-white lg:static">
+        <div className="mx-auto grid h-16 max-w-[1320px] grid-cols-[1fr_auto_1fr] items-center gap-4 px-4 sm:px-6 lg:hidden">
+          <MobileNav items={allItems} siteName={siteName} tagline={SITE.slogan || tagline} dark />
+          <span className="justify-self-center">
             <Wordmark name={siteName} className="text-[1.55rem] text-white sm:text-[1.75rem]" />
           </span>
-          <span className="hidden items-center gap-8 lg:flex">
-            <Wordmark name={siteName} className="text-[3rem] text-white" />
-            <span className="h-14 w-px bg-white/30" aria-hidden />
-            <span className="font-sans text-[0.74rem] font-medium uppercase leading-[1.7] tracking-[0.24em] text-white/80">
-              The international magazine
-              <br />
-              of leadership &amp; business
-            </span>
-          </span>
-
           <Link
             href="/search"
             aria-label="Search"
-            className="flex h-10 w-10 items-center justify-center justify-self-end text-white lg:hidden"
+            className="flex h-10 w-10 items-center justify-center justify-self-end text-white"
           >
             <SearchIcon className="h-[18px] w-[18px]" />
           </Link>
         </div>
+
+        <div className="mx-auto hidden max-w-[1320px] flex-col items-center px-6 pb-6 pt-8 lg:flex">
+          <Wordmark name={siteName} className="text-[3.1rem] text-white" />
+          <p className="mt-3 flex items-center gap-4 font-display text-[1.08rem] italic tracking-[0.02em] text-gold-soft">
+            <span className="h-px w-12 bg-gold-soft/60" aria-hidden />
+            {SITE.slogan}
+            <span className="h-px w-12 bg-gold-soft/60" aria-hidden />
+          </p>
+        </div>
       </header>
 
       {/* Section bar — sticky on desktop */}
-      <nav className="sticky top-0 z-40 hidden border-b border-white/10 bg-brand lg:block" aria-label="Sections">
+      <nav className="sticky top-0 z-40 hidden border-y border-white/15 bg-brand lg:block" aria-label="Sections">
         <div className="relative mx-auto flex h-[54px] max-w-[1320px] items-center justify-center gap-12 px-6">
           {visibleItems.map((item) => (
             <Link

@@ -104,9 +104,15 @@ export default async function HomePage() {
     }),
   ].slice(0, 4);
 
-  // Leaders in Focus: issues 2 to 4 in the magazine order, with their story photos.
+  // Leaders in Focus: the features picked in Admin -> Front Page, topped up with
+  // issues 2 to 4 in the magazine order, with their story photos.
   const articleBySlug = new Map(heroArticles.map((a) => [a.slug, a]));
-  const leaders = issues.slice(1, 4).map((issue) => ({ issue, article: articleBySlug.get(issue.articleSlug) }));
+  const leaderSlugs = payload.leaderPicks.filter((slug) => issueBySlug.has(slug));
+  for (const issue of issues.slice(1)) {
+    if (leaderSlugs.length >= 3) break;
+    if (!leaderSlugs.includes(issue.articleSlug)) leaderSlugs.push(issue.articleSlug);
+  }
+  const leaders = leaderSlugs.map((slug) => ({ issue: issueBySlug.get(slug)!, article: articleBySlug.get(slug) }));
 
   const rails = payload.rails.filter(
     (rail) =>
@@ -239,24 +245,26 @@ export default async function HomePage() {
         </div>
 
         <aside className="lg:col-span-4">
-          <div className="bg-paper-2 p-7">
-            <LetterIcon className="h-7 w-7 text-gold-deep" />
-            <h2 className="mt-4 font-display text-[1.5rem] font-semibold leading-tight text-ink">
-              Stay Informed with PrimeCrest
-            </h2>
-            <p className="mt-2 text-[0.95rem] leading-relaxed text-ink-soft">
-              Receive our latest stories, magazine editions and exclusive insights, straight to your
-              inbox.
-            </p>
-            <div className="mt-5">
-              <NewsletterForm />
+          {payload.showNewsletter ? (
+            <div className="bg-paper-2 p-7">
+              <LetterIcon className="h-7 w-7 text-gold-deep" />
+              <h2 className="mt-4 font-display text-[1.5rem] font-semibold leading-tight text-ink">
+                Stay Informed with PrimeCrest
+              </h2>
+              <p className="mt-2 text-[0.95rem] leading-relaxed text-ink-soft">
+                Receive our latest stories, magazine editions and exclusive insights, straight to your
+                inbox.
+              </p>
+              <div className="mt-5">
+                <NewsletterForm />
+              </div>
+              <p className="mt-4 text-[0.8rem] leading-relaxed text-muted">
+                Join a global community of leaders, entrepreneurs and forward thinkers.
+              </p>
             </div>
-            <p className="mt-4 text-[0.8rem] leading-relaxed text-muted">
-              Join a global community of leaders, entrepreneurs and forward thinkers.
-            </p>
-          </div>
+          ) : null}
           {mpu ? (
-            <div className="mt-8">
+            <div className={payload.showNewsletter ? "mt-8" : ""}>
               <AdUnit slot={mpu.slot} campaign={mpu.campaign} />
             </div>
           ) : null}

@@ -6,8 +6,11 @@ import { api } from "@/components/admin/api";
 import { AdminLoader, useToast } from "@/components/admin/ui";
 import { cn } from "@/lib/utils";
 
-type ArticleOpt = { _id: string; title: string; format?: string; category?: string; categories?: string[] };
-type CategoryOpt = { _id: string; name: string };
+type ArticleOpt = { _id: string; title: string; slug: string; format?: string; category?: string; categories?: string[] };
+type CategoryOpt = { _id: string; name: string; slug?: string };
+
+/** Sections that have their own page and never get a front-page row. */
+const NO_ROW = new Set(["women-in-business", "magazine"]);
 
 type HomepageConfig = {
   heroArticle: string | null;
@@ -19,6 +22,7 @@ type HomepageConfig = {
   /** Stories pinned to each section row, keyed by category id. */
   railArticles: Record<string, string[]>;
   moreArticles: string[];
+  leaderArticles: string[];
   showAds: boolean;
   showNewsletter: boolean;
   showAdvertiseBand: boolean;
@@ -39,6 +43,7 @@ function normalize(raw: Record<string, unknown>): HomepageConfig {
       Object.entries((raw.railArticles as Record<string, unknown>) || {}).map(([key, value]) => [key, ids(value)]),
     ),
     moreArticles: ids(raw.moreArticles),
+    leaderArticles: ids(raw.leaderArticles),
     showAds: raw.showAds !== false,
     showNewsletter: raw.showNewsletter !== false,
     showAdvertiseBand: raw.showAdvertiseBand !== false,
@@ -174,20 +179,55 @@ function MultiPick({
   );
 }
 
+function Step({
+  n,
+  title,
+  children,
+  wide,
+}: {
+  n: number;
+  title: string;
+  children: React.ReactNode;
+  wide?: boolean;
+}) {
+  return (
+    <section className={cn("border border-rule bg-white p-6", wide && "lg:col-span-2")}>
+      <h2 className="mb-4 flex items-center gap-3 font-sans text-[0.95rem] font-semibold text-ink">
+        <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-ink text-[0.72rem] text-white tabular-nums">
+          {n}
+        </span>
+        {title}
+      </h2>
+      <div className="space-y-5">{children}</div>
+    </section>
+  );
+}
+
+const TOGGLES = [
+  ["showNewsletter", "Newsletter card", "\u201cStay Informed\u201d, beside Latest Articles."],
+  ["showAds", "Advertising", "Every ad slot on the homepage."],
+  ["showAdvertiseBand", "\u201cAdvertise with us\u201d band", "Below Latest Articles when no leaderboard ad is booked."],
+] as const;
+
 export default function HomepageAdminPage() {
   const [config, setConfig] = useState<HomepageConfig | null>(null);
   const [articles, setArticles] = useState<ArticleOpt[]>([]);
   const [categories, setCategories] = useState<CategoryOpt[]>([]);
+  const [issueSlugs, setIssueSlugs] = useState<string[]>([]);
   const [busy, setBusy] = useState(false);
   const { toast, element } = useToast();
 
   useEffect(() => {
-    api<{ homepage: Record<string, unknown>; articles: ArticleOpt[]; categories: CategoryOpt[] }>(
-      "/api/admin/homepage",
-    ).then((d) => {
+    api<{
+      homepage: Record<string, unknown>;
+      articles: ArticleOpt[];
+      categories: CategoryOpt[];
+      issueSlugs?: string[];
+    }>("/api/admin/homepage").then((d) => {
       setConfig(normalize(d.homepage));
       setArticles(d.articles);
       setCategories(d.categories);
+      setIssueSlugs(d.issueSlugs || []);
     });
   }, []);
 
@@ -207,6 +247,20 @@ export default function HomepageAdminPage() {
   const set = <K extends keyof HomepageConfig>(k: K, v: HomepageConfig[K]) =>
     setConfig({ ...config, [k]: v });
 
+  // Magazine features, in the order set in Admin -> Magazines.
+  const issueArticles = issueSlugs
+    .map((slug) => articles.find((a) => a.slug === slug))
+    .filter((a): a is ArticleOpt => Boolean(a));
+  const rowSections = categories.filter((c) => !NO_ROW.has(c.slug || ""));
+  const rails = config.categoryRails.filter((id) => rowSections.some((c) => c._id === id));
+  const interviewOptions = articles.filter((a) => a.format === "interview");
+
+  const magazinesLink = (
+    <Link href="/admin/magazines" className="font-semibold text-ink underline">
+      Magazines
+    </Link>
+  );
+
   return (
     <div>
       {element}
@@ -214,8 +268,8 @@ export default function HomepageAdminPage() {
         <div>
           <h1 className="headline text-[1.9rem]">Front Page</h1>
           <p className="mt-1 font-sans text-[0.875rem] text-muted">
-            Compose tomorrow&apos;s front page. Anything left automatic falls back to the
-            latest eligible story.
+            The homepage, top to bottom. Pick stories and set their order; any empty place fills
+            with the newest eligible story.
           </p>
         </div>
         <button type="button" onClick={save} disabled={busy} className="btn-primary disabled:opacity-60">
@@ -224,35 +278,54 @@ export default function HomepageAdminPage() {
       </header>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <div className="space-y-5 border border-rule bg-white p-6">
-          <h2 className="section-title">Lead & anchors</h2>
+        <Step n={1} title="Cover story carousel">
           <p className="border border-rule bg-paper-2 p-3 font-sans text-[0.8rem] text-ink-soft">
-            The lead carousel and &ldquo;Leaders in focus&rdquo; show the magazine issues. Set their
-            order in{" "}
-            <Link href="/admin/magazines" className="font-semibold text-ink underline">
-              Magazines
-            </Link>
-            .
+            The carousel shows every magazine issue, featured issue first. Set the order and the
+            featured issue in {magazinesLink}.
           </p>
-          <ArticleSelect
-            label="The Interview"
-            value={config.interviewArticle}
-            onChange={(v) => set("interviewArticle", v)}
-            articles={articles.filter((a) => a.format === "interview").length
-              ? articles.filter((a) => a.format === "interview")
-              : articles}
-          />
-        </div>
+        </Step>
 
-        <div className="space-y-5 border border-rule bg-white p-6">
-          <h2 className="section-title">Page furniture</h2>
-          {(
-            [
-              ["showAds", "Show advertising", "Reserved slots render the house ad when unsold."],
-              ["showNewsletter", "Show newsletter signup", "The Morning Letter module."],
-              ["showAdvertiseBand", "Show the advertise band", "The dark band near the footer."],
-            ] as const
-          ).map(([key, label, hint]) => (
+        <Step n={2} title="Must Read">
+          <MultiPick
+            label="Stories"
+            hint="The list beside the carousel. Empty places fill with the most-read stories."
+            values={config.featuredArticles}
+            onChange={(v) => set("featuredArticles", v)}
+            options={articles}
+            max={4}
+          />
+        </Step>
+
+        <Step n={3} title="Leaders in Focus">
+          <MultiPick
+            label="Magazine features"
+            hint="Three profile cards. Empty places fill with the next issues in the magazine order."
+            values={config.leaderArticles.filter((id) => issueArticles.some((a) => a._id === id))}
+            onChange={(v) => set("leaderArticles", v)}
+            options={issueArticles}
+            max={3}
+          />
+        </Step>
+
+        <Step n={4} title="The Digital Magazine">
+          <p className="border border-rule bg-paper-2 p-3 font-sans text-[0.8rem] text-ink-soft">
+            Shows the first three covers in the magazine order. Change it in {magazinesLink}.
+          </p>
+        </Step>
+
+        <Step n={5} title="Latest Articles">
+          <MultiPick
+            label="Stories"
+            hint="Two rows of three. Empty places fill with the newest stories."
+            values={config.briefingArticles}
+            onChange={(v) => set("briefingArticles", v)}
+            options={articles}
+            max={6}
+          />
+        </Step>
+
+        <Step n={6} title="Newsletter, ads & partnerships band">
+          {TOGGLES.map(([key, label, hint]) => (
             <button
               key={key}
               type="button"
@@ -278,71 +351,62 @@ export default function HomepageAdminPage() {
               </span>
             </button>
           ))}
-        </div>
+        </Step>
 
-        <div className="border border-rule bg-white p-6">
-          <MultiPick
-            label="Must Read"
-            hint="The panel beside the lead carousel. Leave empty to show the most-read stories."
-            values={config.featuredArticles}
-            onChange={(v) => set("featuredArticles", v)}
-            options={articles}
-            max={5}
+        <Step n={7} title="The Interview">
+          <ArticleSelect
+            label="Story"
+            hint="After the world news band."
+            value={config.interviewArticle}
+            onChange={(v) => set("interviewArticle", v)}
+            articles={interviewOptions.length ? interviewOptions : articles}
           />
-        </div>
+        </Step>
 
-        <div className="border border-rule bg-white p-6">
+        <Step n={8} title="Section rows" wide>
           <MultiPick
-            label="Top story & latest"
-            hint="The first is the Top Story panel; the rest fill the row beneath it. Leave empty for the newest stories."
-            values={config.briefingArticles}
-            onChange={(v) => set("briefingArticles", v)}
-            options={articles}
-            max={4}
-          />
-        </div>
-
-        <div className="border border-rule bg-white p-6 lg:col-span-2">
-          <MultiPick
-            label="Section rails"
-            hint="Which sections get a row on the front page."
-            values={config.categoryRails}
+            label="Sections, in order"
+            hint="Each gets a row of four stories. Women in Business and Magazine have their own pages, so they never get a row."
+            values={rails}
             onChange={(v) => set("categoryRails", v)}
-            options={categories}
+            options={rowSections}
             max={6}
           />
-        </div>
-
-        {config.categoryRails.map((categoryId) => {
-          const section = categories.find((c) => c._id === categoryId);
-          if (!section) return null;
-          const inSection = articles.filter(
-            (a) => a.category === categoryId || (a.categories || []).includes(categoryId),
-          );
-          return (
-            <div key={categoryId} className="border border-rule bg-white p-6">
-              <MultiPick
-                label={`${section.name} row`}
-                hint="Stories for this row, in order. Empty places fill with the section's newest stories."
-                values={config.railArticles[categoryId] || []}
-                onChange={(v) => set("railArticles", { ...config.railArticles, [categoryId]: v })}
-                options={inSection}
-                max={4}
-              />
+          {rails.length ? (
+            <div className="grid gap-5 lg:grid-cols-2">
+              {rails.map((categoryId) => {
+                const section = rowSections.find((c) => c._id === categoryId);
+                if (!section) return null;
+                const inSection = articles.filter(
+                  (a) => a.category === categoryId || (a.categories || []).includes(categoryId),
+                );
+                return (
+                  <div key={categoryId} className="border border-rule p-4">
+                    <MultiPick
+                      label={`${section.name} row`}
+                      hint="Empty places fill with the section's newest stories."
+                      values={config.railArticles[categoryId] || []}
+                      onChange={(v) => set("railArticles", { ...config.railArticles, [categoryId]: v })}
+                      options={inSection}
+                      max={4}
+                    />
+                  </div>
+                );
+              })}
             </div>
-          );
-        })}
+          ) : null}
+        </Step>
 
-        <div className="border border-rule bg-white p-6">
+        <Step n={9} title="More from PrimeCrest" wide>
           <MultiPick
-            label="More from PrimeCrest"
-            hint="The last row of stories. Empty places fill with the newest stories not shown above."
+            label="Stories"
+            hint="The last row. Empty places fill with the newest stories not shown above."
             values={config.moreArticles}
             onChange={(v) => set("moreArticles", v)}
             options={articles}
             max={4}
           />
-        </div>
+        </Step>
       </div>
     </div>
   );
