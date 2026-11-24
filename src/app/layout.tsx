@@ -79,8 +79,8 @@ const sans = localFont({
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl()),
   title: {
-    default: `${SITE.name} — ${SITE.tagline}`,
-    template: `%s — ${SITE.name}`,
+    default: `${SITE.name} | ${SITE.slogan}`,
+    template: `%s | ${SITE.name}`,
   },
   description: SITE.description,
   applicationName: SITE.name,
@@ -91,7 +91,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     siteName: SITE.name,
-    title: `${SITE.name} — ${SITE.tagline}`,
+    title: `${SITE.name} | ${SITE.slogan}`,
     description: SITE.description,
     url: siteUrl(),
     locale: "en_US",
@@ -100,13 +100,13 @@ export const metadata: Metadata = {
         url: "/og.jpg",
         width: 1200,
         height: 630,
-        alt: `${SITE.name} — ${SITE.slogan}`,
+        alt: `${SITE.name} | ${SITE.slogan}`,
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: `${SITE.name} — ${SITE.tagline}`,
+    title: `${SITE.name} | ${SITE.slogan}`,
     description: SITE.description,
     images: ["/og.jpg"],
   },

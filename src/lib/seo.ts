@@ -17,8 +17,10 @@ type SeoInput = {
 };
 
 export function buildMetadata(input: SeoInput): Metadata {
-  const title =
-    input.title === SITE.name ? SITE.name : `${input.title} · ${SITE.name}`;
+  // Absolute, so the layout's "%s | PrimeCrest" template does not add the name twice.
+  const title = {
+    absolute: input.title === SITE.name ? `${SITE.name} | ${SITE.slogan}` : `${input.title} | ${SITE.name}`,
+  };
   const description = input.description || SITE.description;
   const url = siteUrl(input.path || "/");
   const image = input.image || siteUrl("/og.jpg");

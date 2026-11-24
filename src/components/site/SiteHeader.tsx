@@ -112,7 +112,7 @@ export function SiteHeader({
         </div>
       </header>
 
-      {/* Section bar — sticky on desktop */}
+      {/* Section bar, sticky on desktop */}
       <nav className="sticky top-0 z-40 hidden border-y border-white/15 bg-brand lg:block" aria-label="Sections">
         <div className="relative mx-auto flex h-[54px] max-w-[1320px] items-center justify-center gap-12 px-6">
           {visibleItems.map((item) => (

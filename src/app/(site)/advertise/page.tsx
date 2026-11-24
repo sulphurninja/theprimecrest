@@ -20,7 +20,7 @@ const AUDIENCE = [
 const OFFERINGS = [
   {
     title: "Reserved display",
-    body: "Fixed placements across the homepage, section fronts, and long-form features. One advertiser per slot, per period — your brand never rotates in a lottery.",
+    body: "Fixed placements across the homepage, section fronts, and long-form features. One advertiser per slot, per period, so your brand never rotates in a lottery.",
   },
   {
     title: "Issue sponsorship",
