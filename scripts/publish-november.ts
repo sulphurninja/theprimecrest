@@ -6,7 +6,8 @@
  * public/issues/<slug>/ and are uploaded to Cloudinary so the story works
  * before the next deploy.
  *
- * Run: node --env-file=.env.local --import tsx scripts/publish-november.ts [--draft]
+ * Run: node --env-file=.env.local --import tsx scripts/publish-november.ts [--draft] [--refresh-covers]
+ * --refresh-covers re-uploads magcover.jpg after a cover is re-exported.
  */
 import { readFileSync } from "fs";
 import path from "path";
@@ -50,6 +51,7 @@ async function upload(slug: string, file: string) {
 
 async function main() {
   const draft = process.argv.includes("--draft");
+  const refreshCovers = process.argv.includes("--refresh-covers");
   await dbConnect();
   const [magazine, affairs, women, home, author] = await Promise.all([
     Category.findOne({ slug: "magazine" }),
@@ -67,9 +69,9 @@ async function main() {
     ) as Copy;
     const existing = await Article.findOne({ slug: copy.articleSlug }).lean();
 
-    const [cover, wide] = existing?.magazineCover
-      ? [existing.magazineCover, existing.coverImage]
-      : await Promise.all([upload(issue.slug, "magcover.jpg"), upload(issue.slug, "wide.jpg")]);
+    const cover =
+      existing?.magazineCover && !refreshCovers ? existing.magazineCover : await upload(issue.slug, "magcover.jpg");
+    const wide = existing?.coverImage || (await upload(issue.slug, "wide.jpg"));
 
     const categories = [affairs._id, magazine._id, issue.women ? women?._id : null, home?._id].filter(
       Boolean,

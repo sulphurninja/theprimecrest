@@ -167,8 +167,8 @@ export default function CategoriesPage() {
               <div>
                 <span className="admin-label">Magazines</span>
                 <p className="mb-2 font-sans text-[0.72rem] text-muted">
-                  Covers shown on this section. A click opens the feature article. Turn on Digital
-                  magazine on a story to add it here.
+                  Covers shown on this section; a click opens the feature. Any magazine story
+                  filed in this section shows automatically. Tick others to add them as well.
                 </p>
                 {magazineOptions.length ? (
                   <div className="grid max-h-48 gap-1.5 overflow-y-auto border border-rule p-2">

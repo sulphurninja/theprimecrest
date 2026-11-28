@@ -7,6 +7,7 @@ import { ImageField } from "@/components/admin/MediaPicker";
 import { RichTextEditor } from "@/components/admin/RichTextEditor";
 import { useToast } from "@/components/admin/ui";
 import { slugify, cn } from "@/lib/utils";
+import { PdfFlipbookField } from "@/components/admin/PdfFlipbookField";
 
 type Option = { _id: string; name: string };
 
@@ -416,6 +417,22 @@ export function ArticleForm({ initial }: { initial: ArticleFormValue }) {
                 checked={value.magazineEnabled}
                 onChange={(v) => set("magazineEnabled", v)}
               />
+              <div className="mt-3">
+                <PdfFlipbookField
+                  slug={value.slug || slugify(value.title)}
+                  title={value.title}
+                  issueLabel={value.magazineIssue}
+                  description={value.dek}
+                  onPublished={({ url, cover }) =>
+                    setValue((v) => ({
+                      ...v,
+                      magazineEnabled: true,
+                      magazineUrl: url,
+                      magazineCover: v.magazineCover || cover,
+                    }))
+                  }
+                />
+              </div>
               <div className="mt-3">
                 <Field
                   label="Magazine link"

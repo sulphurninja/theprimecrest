@@ -13,7 +13,7 @@ async function updateSocials() {
     {
       $set: {
         "socials.twitter": "",
-        "socials.instagram": "https://www.instagram.com/primecrest_",
+        "socials.instagram": "https://www.instagram.com/theprimecrestmagazine",
         "socials.linkedin": "",
         "socials.facebook": "",
         "socials.youtube": "",

@@ -204,7 +204,7 @@ export default async function StoryPage({ params }: Props) {
 
         {sidebarAd ? (
           <div className="mt-12">
-            <AdUnit slot={sidebarAd.slot} campaign={sidebarAd.campaign} className="mx-auto max-w-[300px]" />
+            <AdUnit slot={sidebarAd.slot} campaign={sidebarAd.campaign} />
           </div>
         ) : null}
       </div>

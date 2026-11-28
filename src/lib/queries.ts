@@ -188,9 +188,17 @@ export async function getRelatedArticles(articleId: string, categoryId: string, 
 export async function getSectionMagazines(slug: string) {
   await dbConnect();
   const category = await Category.findOne({ slug }).select("magazines").lean();
-  const ids = (category?.magazines || []).map(String);
-  if (!ids.length) return [];
-  const items = await Article.find({ _id: { $in: ids }, status: "published" })
+  if (!category) return [];
+  const ids = (category.magazines || []).map(String);
+  // Hand-picked issues (Admin -> Categories) plus every magazine story filed in
+  // this section, so ticking the section on a magazine story is enough.
+  const items = await Article.find({
+    status: "published",
+    $or: [
+      { _id: { $in: ids } },
+      { magazineEnabled: true, magazineCover: { $nin: ["", null] }, categories: category._id },
+    ],
+  })
     .select("title slug magazineCover ogImage coverImage magazineEnabled publishedAt")
     .lean();
   // Same order as everywhere else (Admin -> Magazines); anything else after, newest first.
@@ -397,7 +405,7 @@ export async function getHomePayload() {
     all.find((a) => a.format === "interview");
 
   const usedIds = new Set(
-    [hero, cover, interview, ...featured, ...briefing]
+    [hero, cover, ...featured, ...briefing]
       .filter(Boolean)
       .map((a) => String(a!._id)),
   );

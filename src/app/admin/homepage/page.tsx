@@ -50,39 +50,6 @@ function normalize(raw: Record<string, unknown>): HomepageConfig {
   };
 }
 
-function ArticleSelect({
-  label,
-  hint,
-  value,
-  onChange,
-  articles,
-}: {
-  label: string;
-  hint?: string;
-  value: string | null;
-  onChange: (v: string | null) => void;
-  articles: ArticleOpt[];
-}) {
-  return (
-    <label className="block">
-      <span className="admin-label">{label}</span>
-      <select
-        value={value || ""}
-        onChange={(e) => onChange(e.target.value || null)}
-        className="admin-input"
-      >
-        <option value="">Automatic (latest eligible)</option>
-        {articles.map((a) => (
-          <option key={a._id} value={a._id}>
-            {a.title}
-          </option>
-        ))}
-      </select>
-      {hint ? <span className="mt-1 block font-sans text-[0.72rem] text-muted">{hint}</span> : null}
-    </label>
-  );
-}
-
 function MultiPick({
   label,
   hint,
@@ -253,7 +220,6 @@ export default function HomepageAdminPage() {
     .filter((a): a is ArticleOpt => Boolean(a));
   const rowSections = categories.filter((c) => !NO_ROW.has(c.slug || ""));
   const rails = config.categoryRails.filter((id) => rowSections.some((c) => c._id === id));
-  const interviewOptions = articles.filter((a) => a.format === "interview");
 
   const magazinesLink = (
     <Link href="/admin/magazines" className="font-semibold text-ink underline">
@@ -278,25 +244,14 @@ export default function HomepageAdminPage() {
       </header>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <Step n={1} title="Cover story carousel">
+        <Step n={1} title="Latest Editions carousel">
           <p className="border border-rule bg-paper-2 p-3 font-sans text-[0.8rem] text-ink-soft">
-            The carousel shows every magazine issue, featured issue first. Set the order and the
-            featured issue in {magazinesLink}.
+            The 3D cover carousel at the top shows every magazine issue, featured issue in front.
+            Set the order and the featured issue in {magazinesLink}.
           </p>
         </Step>
 
-        <Step n={2} title="Must Read">
-          <MultiPick
-            label="Stories"
-            hint="The list beside the carousel. Empty places fill with the most-read stories."
-            values={config.featuredArticles}
-            onChange={(v) => set("featuredArticles", v)}
-            options={articles}
-            max={4}
-          />
-        </Step>
-
-        <Step n={3} title="Leaders in Focus">
+        <Step n={2} title="Leaders in Focus">
           <MultiPick
             label="Magazine features"
             hint="Three profile cards. Empty places fill with the next issues in the magazine order."
@@ -307,13 +262,18 @@ export default function HomepageAdminPage() {
           />
         </Step>
 
-        <Step n={4} title="The Digital Magazine">
-          <p className="border border-rule bg-paper-2 p-3 font-sans text-[0.8rem] text-ink-soft">
-            Shows the first three covers in the magazine order. Change it in {magazinesLink}.
-          </p>
+        <Step n={3} title="Must Read">
+          <MultiPick
+            label="Stories"
+            hint="The list beside Leaders in Focus. Empty places fill with the most-read stories."
+            values={config.featuredArticles}
+            onChange={(v) => set("featuredArticles", v)}
+            options={articles}
+            max={4}
+          />
         </Step>
 
-        <Step n={5} title="Latest Articles">
+        <Step n={4} title="Latest Articles">
           <MultiPick
             label="Stories"
             hint="Two rows of three. Empty places fill with the newest stories."
@@ -324,7 +284,7 @@ export default function HomepageAdminPage() {
           />
         </Step>
 
-        <Step n={6} title="Newsletter, ads & partnerships band">
+        <Step n={5} title="Newsletter, ads & partnerships band">
           {TOGGLES.map(([key, label, hint]) => (
             <button
               key={key}
@@ -353,17 +313,7 @@ export default function HomepageAdminPage() {
           ))}
         </Step>
 
-        <Step n={7} title="The Interview">
-          <ArticleSelect
-            label="Story"
-            hint="After the world news band."
-            value={config.interviewArticle}
-            onChange={(v) => set("interviewArticle", v)}
-            articles={interviewOptions.length ? interviewOptions : articles}
-          />
-        </Step>
-
-        <Step n={8} title="Section rows" wide>
+        <Step n={6} title="Section rows" wide>
           <MultiPick
             label="Sections, in order"
             hint="Each gets a row of four stories. Women in Business and Magazine have their own pages, so they never get a row."
@@ -397,7 +347,7 @@ export default function HomepageAdminPage() {
           ) : null}
         </Step>
 
-        <Step n={9} title="More from PrimeCrest" wide>
+        <Step n={7} title="More from PrimeCrest" wide>
           <MultiPick
             label="Stories"
             hint="The last row. Empty places fill with the newest stories not shown above."

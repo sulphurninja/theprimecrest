@@ -68,10 +68,13 @@ export function SiteHeader({
   socials?: Socials;
 }) {
   const magazine = { label: "Magazine", href: "/magazine" };
+  const about = { label: "About", href: "/about" };
   const contact = { label: "Contact", href: "/contact" };
-  // Magazine sits right after the lead section.
+  // Magazine sits right after the lead section; About and Contact close the bar.
   const placeFixed = (items: { label: string; href: string }[]) =>
-    items.length === 0 ? [magazine, contact] : [items[0], magazine, ...items.slice(1), contact];
+    items.length === 0
+      ? [magazine, about, contact]
+      : [items[0], magazine, ...items.slice(1), about, contact];
 
   const sectionHref = (c: NavItem) => (c.slug === "home" ? "/" : `/c/${c.slug}`);
   const sections = categories.filter((c) => c.slug !== "magazine");
@@ -102,9 +105,9 @@ export function SiteHeader({
           </Link>
         </div>
 
-        <div className="mx-auto hidden max-w-[1320px] flex-col items-center px-6 pb-6 pt-8 lg:flex">
-          <Wordmark name={siteName} className="text-[3.1rem] text-white" />
-          <p className="mt-3 flex items-center gap-4 font-display text-[1.08rem] italic tracking-[0.02em] text-gold-soft">
+        <div className="mx-auto hidden max-w-[1320px] flex-col items-center px-6 pb-3.5 pt-5 lg:flex">
+          <Wordmark name={siteName} className="text-[2.5rem] text-white" />
+          <p className="mt-1.5 flex items-center gap-4 font-display text-[0.98rem] italic tracking-[0.02em] text-gold-soft">
             <span className="h-px w-12 bg-gold-soft/60" aria-hidden />
             {SITE.slogan}
             <span className="h-px w-12 bg-gold-soft/60" aria-hidden />
@@ -114,12 +117,12 @@ export function SiteHeader({
 
       {/* Section bar, sticky on desktop */}
       <nav className="sticky top-0 z-40 hidden border-y border-white/15 bg-brand lg:block" aria-label="Sections">
-        <div className="relative mx-auto flex h-[54px] max-w-[1320px] items-center justify-center gap-12 px-6">
+        <div className="relative mx-auto flex h-[46px] max-w-[1320px] items-center justify-center gap-11 px-6">
           {visibleItems.map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              className="relative whitespace-nowrap py-4 font-display text-[1.06rem] font-medium text-white/90 no-underline transition-colors after:absolute after:inset-x-0 after:bottom-0 after:h-[2px] after:origin-left after:scale-x-0 after:bg-gold-soft after:transition-transform hover:text-white hover:after:scale-x-100"
+              className="relative whitespace-nowrap py-3 font-display text-[1.02rem] font-medium text-white/90 no-underline transition-colors after:absolute after:inset-x-0 after:bottom-0 after:h-[2px] after:origin-left after:scale-x-0 after:bg-gold-soft after:transition-transform hover:text-white hover:after:scale-x-100"
             >
               {item.label}
             </Link>

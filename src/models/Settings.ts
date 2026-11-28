@@ -11,7 +11,7 @@ const SettingsSchema = new Schema(
     ogImage: { type: String, default: "" },
     socials: {
       twitter: { type: String, default: "" },
-      instagram: { type: String, default: "https://www.instagram.com/primecrest_" },
+      instagram: { type: String, default: "https://www.instagram.com/theprimecrestmagazine" },
       linkedin: { type: String, default: "" },
       facebook: { type: String, default: "" },
       youtube: { type: String, default: "" },

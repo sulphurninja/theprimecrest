@@ -28,6 +28,7 @@
     "nanoid": "^6.0.1",
     "next": "16.3.1",
     "page-flip": "^2.0.7",
+    "pdfjs-dist": "4.10.38",
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "sanitize-html": "^2.17.7",

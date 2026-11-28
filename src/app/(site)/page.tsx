@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { AdUnit } from "@/components/site/AdUnit";
 import { ArticleCard, type CardArticle } from "@/components/site/ArticleCard";
-import { HeroCarousel } from "@/components/site/HeroCarousel";
+import { CoverFlow } from "@/components/site/CoverFlow";
 import { Reveal } from "@/components/site/Reveal";
 import { NewsDesk } from "@/components/site/NewsDesk";
 import { NewsletterForm } from "@/components/site/NewsletterForm";
@@ -123,13 +123,11 @@ export default async function HomePage() {
 
   return (
     <div>
-      {/* Lead + Must Read */}
-      <div className={`${container} pt-8`}>
-        <HeroCarousel articles={heroArticles} mustRead={mustRead} issues={issues} />
-      </div>
+      {/* Latest editions: 3D cover carousel */}
+      {issues.length ? <CoverFlow issues={issues} /> : null}
 
-      {/* Leaders in Focus | The Digital Magazine */}
-      <section className={`${container} grid grid-cols-1 gap-12 pt-16 lg:grid-cols-12 lg:gap-0`}>
+      {/* Leaders in Focus | Must Read */}
+      <section className={`${container} grid grid-cols-1 gap-12 pt-14 lg:grid-cols-12 lg:gap-0`}>
         {leaders.length ? (
           <div className="lg:col-span-7 lg:border-r lg:border-gold/50 lg:pr-10">
             <SectionTitle title="Leaders in Focus" href="/magazine" linkLabel="View all profiles" />
@@ -167,36 +165,37 @@ export default async function HomePage() {
           </div>
         ) : null}
 
-        {issues.length ? (
-          <div className={leaders.length ? "lg:col-span-5 lg:pl-10" : "lg:col-span-12"}>
-            <SectionTitle title="The Digital Magazine" href="/magazine" linkLabel="Latest editions" />
-            <div className="grid grid-cols-3 items-end gap-4">
-              {issues.slice(0, 3).map((issue) => (
-                <Link
-                  key={issue.articleSlug}
-                  href={`/story/${issue.articleSlug}`}
-                  className="group block no-underline"
-                  aria-label={`${issue.name}: read the feature`}
-                >
-                  <span className="relative block overflow-hidden bg-paper-3 shadow-[0_16px_32px_-18px_rgba(14,14,16,0.6)] transition-transform duration-500 group-hover:-translate-y-1">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={issue.cover}
-                      alt={`PrimeCrest magazine cover: ${issue.name}`}
-                      loading="lazy"
-                      className="block h-auto w-full"
-                    />
-                  </span>
-                </Link>
+        {mustRead.length ? (
+          <aside className={leaders.length ? "lg:col-span-5 lg:pl-10" : "lg:col-span-12"}>
+            <SectionTitle title="Must Read" href="/search" linkLabel="View all" />
+            <ul className="divide-y divide-ink/10">
+              {mustRead.map((a) => (
+                <li key={a._id} className="py-3.5 first:pt-0">
+                  <Link href={`/story/${a.slug}`} className="group grid grid-cols-[120px_1fr] items-center gap-4 no-underline">
+                    <span className="relative block aspect-[3/2] overflow-hidden bg-paper-2">
+                      {a.coverImage ? (
+                        <Image
+                          src={a.coverImage}
+                          alt=""
+                          fill
+                          className="object-cover transition-transform duration-700 group-hover:scale-105"
+                          sizes="120px"
+                        />
+                      ) : null}
+                    </span>
+                    <span className="min-w-0">
+                      <span className="block font-display text-[1.02rem] font-semibold leading-snug text-ink transition-colors line-clamp-2 group-hover:text-gold-deep">
+                        {a.title}
+                      </span>
+                      <span className="mt-1.5 block font-sans text-[0.68rem] font-semibold uppercase tracking-[0.1em] text-gold-deep">
+                        {[a.category?.name, a.readTime ? `${a.readTime} min read` : ""].filter(Boolean).join(" · ")}
+                      </span>
+                    </span>
+                  </Link>
+                </li>
               ))}
-            </div>
-            <div className="mt-7 text-center">
-              <Link href="/magazine" className="btn-primary group">
-                Explore the magazines
-                <ArrowIcon className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
-              </Link>
-            </div>
-          </div>
+            </ul>
+          </aside>
         ) : null}
       </section>
 
@@ -304,19 +303,9 @@ export default async function HomePage() {
         <NewsSection />
       </Suspense>
 
-      {/* The Interview */}
-      {payload.interview ? (
-        <section className={`${container} pt-16`}>
-          <Reveal>
-            <SectionTitle title="The Interview" />
-            <ArticleCard article={payload.interview as CardArticle} variant="standard" />
-          </Reveal>
-        </section>
-      ) : null}
-
       {mid ? (
         <div className={`${container} pt-16`}>
-          <AdUnit slot={mid.slot} campaign={mid.campaign} className="mx-auto max-w-[728px]" />
+          <AdUnit slot={mid.slot} campaign={mid.campaign} className="mx-auto max-w-[970px]" />
         </div>
       ) : null}
 

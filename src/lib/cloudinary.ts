@@ -26,9 +26,9 @@ export function getCloudinary() {
   return cloudinary;
 }
 
-export function uploadBuffer(buffer: Buffer, filename: string, mime: string) {
+export function uploadBuffer(buffer: Buffer, filename: string, mime: string, folderOverride?: string) {
   const client = getCloudinary();
-  const folder = process.env.CLOUDINARY_FOLDER || "primecrest";
+  const folder = folderOverride || process.env.CLOUDINARY_FOLDER || "primecrest";
   const resourceType = mime.startsWith("video/")
     ? "video"
     : mime.startsWith("audio/")
