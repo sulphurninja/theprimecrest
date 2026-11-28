@@ -69,3 +69,17 @@ export function timeAgo(value?: string | Date | null, now = Date.now()) {
   if (days < 7) return `${days}d ago`;
   return formatDate(value, { day: "numeric", month: "short", year: undefined });
 }
+
+/**
+ * An external link as typed in admin, made absolute: "magazines.theprimecrest.com/m/x"
+ * becomes "https://magazines.theprimecrest.com/m/x". Without a scheme the browser
+ * would treat it as a path on this site.
+ */
+export function absoluteUrl(value: unknown) {
+  const url = String(value ?? "").trim();
+  if (!url) return "";
+  if (/^https?:\/\//i.test(url)) return url;
+  if (url.startsWith("//")) return `https:${url}`;
+  if (url.startsWith("/")) return url;
+  return `https://${url.replace(/^:?\/+/, "")}`;
+}

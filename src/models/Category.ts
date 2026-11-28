@@ -11,6 +11,11 @@ const CategorySchema = new Schema(
     order: { type: Number, default: 0 },
     featured: { type: Boolean, default: true },
     magazines: [{ type: Schema.Types.ObjectId, ref: "Article" }],
+    // Show the "On the magazine stand" cover shelf on this section's page.
+    // Off: magazine features list as ordinary story cards.
+    showMagazineShelf: { type: Boolean, default: true },
+    // Stories pinned to the top of the section, in display order.
+    pinnedArticles: [{ type: Schema.Types.ObjectId, ref: "Article" }],
   },
   { timestamps: true },
 );

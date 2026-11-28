@@ -1,7 +1,7 @@
 import { dbConnect } from "@/lib/db";
 import { Article } from "@/models";
 import { requireAdmin, jsonError, jsonOk } from "@/lib/api";
-import { readingTime, slugify, excerptFromHtml } from "@/lib/utils";
+import { absoluteUrl, readingTime, slugify, excerptFromHtml } from "@/lib/utils";
 import { sanitizeArticleHtml } from "@/lib/sanitize";
 import { revalidatePath } from "next/cache";
 
@@ -55,7 +55,7 @@ export async function PUT(request: Request, ctx: Ctx) {
     body.publishedAt = new Date();
   }
   normalizeSections(body);
-  if ("magazineUrl" in body) body.magazineUrl = String(body.magazineUrl ?? "").trim();
+  if ("magazineUrl" in body) body.magazineUrl = absoluteUrl(body.magazineUrl);
   if ("magazineEnabled" in body) body.magazineEnabled = Boolean(body.magazineEnabled);
   if ("magazineIssue" in body) body.magazineIssue = String(body.magazineIssue ?? "").trim();
   if ("magazineRole" in body) body.magazineRole = String(body.magazineRole ?? "").trim();

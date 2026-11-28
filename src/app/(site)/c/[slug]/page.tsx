@@ -44,13 +44,19 @@ export default async function CategoryPage({ params, searchParams }: Props) {
   const page = Math.max(1, Number(pageParam) || 1);
   // Magazine stories sit on the cover shelf (page one), so the article list
   // leaves them out on every page and each page stays full.
-  const magazines = (await getSectionMagazines(category.slug).catch(() => [])) as MagazineShelfItem[];
+  // Sections can turn the shelf off (Admin -> Sections); their magazine
+  // features then list as ordinary story cards.
+  const showShelf = category.showMagazineShelf !== false;
+  const magazines = showShelf
+    ? ((await getSectionMagazines(category.slug).catch(() => [])) as MagazineShelfItem[])
+    : [];
   const [{ items, total }, topAd] = await Promise.all([
     getCategoryArticles(
       String(category._id),
       page,
       PAGE_SIZE,
       magazines.map((item) => item._id),
+      ((category.pinnedArticles as unknown[]) || []).map(String),
     ),
     getActiveAd("category-top").catch(() => null),
   ]);

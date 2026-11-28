@@ -3,7 +3,7 @@ import { demoAdsEnabled, demoCampaign, demoReplaces } from "@/lib/demo-ads";
 import { AD_SLOTS } from "@/lib/constants";
 import { cache } from "react";
 import { MAGAZINE_ISSUES, issueRank, type MagazineIssue } from "@/lib/magazines";
-import { serialize } from "@/lib/utils";
+import { absoluteUrl, serialize } from "@/lib/utils";
 import {
   Article,
   Category,
@@ -87,7 +87,7 @@ function issueFromArticle(a: IssueArticle): MagazineIssue {
     issue: a.magazineIssue || (month ? `The ${month} Issue` : "The Digital Issue"),
     title: coverLine(rest.join(":")) || a.dek || "",
     cover: a.magazineCover || a.coverImage || "",
-    magazineUrl: a.magazineUrl || "",
+    magazineUrl: absoluteUrl(a.magazineUrl),
     publishedAt: a.publishedAt,
   };
 }
@@ -238,24 +238,45 @@ export async function getCategoryArticles(
   limit = 12,
   /** Stories shown elsewhere on the page (the cover shelf), left out of the list. */
   excludeIds: string[] = [],
+  /** Stories pinned to the top, in order (Admin -> Sections); the rest follow newest first. */
+  pinnedIds: string[] = [],
 ) {
   await dbConnect();
-  const skip = (page - 1) * limit;
-  const filter = {
-    status: "published" as const,
-    ...inSection(categoryId),
-    ...(excludeIds.length ? { _id: { $nin: excludeIds } } : {}),
-  };
-  const [items, total] = await Promise.all([
-    Article.find(filter)
-      .sort({ publishedAt: -1, _id: -1 })
-      .skip(skip)
-      .limit(limit)
-      .populate(articlePopulate)
-      .lean(),
-    Article.countDocuments(filter),
+  const base = { status: "published" as const, ...inSection(categoryId) };
+  const excluded = new Set(excludeIds.map(String));
+
+  // Pinned stories that are still published, in this section and not on the shelf.
+  const pinnedDocs = pinnedIds.length
+    ? await Article.find({ ...base, _id: { $in: pinnedIds } })
+        .populate(articlePopulate)
+        .lean()
+    : [];
+  const byId = new Map(pinnedDocs.map((doc) => [String(doc._id), doc]));
+  const pinned = pinnedIds
+    .map(String)
+    .filter((id) => !excluded.has(id))
+    .map((id) => byId.get(id))
+    .filter(Boolean) as typeof pinnedDocs;
+
+  const skipIds = [...excluded, ...pinned.map((doc) => String(doc._id))];
+  const restFilter = { ...base, ...(skipIds.length ? { _id: { $nin: skipIds } } : {}) };
+  const offset = (page - 1) * limit;
+  const pinnedSlice = pinned.slice(offset, offset + limit);
+  const restSkip = Math.max(0, offset - pinned.length);
+  const restLimit = limit - pinnedSlice.length;
+
+  const [rest, restTotal] = await Promise.all([
+    restLimit > 0
+      ? Article.find(restFilter)
+          .sort({ publishedAt: -1, _id: -1 })
+          .skip(restSkip)
+          .limit(restLimit)
+          .populate(articlePopulate)
+          .lean()
+      : Promise.resolve([]),
+    Article.countDocuments(restFilter),
   ]);
-  return { items: serialize(items), total };
+  return { items: serialize([...pinnedSlice, ...rest]), total: pinned.length + restTotal };
 }
 
 export async function getAuthorBySlug(slug: string) {

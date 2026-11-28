@@ -13,9 +13,10 @@ export async function PUT(request: Request, ctx: Ctx) {
   const body = await request.json();
   await dbConnect();
   if (body.name || body.slug) body.slug = slugify(body.slug || body.name);
-  if (Array.isArray(body.magazines)) {
-    body.magazines = [...new Set(body.magazines.map(String).filter(Boolean))];
+  for (const key of ["magazines", "pinnedArticles"] as const) {
+    if (Array.isArray(body[key])) body[key] = [...new Set(body[key].map(String).filter(Boolean))];
   }
+  if ("showMagazineShelf" in body) body.showMagazineShelf = body.showMagazineShelf !== false;
   const item = await Category.findByIdAndUpdate(id, body, { new: true });
   if (!item) return jsonError("Category not found", 404);
   revalidatePath("/");

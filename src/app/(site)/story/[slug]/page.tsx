@@ -10,7 +10,7 @@ import { SectionTitle } from "@/components/site/SectionHead";
 import { ShareBar } from "@/components/site/ShareBar";
 import { getActiveAd, getPublishedArticle, getRelatedArticles } from "@/lib/queries";
 import { buildMetadata, newsArticleJsonLd } from "@/lib/seo";
-import { formatDate, siteUrl } from "@/lib/utils";
+import { absoluteUrl, formatDate, siteUrl } from "@/lib/utils";
 
 export const revalidate = 120;
 
@@ -52,7 +52,7 @@ export default async function StoryPage({ params }: Props) {
   ]);
 
   const magazineHref =
-    article.magazineEnabled === false ? "" : String(article.magazineUrl || "").trim();
+    article.magazineEnabled === false ? "" : absoluteUrl(article.magazineUrl);
 
   const jsonLd = newsArticleJsonLd({
     headline: article.title,
