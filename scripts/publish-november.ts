@@ -8,6 +8,7 @@
  *
  * Run: node --env-file=.env.local --import tsx scripts/publish-november.ts [--draft] [--refresh-covers]
  * --refresh-covers re-uploads magcover.jpg after a cover is re-exported.
+ * --only <slug> touches one issue and leaves the others (and any admin edits) alone.
  */
 import { readFileSync } from "fs";
 import path from "path";
@@ -52,6 +53,8 @@ async function upload(slug: string, file: string) {
 async function main() {
   const draft = process.argv.includes("--draft");
   const refreshCovers = process.argv.includes("--refresh-covers");
+  const onlyIndex = process.argv.indexOf("--only");
+  const only = onlyIndex >= 0 ? process.argv[onlyIndex + 1] : null;
   await dbConnect();
   const [magazine, affairs, women, home, author] = await Promise.all([
     Category.findOne({ slug: "magazine" }),
@@ -63,7 +66,7 @@ async function main() {
   if (!magazine || !affairs || !author) throw new Error("Missing magazine/affairs category or author");
 
   const now = Date.now();
-  for (const issue of ISSUES) {
+  for (const issue of ISSUES.filter((item) => !only || item.slug === only)) {
     const copy = JSON.parse(
       readFileSync(path.join(ROOT, "scripts", "november", `${issue.slug}.json`), "utf8"),
     ) as Copy;
