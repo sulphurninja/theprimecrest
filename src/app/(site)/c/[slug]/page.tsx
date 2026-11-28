@@ -1,5 +1,5 @@
 import { Fragment } from "react";
-import Link from "next/link";
+import { Pagination } from "@/components/site/Pagination";
 import { notFound, redirect } from "next/navigation";
 import { AdUnit } from "@/components/site/AdUnit";
 import { ArticleCard, type CardArticle } from "@/components/site/ArticleCard";
@@ -10,7 +10,10 @@ import { buildMetadata } from "@/lib/seo";
 
 export const revalidate = 120;
 
+/** A lead story plus a 3 x 4 grid on page one; 12 a page after that. */
 const PAGE_SIZE = 13;
+/** Covers on the section's magazine shelf; the rest live on /magazine. */
+const SHELF_SIZE = 8;
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -39,15 +42,21 @@ export default async function CategoryPage({ params, searchParams }: Props) {
   if (!category) notFound();
 
   const page = Math.max(1, Number(pageParam) || 1);
-  const [{ items, total }, topAd, magazines] = await Promise.all([
-    getCategoryArticles(String(category._id), page, PAGE_SIZE),
+  // Magazine stories sit on the cover shelf (page one), so the article list
+  // leaves them out on every page and each page stays full.
+  const magazines = (await getSectionMagazines(category.slug).catch(() => [])) as MagazineShelfItem[];
+  const [{ items, total }, topAd] = await Promise.all([
+    getCategoryArticles(
+      String(category._id),
+      page,
+      PAGE_SIZE,
+      magazines.map((item) => item._id),
+    ),
     getActiveAd("category-top").catch(() => null),
-    page === 1 ? getSectionMagazines(category.slug).catch(() => []) : Promise.resolve([]),
   ]);
 
-  const shelf = magazines as MagazineShelfItem[];
-  const shelfIds = new Set(shelf.map((item) => item._id));
-  const articles = (items as CardArticle[]).filter((article) => !shelfIds.has(article._id));
+  const shelf = page === 1 ? magazines.slice(0, SHELF_SIZE) : [];
+  const articles = items as CardArticle[];
   const lead = page === 1 ? articles[0] : null;
   const rest = page === 1 ? articles.slice(1) : articles;
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
@@ -83,7 +92,12 @@ export default async function CategoryPage({ params, searchParams }: Props) {
       {shelf.length ? (
         <section className="relative left-1/2 right-1/2 -mx-[50vw] w-screen bg-paper-2">
           <div className="mx-auto max-w-[1320px] px-4 py-16 sm:px-6">
-            <SectionTitle eyebrow="The covers · Newest first" title="On the magazine stand" href="/magazine" linkLabel="Every issue" />
+            <SectionTitle
+              eyebrow="The covers · Newest first"
+              title="On the magazine stand"
+              href="/magazine"
+              linkLabel={magazines.length > SHELF_SIZE ? `All ${magazines.length} editions` : "Every issue"}
+            />
             <MagazineCoverGrid items={shelf} issues={await getMagazineIssues()} />
           </div>
         </section>
@@ -117,36 +131,12 @@ export default async function CategoryPage({ params, searchParams }: Props) {
             ))}
           </section>
 
-          {totalPages > 1 ? (
-            <nav
-              className="flex items-center justify-between border-t border-ink/10 py-8"
-              aria-label="Pagination"
-            >
-              {page > 1 ? (
-                <Link
-                  href={`/c/${category.slug}?page=${page - 1}`}
-                  className="btn-outline !px-4 !py-2"
-                >
-                  ← Newer
-                </Link>
-              ) : (
-                <span />
-              )}
-              <span className="meta">
-                Page {page} of {totalPages}
-              </span>
-              {page < totalPages ? (
-                <Link
-                  href={`/c/${category.slug}?page=${page + 1}`}
-                  className="btn-outline !px-4 !py-2"
-                >
-                  Older →
-                </Link>
-              ) : (
-                <span />
-              )}
-            </nav>
-          ) : null}
+          <Pagination
+            page={page}
+            totalPages={totalPages}
+            href={(n) => (n === 1 ? `/c/${category.slug}` : `/c/${category.slug}?page=${n}`)}
+            className="border-t border-ink/10"
+          />
         </>
       ) : null}
     </div>

@@ -232,17 +232,28 @@ export async function getCategoryBySlug(slug: string) {
   return category ? serialize(category) : null;
 }
 
-export async function getCategoryArticles(categoryId: string, page = 1, limit = 12) {
+export async function getCategoryArticles(
+  categoryId: string,
+  page = 1,
+  limit = 12,
+  /** Stories shown elsewhere on the page (the cover shelf), left out of the list. */
+  excludeIds: string[] = [],
+) {
   await dbConnect();
   const skip = (page - 1) * limit;
+  const filter = {
+    status: "published" as const,
+    ...inSection(categoryId),
+    ...(excludeIds.length ? { _id: { $nin: excludeIds } } : {}),
+  };
   const [items, total] = await Promise.all([
-    Article.find({ status: "published", ...inSection(categoryId) })
+    Article.find(filter)
       .sort({ publishedAt: -1, _id: -1 })
       .skip(skip)
       .limit(limit)
       .populate(articlePopulate)
       .lean(),
-    Article.countDocuments({ status: "published", ...inSection(categoryId) }),
+    Article.countDocuments(filter),
   ]);
   return { items: serialize(items), total };
 }

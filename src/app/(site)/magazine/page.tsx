@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { PageHero } from "@/components/site/PageHero";
+import { Pagination } from "@/components/site/Pagination";
 import { buildMetadata } from "@/lib/seo";
 import { getMagazineIssues } from "@/lib/queries";
 
@@ -12,9 +13,16 @@ export const metadata = buildMetadata({
   path: "/magazine",
 });
 
+/** Covers per page: three rows of four. */
+const PAGE_SIZE = 12;
+
 /** Every edition as a plain cover grid, in the order set in Admin -> Magazines. */
-export default async function MagazinePage() {
-  const issues = await getMagazineIssues();
+export default async function MagazinePage({ searchParams }: { searchParams: Promise<{ page?: string }> }) {
+  const { page: pageParam } = await searchParams;
+  const all = await getMagazineIssues();
+  const totalPages = Math.max(1, Math.ceil(all.length / PAGE_SIZE));
+  const page = Math.min(totalPages, Math.max(1, Number(pageParam) || 1));
+  const issues = all.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   return (
     <div>
@@ -46,6 +54,13 @@ export default async function MagazinePage() {
             );
           })}
         </div>
+
+        <Pagination
+          page={page}
+          totalPages={totalPages}
+          href={(n) => (n === 1 ? "/magazine" : `/magazine?page=${n}`)}
+          className="mt-6"
+        />
       </div>
     </div>
   );
