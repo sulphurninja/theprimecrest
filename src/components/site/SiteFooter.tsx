@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Wordmark } from "@/components/site/Logo";
+import { CREST_LOWER, CREST_UPPER, FULL_STOP, LETTERS, LOGO_VIEWBOX } from "@/components/site/logo-paths";
 import { BackToTop } from "@/components/site/BackToTop";
 import {
   FacebookIcon,
@@ -82,7 +83,7 @@ export function SiteFooter({
   ].filter((s) => s.url);
 
   return (
-    <footer className="mt-20 bg-brand text-white">
+    <footer className="mt-20 overflow-hidden bg-brand text-white">
       <div className="mx-auto max-w-[1320px] px-4 py-14 sm:px-6">
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-8">
           <div className="lg:col-span-4 lg:border-r lg:border-white/20 lg:pr-8">
@@ -145,6 +146,17 @@ export function SiteFooter({
             <BackToTop />
           </div>
         </div>
+      </div>
+      {/* The masthead in outline, full width, bleeding off the bottom of the page. */}
+      <div className="mx-auto max-w-[1320px] px-4 pt-6 sm:px-6" aria-hidden>
+        <svg viewBox={LOGO_VIEWBOX} className="-mb-[1.5%] block w-full select-none">
+          <g fill="none" stroke="rgba(228,201,143,0.24)" strokeWidth="2.5">
+            <path d={CREST_UPPER} vectorEffect="non-scaling-stroke" />
+            <path d={CREST_LOWER} vectorEffect="non-scaling-stroke" />
+            <path d={LETTERS} vectorEffect="non-scaling-stroke" />
+            <path d={FULL_STOP} vectorEffect="non-scaling-stroke" />
+          </g>
+        </svg>
       </div>
     </footer>
   );
